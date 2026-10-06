@@ -271,8 +271,9 @@ class Engine {
     await writeJson(path.join(this.root, 'ready.json'), { minecraft: MC, neoforge: NF, launcher: 'electron', created: new Date().toISOString() });
     this.progress('Instalação concluída.', 1, 1);
   }
-  async buildArguments(nickname, ram) {
+  async buildArguments(nickname, ram, account) {
     validateOptions({ mode: 'nickname', nickname, ram });
+    if (account && (account.name !== nickname || !/^[a-f0-9]{32}$/i.test(account.id) || typeof account.accessToken !== 'string' || !account.accessToken || !Number.isFinite(account.expires) || account.expires <= Date.now())) throw new Error('Sessão Microsoft inválida ou expirada. Faça login novamente.');
     const vanilla = await readJson(this.versionFile(MC)), neo = await readJson(this.versionFile(VERSION));
     const merged = new Map();
     for (const library of [...vanilla.libraries, ...neo.libraries]) {
@@ -299,9 +300,9 @@ class Engine {
     const replacements = {
       auth_player_name: nickname, version_name: VERSION, game_directory: this.game,
       assets_root: path.join(this.game, 'assets'), assets_index_name: vanilla.assetIndex.id,
-      auth_uuid: offlineUuid(nickname), auth_access_token: '0', clientid: '', auth_xuid: '',
-      user_type: 'legacy', version_type: 'release', natives_directory: natives,
-      launcher_name: 'HollowSMP', launcher_version: '2.0.0', classpath: classpath.join(';'),
+      auth_uuid: account?.id || offlineUuid(nickname), auth_access_token: account?.accessToken || '0', clientid: account?.clientId || '', auth_xuid: account?.xuid || '',
+      user_type: account ? 'msa' : 'legacy', version_type: 'release', natives_directory: natives,
+      launcher_name: 'HollowSMP', launcher_version: require('../package.json').version, classpath: classpath.join(';'),
       library_directory: libraries, classpath_separator: ';', user_properties: '{}',
     };
     const expand = argument => String(argument).replace(/\$\{([^}]+)\}/g, (_, name) => {
@@ -312,18 +313,31 @@ class Engine {
       `-DignoreList=client-extra,${VERSION}.jar,${MC}.jar`, neo.mainClass,
       ...[vanilla, neo].flatMap(version => argumentsOf(version, 'game').map(expand))];
   }
-  async launch(nickname, ram) {
+  async launch(nickname, ram, account) {
     if (this.gameProcess && this.gameProcess.exitCode === null) throw new Error('O Minecraft já está aberto.');
-    const argumentsList = await this.buildArguments(nickname, ram);
+    const argumentsList = await this.buildArguments(nickname, ram, account);
     const argumentFile = path.join(this.root, 'game-args.txt');
+    await fs.writeFile(argumentFile, '', { mode: 0o600 });
+    if (account && this.platform === 'win32') {
+      // Java needs an argument file for Windows command length limits. Protect it before writing credentials.
+      const script = "$ErrorActionPreference='Stop'; $file=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('" + Buffer.from(argumentFile).toString('base64') + "')); $acl=New-Object Security.AccessControl.FileSecurity; $acl.SetAccessRuleProtection($true,$false); $sid=[Security.Principal.WindowsIdentity]::GetCurrent().User; $acl.SetOwner($sid); $acl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule($sid,'FullControl','Allow'))); $acl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule((New-Object Security.Principal.SecurityIdentifier('S-1-5-18')),'FullControl','Allow'))); [IO.File]::SetAccessControl($file,$acl)";
+      try { await runFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-EncodedCommand', Buffer.from(script, 'utf16le').toString('base64')], { windowsHide: true, timeout: 15000 }); }
+      catch { await fs.rm(argumentFile, { force: true }); throw new Error('Não consegui proteger a sessão no Windows. Verifique o acesso à pasta HollowSMP e tente novamente.'); }
+    }
     await fs.writeFile(argumentFile, argumentsList.map(value => `"${value.replaceAll('\\', '\\\\').replaceAll('"', '\\"')}"`).join('\n'), 'utf8');
     const output = createWriteStream(path.join(this.root, 'game-launch.log'), { flags: 'w' });
     output.write(`Hollow Launcher Electron — ${new Date().toISOString()}\n`);
     const child = spawn(this.java, [`@${argumentFile}`], { cwd: this.game, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
     this.gameProcess = child;
-    child.stdout.pipe(output, { end: false }); child.stderr.pipe(output, { end: false });
-    child.once('close', code => { output.end(`\nExit code: ${code}\n`); if (this.gameProcess === child) this.gameProcess = null; this.report({ text: code === 0 ? 'Minecraft fechado.' : 'O Minecraft encerrou. Confira game-launch.log.', gameRunning: false }); });
-    await new Promise((resolve, reject) => { child.once('spawn', resolve); child.once('error', reject); });
+    const cleanupArgs = () => fs.rm(argumentFile, { force: true }).catch(() => {});
+    const { redactedLog } = require('./redacted-log.cjs');
+    child.stdout.pipe(redactedLog(account?.accessToken)).pipe(output, { end: false });
+    child.stderr.pipe(redactedLog(account?.accessToken)).pipe(output, { end: false });
+    // First Java output means the VM has parsed the argument file.
+    child.stdout.once('data', cleanupArgs); child.stderr.once('data', cleanupArgs);
+    child.once('close', code => { cleanupArgs(); output.end(`\nExit code: ${code}\n`); if (this.gameProcess === child) this.gameProcess = null; this.report({ text: code === 0 ? 'Minecraft fechado.' : 'O Minecraft encerrou. Confira game-launch.log.', gameRunning: false }); });
+    try { await new Promise((resolve, reject) => { child.once('spawn', resolve); child.once('error', reject); }); }
+    catch (error) { await cleanupArgs(); output.end(); this.gameProcess = null; throw error; }
     return child.pid;
   }
   async javaRunning() {

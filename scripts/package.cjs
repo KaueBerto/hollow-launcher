@@ -13,6 +13,7 @@ const metadata = require('../package.json');
   const zip = new AdmZip();
   zip.addLocalFile(exe, '', 'HollowSMP-Launcher.exe');
   zip.addLocalFile(path.join(root, 'docs', 'LEIA-ME.txt'));
+  zip.addLocalFile(path.join(root, 'docs', 'MICROSOFT.md'));
   zip.addLocalFile(path.join(root, 'THIRD-PARTY.txt'));
   zip.addLocalFolder(path.join(root, 'licenses'), 'licenses');
   // Chromium notices are distributed by Electron alongside its runtime.

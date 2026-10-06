@@ -18,8 +18,10 @@ function render() {
   $('#nickname').hidden = microsoft;
   $('#account-note').hidden = !microsoft;
   $('#remember').disabled = current.busy || microsoft;
-  $('#official').hidden = !microsoft || current.busy;
-  $('#play').textContent = current.busy ? 'PREPARANDO…' : current.gameRunning ? 'JOGO ABERTO' : !current.ready ? 'INSTALAR E JOGAR' : microsoft ? 'ABRIR MINECRAFT' : 'JOGAR';
+  $('#account-note').textContent = current.account?.name || 'Conta Microsoft';
+  $('#logout').hidden = !microsoft || !current.account || current.busy || current.gameRunning;
+  $('#cancel-login').hidden = !current.authPending;
+  $('#play').textContent = current.authPending ? 'AGUARDANDO LOGIN…' : current.busy ? 'PREPARANDO…' : current.gameRunning ? 'JOGO ABERTO' : microsoft && !current.account ? 'ENTRAR E JOGAR' : !current.ready ? 'INSTALAR E JOGAR' : 'JOGAR';
   for (const element of document.querySelectorAll('#reset, #play, #nickname, #ram, [name=mode]')) element.disabled = current.busy || element.id === 'play' && current.gameRunning;
   $('#close').disabled = current.busy;
   $('#ram-value').textContent = `${$('#ram').value} GB`;
@@ -47,7 +49,8 @@ function save() {
 }
 $('#minimize').addEventListener('click', () => window.hollow.minimize());
 $('#close').addEventListener('click', () => window.hollow.close());
-$('#official').addEventListener('click', () => window.hollow.downloadOfficial());
+$('#logout').addEventListener('click', () => execute(() => window.hollow.logout()));
+$('#cancel-login').addEventListener('click', () => window.hollow.cancelLogin());
 $('#play-form').addEventListener('submit', event => { event.preventDefault(); if (!current.busy) execute(() => window.hollow.play(options())); });
 $('#ram').addEventListener('input', () => { render(); save(); });
 $('#nickname').addEventListener('input', save);

@@ -1,4 +1,4 @@
-HOLLOW SMP LAUNCHER — 2.0.2 — Electron
+HOLLOW SMP LAUNCHER — 2.1.0-rc.1 — Electron
 
 1. Extraia o pacote e abra HollowSMP-Launcher.exe.
 2. Escolha Nickname ou Microsoft e ajuste a memória na barra.
@@ -7,9 +7,10 @@ HOLLOW SMP LAUNCHER — 2.0.2 — Electron
 5. Confirme os avisos do AutoModpack. Se ele pedir reinício, feche
    o jogo, abra novamente pelo launcher e volte ao servidor.
 
-Microsoft usa o Minecraft Launcher oficial e exige acesso ao Minecraft
-Java na conta. Faça login no programa oficial e feche-o antes de criar
-o perfil. Depois selecione a instalação Hollow SMP no launcher oficial.
+Microsoft abre a autorização no navegador e inicia o Minecraft direto.
+PRÉVIA: falta o cadastro aprovado do Hollow para ativar esse login.
+O responsável deve seguir docs/MICROSOFT.md antes de distribuir para
+contas Microsoft. Nickname continua disponível.
 Nickname não autentica uma conta Microsoft: o servidor precisa permitir
 esse modo de entrada. O Hollow não coleta senhas de conta.
 
@@ -43,6 +44,6 @@ e as preferências são reaproveitadas. Não é preciso instalar Node.js.
 
 DURANTE O JOGO
 O launcher se esconde quando o Minecraft inicia e retorna ao fechar.
-No modo Microsoft, aguarda você iniciar Hollow SMP no programa oficial.
+Microsoft também abre o jogo diretamente após a autorização.
 Para abrir durante a partida, use o ícone perto do relógio ou abra o
 executável novamente. Não é preciso deixar a janela na frente do jogo.

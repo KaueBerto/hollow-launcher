@@ -8,7 +8,8 @@ contextBridge.exposeInMainWorld('hollow', Object.freeze({
   reset: () => ipcRenderer.invoke('launcher:reset'),
   minimize: () => ipcRenderer.send('window:minimize'),
   close: () => ipcRenderer.send('window:close'),
-  downloadOfficial: () => ipcRenderer.invoke('launcher:official-download'),
+  logout: () => ipcRenderer.invoke('launcher:logout'),
+  cancelLogin: () => ipcRenderer.send('launcher:cancel-login'),
   onState: callback => {
     const listener = (_, state) => callback(state);
     ipcRenderer.on('launcher:changed', listener);

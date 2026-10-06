@@ -48,3 +48,7 @@ Flutuação com ciclo de oito segundos, deslocamento vertical de 14 px, lateral 
 ## Janela escondida — 2.0.2
 
 16 testes passaram, incluindo ocultar/restaurar, reabertura manual, acompanhamento Microsoft, falha de consulta e cancelamento de consulta antiga. A interface Electron confirmou esconder e restaurar uma BrowserWindow real. O detector Windows identificou e acompanhou o encerramento de um processo Java de teste isolado; não foi realizado login Microsoft real.
+
+## Prévia 2.1.0-rc.1 — Microsoft direto
+
+Integração OAuth PKCE implementada; nenhum launcher oficial é aberto. Oito testes novos verificam callback local/state/PKCE, renovação, cancelamento, recusa da API, conta sem acesso ao Java, ausência de criptografia, argumentos online e ocultação de tokens. Serviços Microsoft/Xbox/Minecraft simulados; conta real e servidor autenticado ainda não validados. O smoke Electron verifica nome de conta, cancelamento e criptografia Windows real. Um Java real verificou a proteção do arquivo de argumentos e sua remoção ao encerrar. Consulte MICROSOFT.md: falta Client ID próprio aprovado.

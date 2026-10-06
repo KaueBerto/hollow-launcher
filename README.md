@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/logo_smp.png" alt="Hollow SMP" width="260"></p>
 <h1 align="center">Hollow Launcher</h1>
 <p align="center">Launcher Electron do Hollow SMP para Windows.<br>Instalação automática, visual pixelado e modpack pelo AutoModpack.</p>
-<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-8b2de2"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.0.2-8b2de2"></p>
+<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-8b2de2"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.1.0-rc.1-8b2de2"></p>
 
 ![Interface do Hollow Launcher](docs/launcher.png)
 
@@ -37,9 +37,11 @@ A pasta `%LOCALAPPDATA%\HollowSMP` e as preferências da versão 1.x são reapro
 | Modo | Funcionamento |
 | --- | --- |
 | Nickname | Inicia diretamente com um nome de 3 a 16 letras, números ou `_`. Não autentica uma conta Microsoft; a entrada depende de o servidor permitir esse modo. |
-| Microsoft | Cria o perfil Hollow SMP no **Minecraft Launcher oficial**, que faz o login e inicia o jogo. Exige acesso ao Minecraft Java na conta. |
+| Microsoft | Autoriza a conta no navegador e inicia o Minecraft diretamente pelo Hollow. Exige acesso ativo ao Minecraft Java e cadastro do aplicativo aprovado. |
 
-Para Microsoft, instale o programa oficial, faça login uma vez e feche-o. Depois prepare o perfil pelo Hollow e selecione **Hollow SMP** no launcher oficial. Os arquivos de perfis recebem backup antes da primeira alteração. O Hollow não coleta senhas nem implementa OAuth próprio.
+O launcher oficial não é necessário. O Hollow usa OAuth com PKCE no navegador do sistema, valida o acesso ao Minecraft Java e utiliza seu nome e UUID oficiais. O refresh token é protegido pelo Windows via Electron `safeStorage`; senha e access tokens não são salvos na conta. **Sair da conta** remove a sessão salva. O botão **Cancelar login** encerra a autorização em andamento.
+
+**Integração em prévia:** o Client ID do Hollow ainda não foi fornecido/aprovado. Sem esse cadastro, Microsoft exibe uma mensagem de configuração pendente antes de baixar o jogo. Nickname continua funcionando. O login com uma conta real só poderá ser validado após a aprovação. Consulte [o cadastro Microsoft](docs/MICROSOFT.md).
 
 A autenticação do servidor é responsabilidade da configuração da VPS. Este projeto não altera essas regras.
 
@@ -55,7 +57,7 @@ Feche Minecraft e outros programas Java antes. O reset recusa processos `java`/`
 
 - Windows 10 ou 11 de 64 bits.
 - Internet, espaço para o jogo/modpack e memória suficiente para o pack.
-- Minecraft Launcher oficial para Microsoft.
+- Conta com Minecraft Java para Microsoft, e aplicativo Hollow registrado/aprovado.
 
 O jogador não precisa instalar Node.js, Electron, Java ou um SDK. A barra de RAM não verifica a capacidade física: deixe memória livre para Windows e outros programas.
 
@@ -72,7 +74,7 @@ npm run build
 npm run package
 ```
 
-`build` gera `dist/HollowSMP-Launcher-2.0.2.exe`, um executável portátil. `package` gera `dist/HollowSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
+`build` gera `dist/HollowSMP-Launcher-2.1.0-rc.1.exe`, um executável portátil. `package` gera `dist/HollowSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
 
 O executável não possui certificado de assinatura de código do Hollow. Para uma distribuição assinada, configure seu certificado no electron-builder.
 
@@ -83,6 +85,8 @@ src/main.cjs       Janela Electron, estado e IPC
 src/preload.cjs    API limitada exposta à interface
 src/game-window.cjs Visibilidade e acompanhamento do jogo
 src/engine.cjs     Instalação, reset, perfis e inicialização do jogo
+src/microsoft-auth.cjs Login Microsoft, sessão protegida e perfil Java
+src/microsoft-config.cjs Client ID público próprio do Hollow (pendente)
 renderer/         HTML, CSS, eventos e animação
 assets/           Logo, ícone, fontes e AutoModpack original
 scripts/          Smoke test, integração opcional e distribuição
@@ -96,7 +100,7 @@ Versões do jogo e servidor ficam em `src/engine.cjs`. O layout está em `render
 
 ## Verificações e problemas
 
-`npm test` verifica UUID, manifestos, caminhos, preferências, reset, arquivos ocupados, junctions, ZIPs, downloads e preservação de perfis Microsoft. `npm run test:ui` abre a interface em renderização isolada, testa os controles e gera screenshots. Todos os dados de teste ficam em `dist/`.
+`npm test` verifica UUID, manifestos, caminhos, preferências, reset, arquivos ocupados, junctions, ZIPs, downloads e autenticação Microsoft simulada. `npm run test:ui` abre a interface em renderização isolada, testa os controles e a criptografia Windows, e gera screenshots. Todos os dados de teste ficam em `dist/`.
 
 A integração opcional `node scripts/verify-engine.cjs <pasta>` prepara o jogo e abre um cliente de teste. Ela exige uma pasta isolada chamada `electron-install-test` ou `runtime-download-test`, e encerra apenas o cliente que iniciou. Não use a instalação do jogador.
 
@@ -111,4 +115,4 @@ O código original e a identidade visual do Hollow SMP não recebem licença de 
 Projeto independente do Hollow SMP, sem vínculo oficial com Mojang ou Microsoft.
 ## Enquanto o Minecraft está aberto
 
-O Hollow se esconde ao iniciar o Minecraft e volta quando o jogo encerra. No modo Microsoft, aguarda o jogo Hollow SMP iniciar pelo launcher oficial. Para abrir o Hollow durante a partida, use o ícone perto do relógio: clique duas vezes ou escolha **Mostrar launcher**. Abrir o executável novamente também traz a janela existente.
+O Hollow se esconde ao iniciar o Minecraft diretamente, em ambos os modos, e volta quando o jogo encerra. Para abrir o Hollow durante a partida, use o ícone perto do relógio: clique duas vezes ou escolha **Mostrar launcher**. Abrir o executável novamente também traz a janela existente.

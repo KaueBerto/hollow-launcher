@@ -1,17 +1,17 @@
 'use strict';
-const { app, BrowserWindow, ipcMain, shell, Tray, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, Tray, Menu, safeStorage } = require('electron');
 const path = require('node:path');
 const fs = require('node:fs/promises');
-const { spawn } = require('node:child_process');
 const { Engine, validateOptions, exists } = require('./engine.cjs');
-const { GameWindow, OfficialGameWatcher } = require('./game-window.cjs');
+const { GameWindow } = require('./game-window.cjs');
+const { MicrosoftAuth } = require('./microsoft-auth.cjs');
 
 const smoke = process.argv.includes('--smoke-ui');
 const integration = process.argv.includes('--verify-engine');
 const verifyRootIndex = process.argv.indexOf('--test-root');
 const verifyOutputIndex = process.argv.indexOf('--test-output');
 if (smoke) app.disableHardwareAcceleration();
-let window, engine, tray, officialWatcher;
+let window, engine, tray, microsoft;
 const gameWindow = new GameWindow(() => window);
 const state = { busy: false, ready: false, gameRunning: false, text: '', percent: null };
 const pagePath = path.join(__dirname, '..', 'renderer', 'index.html');
@@ -44,7 +44,7 @@ async function prepare(operation) {
   finally { publish({ busy: false, ready: await engine.ready(), text: '', percent: null }); }
 }
 function registerHandlers() {
-  ipcMain.handle('launcher:state', async event => { trusted(event); return { ...state, ready: await engine.ready(), settings: await engine.loadSettings(), version: app.getVersion() }; });
+  ipcMain.handle('launcher:state', async event => { trusted(event); return { ...state, account: await microsoft.publicAccount(), ready: await engine.ready(), settings: await engine.loadSettings(), version: app.getVersion() }; });
   ipcMain.handle('launcher:save', async (event, options) => {
     trusted(event);
     return result(async () => { if (state.busy) return {}; await engine.saveSettings(options); return {}; });
@@ -55,21 +55,12 @@ function registerHandlers() {
       const selected = validateOptions(options);
       if (state.gameRunning || engine.gameProcess) throw new Error('O Minecraft já está aberto.');
       await engine.saveSettings(selected);
+      const account = selected.mode === 'microsoft' ? await microsoft.authenticate() : undefined;
+      publish({ account: await microsoft.publicAccount() });
       if (!await engine.ready()) await engine.install();
-      officialWatcher.stop();
-      if (selected.mode === 'microsoft') {
-        // Locate the official app before copying libraries or changing its profiles.
-        const official = await engine.officialLocation();
-        await engine.registerOfficial(selected.ram);
-        if (official.startsWith('shell:')) {
-          await new Promise((resolve, reject) => { const child = spawn('explorer.exe', [official], { windowsHide: true, detached: true, stdio: 'ignore' }); child.once('error', reject); child.once('spawn', () => { child.unref(); resolve(); }); });
-        } else {
-          const error = await shell.openPath(official); if (error) throw new Error('Não consegui abrir o Minecraft Launcher oficial.');
-        }
-        officialWatcher.start();
-        return { message: 'No launcher oficial, selecione Hollow SMP e clique em Jogar. O Hollow ficará escondido enquanto o jogo estiver aberto.' };
-      }
-      const pid = await engine.launch(selected.nickname, selected.ram);
+      // A first installation can outlast a short session. Refresh before launching.
+      const identity = account ? await microsoft.authenticate() : undefined;
+      const pid = await engine.launch(identity?.name || selected.nickname, selected.ram, identity);
       publish({ gameRunning: true });
       return { pid };
     }));
@@ -80,11 +71,17 @@ function registerHandlers() {
       if (state.gameRunning) throw new Error('Feche o Minecraft antes de resetar.');
       publish({ text: 'Limpando a instalação…' });
       await engine.reset();
+      microsoft.session = null;
+      publish({ account: null });
       await engine.install();
       return { settings: await engine.loadSettings(), message: 'Instalação renovada. Clique em Jogar e entre no servidor para receber o modpack.' };
     }));
   });
-  ipcMain.handle('launcher:official-download', async event => { trusted(event); await shell.openExternal('https://www.minecraft.net/download'); return { ok: true }; });
+  ipcMain.handle('launcher:logout', async event => { trusted(event); return result(async () => {
+    if (state.busy || state.gameRunning) throw new Error('Feche o jogo e aguarde a preparação para sair da conta.');
+    await microsoft.logout(); publish({ account: null }); return {};
+  }); });
+  ipcMain.on('launcher:cancel-login', event => { trusted(event); microsoft.cancel(); });
   ipcMain.on('window:minimize', event => { trusted(event); window.minimize(); });
   ipcMain.on('window:close', event => { trusted(event); if (!state.busy) window.close(); });
 }
@@ -114,6 +111,15 @@ async function smokeUi() {
     return ['16 trocas de conta: OK','Memória sincronizada: OK','Animação CSS ativa: OK','Fonte incorporada: OK','Interface sem Node: OK','Confirmação e cancelamento de reset: OK'];
   })()`);
   report.push('Launcher escondido durante o jogo e restaurado ao fechar: OK');
+  if (!safeStorage.isEncryptionAvailable()) throw new Error('Criptografia Windows indisponível no teste.');
+  const protectedToken = safeStorage.encryptString('hollow-test-token');
+  if (protectedToken.includes(Buffer.from('hollow-test-token')) || safeStorage.decryptString(protectedToken) !== 'hollow-test-token') throw new Error('Proteção da sessão falhou.');
+  report.push('Criptografia Windows de sessão: OK');
+  publish({ authPending: true, busy: true, account: { name: 'HollowTeste' } });
+  await window.webContents.executeJavaScript(`document.querySelector('[value="microsoft"]').checked=true; render(); if(document.querySelector('#cancel-login').hidden || document.querySelector('#account-note').textContent!=='HollowTeste') throw new Error('Controles do login Microsoft');`);
+  publish({ authPending: false, busy: false, account: null });
+  report.push('Nome de conta e cancelamento Microsoft: OK');
+  await window.webContents.executeJavaScript(`document.querySelector('[value="nickname"]').click()`);
   await fs.writeFile(path.join(output, 'nickname.png'), (await window.webContents.capturePage()).toPNG());
   await window.webContents.executeJavaScript(`document.querySelector('[value="microsoft"]').click()`);
   await new Promise(resolve => setTimeout(resolve, 100));
@@ -127,7 +133,7 @@ app.whenReady().then(async () => {
   const testRoot = (smoke || integration) && verifyRootIndex >= 0 ? path.resolve(process.argv[verifyRootIndex + 1]) : undefined;
   if ((smoke || integration) && !testRoot) throw new Error('As verificações exigem --test-root para isolar os dados do jogador.');
   engine = new Engine({ root: testRoot, assets: app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '..', 'assets'), report: update => publish(update) });
-  officialWatcher = new OfficialGameWatcher({ readPids: () => state.busy ? Promise.reject(new Error('Preparação em andamento.')) : engine.hollowGamePids(), started: () => publish({ gameRunning: true }), ended: () => publish({ gameRunning: false }) });
+  microsoft = new MicrosoftAuth({ root: engine.root, storage: safeStorage, openBrowser: url => shell.openExternal(url), report: publish });
   if (integration) {
     await engine.install();
     await engine.buildArguments('HollowTeste', 4);
@@ -169,4 +175,4 @@ app.whenReady().then(async () => {
   app.exit(1);
 });
 app.on('window-all-closed', () => app.quit());
-app.on('before-quit', () => { officialWatcher?.stop(); });
+app.on('before-quit', () => { microsoft?.cancel(); });
