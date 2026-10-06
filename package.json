@@ -1,6 +1,6 @@
 {
   "name": "hollow-launcher",
-  "version": "2.1.0-rc.2",
+  "version": "2.1.0-rc.3",
   "description": "Launcher Electron do Hollow SMP para Windows",
   "author": "Hollow SMP",
   "license": "UNLICENSED",
@@ -30,6 +30,7 @@
       "src/**/*.cjs",
       "renderer/**/*",
       "assets/logo_smp.png",
+      "assets/end-background.png",
       "assets/hollow.ico",
       "assets/Monocraft*.ttf",
       "package.json"

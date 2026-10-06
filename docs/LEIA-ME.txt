@@ -1,4 +1,4 @@
-HOLLOW SMP LAUNCHER — 2.1.0-rc.2 — Electron
+HOLLOW SMP LAUNCHER — 2.1.0-rc.3 — Electron
 
 1. Extraia o pacote e abra HollowSMP-Launcher.exe.
 2. Escolha Nickname ou Microsoft e ajuste a memória na barra.
@@ -52,3 +52,9 @@ MOTION DESIGN
 Entrada suave, botões com brilho discreto e efeito de pressão, troca de
 conta animada, barra de progresso e avisos com transições suaves.
 Respeita a opção do Windows de reduzir movimentos e pausa ao ocultar.
+
+AMBIENTE DO END
+Cenário local, névoa e partículas discretas. O portal reage ao clicar
+em Jogar e durante a preparação. O painel mostra status, jogadores
+e ping reais, com atualização automática ou pelo botão circular.
+Se mostrar Sem resposta, você ainda pode tentar entrar normalmente.

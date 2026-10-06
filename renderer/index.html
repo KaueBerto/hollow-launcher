@@ -9,6 +9,7 @@
   <script defer src="app.js"></script>
 </head>
 <body>
+  <div class="ambient" aria-hidden="true"><div class="end-scene"></div><div class="end-mist"></div><div class="particles"></div></div>
   <header class="titlebar">
     <div class="drag-region" aria-hidden="true"></div>
     <nav aria-label="Janela">
@@ -18,6 +19,10 @@
     </nav>
   </header>
   <main>
+    <section class="server-status" aria-label="Status do servidor Hollow SMP">
+      <div class="server-heading"><span class="server-dot" aria-hidden="true"></span><span id="server-label">Consultando servidor…</span><button type="button" id="refresh-server" class="icon-action" aria-label="Atualizar status do servidor"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M12 6A5 5 0 1 0 13 10M12 2v4H8"/></svg></button></div>
+      <p id="server-details">Hollow SMP</p>
+    </section>
     <section class="controls" aria-label="Jogar">
       <h1>HOLLOW LAUNCHER</h1>
       <form id="play-form">

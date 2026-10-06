@@ -2,16 +2,17 @@
 const { app, BrowserWindow, ipcMain, shell, Tray, Menu, safeStorage } = require('electron');
 const path = require('node:path');
 const fs = require('node:fs/promises');
-const { Engine, validateOptions, exists } = require('./engine.cjs');
+const { Engine, validateOptions, SERVER } = require('./engine.cjs');
 const { GameWindow } = require('./game-window.cjs');
 const { MicrosoftAuth } = require('./microsoft-auth.cjs');
+const { queryServer, ServerMonitor } = require('./server-status.cjs');
 
 const smoke = process.argv.includes('--smoke-ui');
 const integration = process.argv.includes('--verify-engine');
 const verifyRootIndex = process.argv.indexOf('--test-root');
 const verifyOutputIndex = process.argv.indexOf('--test-output');
 if (smoke) app.disableHardwareAcceleration();
-let window, engine, tray, microsoft;
+let window, engine, tray, microsoft, serverMonitor;
 const gameWindow = new GameWindow(() => window);
 const state = { busy: false, ready: false, gameRunning: false, text: '', percent: null };
 const pagePath = path.join(__dirname, '..', 'renderer', 'index.html');
@@ -44,6 +45,7 @@ async function prepare(operation) {
   finally { publish({ busy: false, ready: await engine.ready(), text: '', percent: null }); }
 }
 function registerHandlers() {
+  ipcMain.handle('launcher:server-refresh', async event => { trusted(event); if (!smoke) await serverMonitor.refresh(true); return { ok: true }; });
   ipcMain.handle('launcher:state', async event => { trusted(event); return { ...state, account: await microsoft.publicAccount(), ready: await engine.ready(), settings: await engine.loadSettings(), version: app.getVersion() }; });
   ipcMain.handle('launcher:save', async (event, options) => {
     trusted(event);
@@ -140,7 +142,17 @@ async function smokeUi() {
   await window.webContents.executeJavaScript(`if(getComputedStyle(document.querySelector('.controls')).opacity!=='1' || getComputedStyle(document.querySelector('.brand')).opacity!=='1') throw new Error('Interface sumiu ao trocar preferência de movimento');`);
   publish({ busy: false, ready: false, text: '', percent: null, account: null });
   report.push('Motion: conclusão sem travar controles e preferência por movimento reduzido: OK');
+  publish({ server: { kind: 'online', players: 3, maxPlayers: 100, ping: 23, checking: false } });
+  await window.webContents.executeJavaScript(`(async()=>{ const art = new Image(); art.src='../assets/end-background.png'; await art.decode(); if(art.naturalWidth<1000 || document.querySelectorAll('.end-particle').length!==18) throw new Error('Cenário e partículas'); if(!document.querySelector('#server-details').textContent.includes('3/100 jogadores · 23 ms')) throw new Error('Contagem e ping'); const button=document.querySelector('#play'), rect=button.getBoundingClientRect(); if(document.elementFromPoint(rect.x+rect.width/2,rect.y+rect.height/2)!==button) throw new Error('Atmosfera bloqueou botão'); })()`);
+  publish({ busy: true });
+  await new Promise(resolve=>setTimeout(resolve,700));
+  await window.webContents.executeJavaScript(`if(!document.querySelector('.brand').classList.contains('preparing') || Number(getComputedStyle(document.querySelector('.brand'),'::before').opacity)<.1) throw new Error('Portal não reagiu à preparação');`);
+  publish({ busy: false, server: { kind: 'unknown', players: null, maxPlayers: null, ping: null, checking: false } });
+  await window.webContents.executeJavaScript(`if(document.querySelector('#server-details').textContent.includes('3/100') || document.querySelector('.brand').classList.contains('preparing')) throw new Error('Estado antigo permaneceu na interface');`);
+  report.push('End: cenário carregado, partículas sem bloquear controles, portal reativo e status/ping sem dados inventados: OK');
+  publish({ busy: false, ready: false, gameRunning: false, text: '', percent: null, server: { kind: 'online', players: 0, maxPlayers: 20, ping: 19, checking: false } });
   await window.webContents.executeJavaScript(`document.querySelector('[value="nickname"]').click()`);
+  await new Promise(resolve=>setTimeout(resolve,800));
   await fs.writeFile(path.join(output, 'nickname.png'), (await window.webContents.capturePage()).toPNG());
   await window.webContents.executeJavaScript(`document.querySelector('[value="microsoft"]').click()`);
   await new Promise(resolve => setTimeout(resolve, 100));
@@ -175,6 +187,9 @@ app.whenReady().then(async () => {
   window.on('close', event => { if (state.busy) { event.preventDefault(); publish({ text: 'Aguarde a preparação terminar para fechar.' }); } });
   window.on('minimize', () => window.webContents.send('launcher:animation', false));
   window.on('restore', () => window.webContents.send('launcher:animation', true));
+  serverMonitor = new ServerMonitor({ query: () => { const [host, port] = SERVER.split(':'); return queryServer({ host, port: Number(port) }); }, report: server => publish({ server }), visible: () => window && !window.isDestroyed() && window.isVisible() && !window.isMinimized() });
+  window.on('show', () => { if (!smoke) serverMonitor.refresh(); });
+  window.on('restore', () => { if (!smoke) serverMonitor.refresh(); });
   if (!smoke) {
     tray = new Tray(path.join(__dirname, '..', 'assets', 'hollow.ico'));
     tray.setToolTip('Hollow SMP — Launcher');
@@ -187,7 +202,7 @@ app.whenReady().then(async () => {
   }
   await window.loadFile(pagePath);
   if (smoke) await new Promise(resolve => setTimeout(resolve, 300));
-  if (smoke) await smokeUi(); else window.show();
+  if (smoke) await smokeUi(); else { window.show(); serverMonitor.start(); }
 }).catch(async error => {
   if ((smoke || integration) && verifyOutputIndex >= 0) {
     const output = path.resolve(process.argv[verifyOutputIndex + 1]); await fs.mkdir(output, { recursive: true }); await fs.writeFile(path.join(output, 'error.txt'), error.stack || String(error));
@@ -196,4 +211,4 @@ app.whenReady().then(async () => {
   app.exit(1);
 });
 app.on('window-all-closed', () => app.quit());
-app.on('before-quit', () => { microsoft?.cancel(); });
+app.on('before-quit', () => { microsoft?.cancel(); serverMonitor?.stop(); });

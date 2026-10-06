@@ -56,3 +56,7 @@ Integração OAuth PKCE implementada; nenhum launcher oficial é aberto. Oito te
 ## Motion design — 2.1.0-rc.2
 
 Teste Electron: entrada concluída, 12 trocas rápidas de conta sem deslocar a área de entrada, fechamento animado e Escape nos avisos, confirmação de instalação e limpeza do indicador, movimento reduzido e mudança dessa preferência sem esconder a interface. A flutuação original da logo, memória e ocultar/restaurar o launcher continuam verificados.
+
+## Ambiente do End — 2.1.0-rc.3
+
+Seis testes do status Java: frames fragmentados e pong, servidor sem pong, timeout/dados inválidos, resolução SRV, cache/consulta simultânea/atualização manual e pausa de consultas com janela escondida. Consulta real ao Hollow SMP respondeu online, 0/20 jogadores e 19 ms nesta sessão; valores variam. A interface verifica arte carregada, 18 partículas que não bloqueiam controles, brilho durante preparação e limpeza de contagens após falha. Capturas do smoke usam dados de teste.

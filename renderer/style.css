@@ -1,13 +1,22 @@
 @font-face { font-family: Monocraft; src: url('../assets/Monocraft-Bold.ttf') format('truetype'); font-weight: 700; font-display: block; }
 :root { color-scheme: dark; font-family: Monocraft, monospace; font-weight: 700; --ink: #f0dcff; --muted: #ad94bd; --accent: #ba35f5; }
 * { box-sizing: border-box; }
-body { margin: 0; color: var(--ink); background: radial-gradient(ellipse at 74% 44%, #371144 0%, transparent 45%), linear-gradient(115deg, #130a1d, #261039); user-select: none; overflow: hidden; }
+body { margin: 0; color: var(--ink); background: #100917; user-select: none; overflow: hidden; }
+.ambient { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.ambient::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #100917bb 0%, #10091766 42%, #10091714 67%, #10091733 100%), linear-gradient(0deg, #0e081bbb, transparent 28%, transparent 84%, #0e081b77); }
+.end-scene { position: absolute; inset: -2%; background: url('../assets/end-background.png') center/cover no-repeat; opacity: .88; animation: scene-drift 40s ease-in-out infinite alternate; }
+.end-mist { position: absolute; inset: -20%; opacity: .17; background: radial-gradient(ellipse at 70% 70%, #ba3df55c, transparent 45%), radial-gradient(ellipse at 30% 80%, #9f63ff44, transparent 42%); animation: mist-drift 24s ease-in-out infinite alternate; }
+@keyframes scene-drift { from { transform: translate3d(-4px, 0, 0) scale(1); } to { transform: translate3d(4px, -3px, 0) scale(1.015); } }
+@keyframes mist-drift { from { transform: translate3d(-16px, 5px, 0); } to { transform: translate3d(16px, -8px, 0); } }
+.particles { position: absolute; inset: 0; z-index: 1; }
+.end-particle { position: absolute; left: var(--x); bottom: -12px; width: var(--size); height: var(--size); background: #d87aff; opacity: 0; box-shadow: 0 0 9px #c050ff50; animation: particle-rise var(--duration) var(--delay) linear infinite; }
+@keyframes particle-rise { 0% { opacity: 0; transform: translate3d(0, 0, 0); } 18%, 72% { opacity: var(--opacity); } 100% { opacity: 0; transform: translate3d(var(--drift), -570px, 0); } }
 button, input, output { font: inherit; }
 button { color: inherit; cursor: pointer; transition: color 160ms ease, background-color 160ms ease, box-shadow 180ms ease, transform 120ms ease, opacity 160ms ease; }
 button:disabled { cursor: default; opacity: .45; }
 button:focus-visible, input:focus-visible, .account-modes label:has(input:focus-visible) span { outline: 2px solid #de9bff; outline-offset: 5px; }
 [hidden] { display: none !important; }
-.titlebar { height: 54px; display: flex; align-items: flex-start; padding: 8px 12px 0 0; }
+.titlebar { position: relative; z-index: 1; height: 54px; display: flex; align-items: flex-start; padding: 8px 12px 0 0; }
 .drag-region { flex: 1; height: 46px; -webkit-app-region: drag; }
 .titlebar nav { display: flex; align-items: center; gap: 9px; -webkit-app-region: no-drag; }
 .text-action, .icon-action { border: 0; background: transparent; box-shadow: none; color: var(--muted); }
@@ -16,7 +25,15 @@ button:focus-visible, input:focus-visible, .account-modes label:has(input:focus-
 .text-action:active:enabled, .icon-action:active:enabled { transform: translateY(1px); }
 .icon-action { width: 34px; height: 34px; padding: 8px; }
 .icon-action svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; shape-rendering: crispEdges; }
-main { position: relative; height: 476px; }
+main { position: relative; z-index: 1; height: 476px; }
+.server-status { position: absolute; left: 74px; top: 9px; width: 326px; font-size: 10px; color: #c5b2d4; }
+.server-heading { display: flex; align-items: center; gap: 8px; height: 22px; }
+.server-dot { width: 5px; height: 5px; background: #89739b; flex-shrink: 0; transition: background-color 250ms ease, box-shadow 250ms ease; }
+.server-status[data-state="online"] .server-dot { background: #a3e6ae; box-shadow: 0 0 8px #a3e6ae40; }
+.server-status[data-state="unknown"] .server-dot { background: #cc9b82; }
+#refresh-server { margin-left: auto; width: 24px; height: 24px; padding: 5px; }
+#refresh-server svg { width: 14px; height: 14px; }
+#server-details { margin: 3px 0 0 13px; color: #a58db7; line-height: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .controls { position: absolute; left: 74px; top: 65px; width: 326px; }
 h1 { margin: 0 0 42px; color: #e290ff; font-size: 28px; line-height: 1.3; white-space: nowrap; letter-spacing: -1px; }
 .account-input { height: 50px; background: #10071a; display: flex; align-items: center; padding: 0 16px; }
@@ -45,7 +62,11 @@ input[type=range]::-webkit-slider-thumb { appearance: none; width: 16px; height:
 input[type=range]:disabled { opacity: .45; cursor: default; }
 .official { margin: 3px 0 0; width: 100%; padding: 9px 0; font-size: 12px; text-align: left; }
 .brand { position: absolute; left: 470px; top: 16px; width: 390px; height: 390px; pointer-events: none; }
-.logo { width: 100%; height: 100%; object-fit: contain; transform-origin: center; will-change: transform; animation: float-logo 8s cubic-bezier(.45, 0, .55, 1) infinite; }
+.brand::before { content: ''; position: absolute; left: 45px; top: 35px; width: 310px; height: 310px; background: radial-gradient(ellipse, #d03aff5c, #831dc926 43%, transparent 70%); opacity: 0; transition: opacity 600ms ease; }
+.brand.preparing::before, .brand.responding::before { opacity: .8; animation: portal-breathe 3s ease-in-out infinite alternate; }
+.brand.preparing .logo, .brand.responding .logo { filter: drop-shadow(0 0 12px #cd50ff55); }
+@keyframes portal-breathe { from { opacity: .45; } to { opacity: .9; } }
+.logo { position: relative; width: 100%; height: 100%; object-fit: contain; transform-origin: center; will-change: transform; transition: filter 600ms ease; animation: float-logo 8s cubic-bezier(.45, 0, .55, 1) infinite; }
 @keyframes float-logo {
   0%, 100% { transform: translate3d(-3px, -7px, 0) rotate(-.55deg); }
   50% { transform: translate3d(3px, 7px, 0) rotate(.55deg); }
@@ -91,5 +112,6 @@ body.entering .account-modes { animation: panel-enter 440ms 120ms cubic-bezier(.
   *, *::before, *::after { animation: none !important; transition: none !important; }
   progress::-webkit-progress-bar { animation: none !important; transition: none !important; }
   .primary::after { display: none; }
+  .particles { display: none; }
   .primary:hover:enabled, .block-button:active:enabled, .text-action:active:enabled, .icon-action:active:enabled { transform: none; }
 }

@@ -5,6 +5,25 @@ let saveTimer;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const motion = new Map();
 let completionTimer, completed = false;
+let portalTimer;
+// A fixed, sparse particle field keeps the atmosphere calm and reproducible.
+for (let i = 0; i < 18; i++) {
+  const particle = document.createElement('span'); particle.className = 'end-particle';
+  particle.style.setProperty('--x', `${(i * 37 + 9) % 100}%`);
+  particle.style.setProperty('--size', `${i % 3 + 2}px`);
+  particle.style.setProperty('--duration', `${19 + i % 7 * 2}s`);
+  particle.style.setProperty('--delay', `${-i * 2.7}s`);
+  particle.style.setProperty('--opacity', `${.15 + i % 4 * .07}`);
+  particle.style.setProperty('--drift', `${i % 2 ? -24 : 28}px`);
+  $('.particles').append(particle);
+}
+function serverStatus(value = {}) {
+  const panel = $('.server-status'); panel.dataset.state = value.kind || 'checking';
+  $('#server-label').textContent = value.kind === 'online' ? 'Servidor online' : value.kind === 'unknown' ? 'Sem resposta do servidor' : 'Consultando servidor…';
+  const count = Number.isInteger(value.players) && Number.isInteger(value.maxPlayers) ? `${value.players}/${value.maxPlayers} jogadores` : 'Hollow SMP';
+  $('#server-details').textContent = value.kind === 'online' ? `${count}${Number.isInteger(value.ping) ? ` · ${value.ping} ms` : ''}` : value.kind === 'unknown' ? 'Você pode tentar entrar normalmente.' : 'Hollow SMP';
+  $('#refresh-server').disabled = Boolean(value.checking);
+}
 
 function animate(element, frames, duration = 240) {
   motion.get(element)?.cancel();
@@ -43,6 +62,8 @@ function settings(value) {
 }
 function render() {
   const microsoft = options().mode === 'microsoft';
+  $('.brand').classList.toggle('preparing', current.busy && !current.authPending);
+  serverStatus(current.server);
   $('#nickname').hidden = microsoft;
   $('#account-note').hidden = !microsoft;
   $('#remember').disabled = current.busy || microsoft;
@@ -81,7 +102,18 @@ $('#minimize').addEventListener('click', () => window.hollow.minimize());
 $('#close').addEventListener('click', () => window.hollow.close());
 $('#logout').addEventListener('click', () => execute(() => window.hollow.logout()));
 $('#cancel-login').addEventListener('click', () => window.hollow.cancelLogin());
-$('#play-form').addEventListener('submit', event => { event.preventDefault(); if (!current.busy) execute(() => window.hollow.play(options())); });
+$('#play-form').addEventListener('submit', event => {
+  event.preventDefault(); if (current.busy || current.gameRunning) return;
+  clearTimeout(portalTimer); $('.brand').classList.add('responding');
+  portalTimer = setTimeout(() => $('.brand').classList.remove('responding'), 1000);
+  execute(() => window.hollow.play(options()));
+});
+$('#refresh-server').addEventListener('click', async () => {
+  $('#refresh-server').disabled = true;
+  try { await window.hollow.refreshServer(); }
+  catch { serverStatus({ kind: 'unknown' }); }
+  finally { $('#refresh-server').disabled = false; }
+});
 $('#ram').addEventListener('input', () => { render(); save(); });
 $('#nickname').addEventListener('input', save);
 $('#remember').addEventListener('change', save);
