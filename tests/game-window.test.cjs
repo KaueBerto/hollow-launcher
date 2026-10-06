@@ -17,6 +17,23 @@ test('reabertura manual restaura janela minimizada e janela destruída é ignora
   controller.started(); window.minimized = true; controller.reveal(); assert.equal(window.visible, true); assert.equal(window.minimized, false);
   window.destroyed = true; assert.doesNotThrow(() => controller.started()); assert.doesNotThrow(() => controller.ended());
 });
+
+test('fechar durante a partida esconde e restaura ao encerrar, mesmo após reabrir pelo tray', () => {
+  const window = fakeWindow(), controller = new GameWindow(() => window);
+  let prevented = false;
+  controller.started(); controller.reveal();
+  controller.closeRequested({ preventDefault() { prevented = true; } }, { running: true, quitting: false });
+  assert.equal(prevented, true); assert.equal(window.visible, false); assert.equal(window.destroyed, false);
+  controller.ended(); assert.equal(window.visible, true);
+});
+
+test('fechamento sem jogo e saída explícita não são interceptados', () => {
+  const window = fakeWindow(), controller = new GameWindow(() => window);
+  const event = { preventDefault() { assert.fail('Fechamento normal bloqueado'); } };
+  controller.closeRequested(event, { running: false, quitting: false });
+  controller.closeRequested(event, { running: true, quitting: true });
+  assert.equal(window.visible, true);
+});
 test('Microsoft aguarda o jogo, ignora falha de consulta e restaura ao fechar', async () => {
   const queries = [[], [12], new Error('query unavailable'), [12], []];
   const events = [];

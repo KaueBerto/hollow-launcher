@@ -130,4 +130,4 @@ O código original e a identidade visual do Hollow SMP não recebem licença de 
 Projeto independente do Hollow SMP, sem vínculo oficial com Mojang ou Microsoft.
 ## Enquanto o Minecraft está aberto
 
-O Hollow se esconde ao iniciar o Minecraft diretamente, em ambos os modos, e volta quando o jogo encerra. Para abrir o Hollow durante a partida, use o ícone perto do relógio: clique duas vezes ou escolha **Mostrar launcher**. Abrir o executável novamente também traz a janela existente.
+O Hollow se esconde ao iniciar o Minecraft diretamente, em ambos os modos, e volta quando o jogo encerra. Clicar no **X** ou usar **Alt+F4** durante a partida apenas esconde o launcher, mantendo o jogo e a atividade do Discord funcionando. Sem o Minecraft aberto, o X fecha normalmente. Para abrir o Hollow durante a partida, use o ícone perto do relógio: clique duas vezes ou escolha **Mostrar launcher**. Abrir o executável novamente também traz a janela existente. A opção **Sair** na bandeja continua sendo uma saída explícita.

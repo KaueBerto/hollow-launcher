@@ -116,6 +116,13 @@ async function smokeUi() {
   await window.webContents.executeJavaScript(`if(!document.body.classList.contains('entered') || getComputedStyle(document.querySelector('.controls')).animationName!=='panel-enter') throw new Error('Entrada suave ausente');`);
   publish({ gameRunning: true });
   if (window.isVisible()) throw new Error('Launcher não se escondeu ao abrir o jogo.');
+  gameWindow.reveal();
+  window.close();
+  if (window.isDestroyed() || window.isVisible()) throw new Error('Fechar a janela durante o jogo não a escondeu.');
+  gameWindow.reveal();
+  await window.webContents.executeJavaScript(`document.querySelector('#close').click()`);
+  await new Promise(resolve => setTimeout(resolve, 100));
+  if (window.isDestroyed() || window.isVisible()) throw new Error('O X durante o jogo não escondeu o launcher.');
   publish({ gameRunning: false });
   if (!window.isVisible()) throw new Error('Launcher não voltou ao fechar o jogo.');
   const report = await window.webContents.executeJavaScript(`(async () => {
@@ -136,7 +143,7 @@ async function smokeUi() {
     document.querySelector('#reset').click();await wait(250);document.querySelector('#confirm-reset').dispatchEvent(new Event('cancel',{cancelable:true}));await wait(200);check(!document.querySelector('#confirm-reset').open,'Escape durante animação');
     return ['16 trocas de conta: OK','Memória sincronizada: OK','Animação CSS ativa: OK','Fonte incorporada: OK','Interface sem Node: OK','Confirmação e cancelamento de reset: OK','Motion: entrada, trocas rápidas sem deslocamento e Escape nos avisos: OK'];
   })()`);
-  report.push('Launcher escondido durante o jogo e restaurado ao fechar: OK');
+  report.push('Fechamento nativo e X escondem durante o jogo; janela preservada e restaurada ao encerrar: OK');
   if (!safeStorage.isEncryptionAvailable()) throw new Error('Criptografia Windows indisponível no teste.');
   const protectedToken = safeStorage.encryptString('hollow-test-token');
   if (protectedToken.includes(Buffer.from('hollow-test-token')) || safeStorage.decryptString(protectedToken) !== 'hollow-test-token') throw new Error('Proteção da sessão falhou.');
@@ -255,7 +262,13 @@ app.whenReady().then(async () => {
   window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   window.webContents.on('will-navigate', event => event.preventDefault());
   window.webContents.session.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
-  window.on('close', event => { if ((state.busy || state.updating) && !quitting) { event.preventDefault(); publish({ text: 'Aguarde a preparação terminar para fechar.' }); } });
+  window.on('close', event => {
+    if ((state.busy || state.updating) && !quitting) {
+      event.preventDefault(); publish({ text: 'Aguarde a preparação terminar para fechar.' });
+      return;
+    }
+    gameWindow.closeRequested(event, { running: state.gameRunning || Boolean(engine.gameProcess), quitting });
+  });
   window.on('minimize', () => window.webContents.send('launcher:animation', false));
   window.on('restore', () => window.webContents.send('launcher:animation', true));
   serverMonitor = new ServerMonitor({ query: () => { const [host, port] = SERVER.split(':'); return queryServer({ host, port: Number(port) }); }, report: server => publish({ server }), visible: () => window && !window.isDestroyed() && window.isVisible() && !window.isMinimized() });
@@ -303,5 +316,5 @@ app.on('before-quit', event => {
   if (discordPresence && !quitting) {
     event.preventDefault(); quitting = true;
     discordPresence.stop().finally(() => app.quit());
-  }
+  } else quitting = true;
 });

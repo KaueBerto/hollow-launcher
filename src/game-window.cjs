@@ -2,6 +2,11 @@
 
 class GameWindow {
   constructor(getWindow) { this.getWindow = getWindow; this.hiddenForGame = false; }
+  closeRequested(event, { running, quitting }) {
+    if (!running || quitting) return;
+    event.preventDefault();
+    this.started();
+  }
   started() {
     const window = this.getWindow();
     if (!window || window.isDestroyed()) return;
