@@ -1,0 +1,12 @@
+/dist/
+/work/
+/.vs/
+/bin/
+/obj/
+*.log
+*.partial
+*.hollow-new
+*.user
+*.suo
+Thumbs.db
+Desktop.ini

@@ -1,0 +1,38 @@
+HOLLOW SMP LAUNCHER — 1.7.0
+
+1. Extraia o pacote e abra HollowSMP-Launcher.exe.
+2. Escolha Nickname ou Microsoft e ajuste a memória na barra.
+3. Clique em Instalar e jogar e aguarde a preparação inicial.
+4. Abra Multijogador e entre no Hollow SMP.
+5. Confirme os avisos do AutoModpack. Se ele pedir reinício, feche
+   o jogo, abra novamente pelo launcher e volte ao servidor.
+
+Microsoft usa o Minecraft Launcher oficial e exige acesso ao Minecraft
+Java na conta. Faça login no programa oficial e feche-o antes de criar
+o perfil. Depois selecione a instalação Hollow SMP no launcher oficial.
+Nickname não autentica uma conta Microsoft: o servidor precisa permitir
+esse modo de entrada. O Hollow não coleta senhas de conta.
+
+Requer Windows 10/11 de 64 bits com .NET Framework 4.8, internet e espaço
+livre para o pack. Java 21 é baixado automaticamente. A primeira
+instalação pode levar vários minutos. O pack é baixado dentro do jogo,
+na primeira conexão ao servidor. Não escolha mais RAM que seu PC possui.
+
+RESETAR
+O botão no topo pede confirmação, apaga a instalação do Hollow e baixa
+a base do jogo novamente. Isso remove mods, configurações, mundos
+locais, screenshots, logs, Java e preferências. Não é possível desfazer.
+Faça backup do que deseja guardar. Feche o Minecraft e outros programas
+Java antes. O reset não modifica o servidor nem remove os perfis e
+bibliotecas compartilhados do launcher oficial. Entre novamente no
+servidor para receber o modpack após o reset.
+
+Dados e logs: %LOCALAPPDATA%\HollowSMP
+Logs principais: launcher-error.log, neoforge-install.log,
+game-launch.log e game\logs.
+Servidor: hollowsmp.com.br:25565
+
+Interface com fonte Monocraft inspirada no Minecraft, em negrito,
+logo animada e controles superiores sem borda.
+Créditos: THIRD-PARTY.txt e pasta licenses.
+Projeto independente, sem vínculo oficial com Mojang ou Microsoft.

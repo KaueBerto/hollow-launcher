@@ -1,0 +1,28 @@
+Este launcher é um projeto independente do Hollow SMP.
+
+AutoModpack 5.0.0-rc.2
+Copyright de seus respectivos autores.
+https://github.com/Skidamek/AutoModpack
+https://github.com/Skidamek/AutoModpack/releases
+Licença LGPL-3.0. O JAR original, sem alterações, está incorporado no .exe
+como arquivo de recurso e é extraído separadamente para a pasta mods.
+Suas licenças originais também estão preservadas dentro do JAR e na
+pasta licenses deste pacote. O código do launcher e o JAR original estão
+no pacote de fontes, permitindo reconstruir o executável.
+
+Downloads realizados quando o jogador prepara o jogo:
+- Java 21: Eclipse Temurin / Adoptium. Metadados e SHA256 oficiais.
+  https://adoptium.net/
+- NeoForge 21.1.253: instalador oficial e bibliotecas oficiais.
+  https://neoforged.net/
+- Minecraft 1.21.1 e recursos: servidores oficiais da Mojang/Microsoft.
+  https://www.minecraft.net/
+
+O launcher não incorpora os JARs do Minecraft, o Java, o NeoForge nem
+os mods e texturas comerciais do servidor. Os downloads mantêm as
+licenças e termos dos respectivos autores.
+
+Monocraft: fonte pixelada inspirada na tipografia do Minecraft.
+Copyright (c) 2022, Idrees Hassan. SIL Open Font License 1.1.
+https://github.com/IdreesInc/Monocraft
+Licença preservada em licenses/Monocraft-LICENSE.txt.
