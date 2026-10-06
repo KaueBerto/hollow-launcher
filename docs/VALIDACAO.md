@@ -1,40 +1,43 @@
-# Validação
+# Validação — Electron 2.0.0
 
-Versão 1.7.1, Windows de 64 bits, 06/10/2026.
+Verificações realizadas em Windows x64, em 06/10/2026.
 
-## Verificações desta versão
+## Motor JavaScript
 
-`scripts/test.ps1` compila e executa verificações locais sem instalar o jogo.
+Os 12 testes de `npm test` passaram:
 
-| Verificação | Resultado |
-| --- | --- |
-| UUID offline, regras de bibliotecas, caminhos e AutoModpack incorporado | Passou |
-| Reset completo e repetição em pasta de teste isolada | Passou |
-| Recusa de arquivo ocupado, preservando a instalação | Passou |
-| Recusa de pasta fora do escopo e preservação de arquivo externo | Passou |
-| 16 trocas de modo, checkbox e 20 redesenhos | Passou |
-| Arraste da memória em 2, 13 e 24 GB e valor exibido | Passou |
-| Fontes em negrito, alinhamento e recorte de texto | Passou |
-| Timer ativo e movimento da logo dentro da área do controle | Passou |
-| Preview da tela com Resetar sem borda | Inspecionado |
+- UUID offline e regras de plataforma/argumentos.
+- Caminhos fora da instalação recusados.
+- SHA256 do AutoModpack original.
+- Migração das preferências C# e privacidade de nickname não lembrado.
+- Reset completo e repetido em pasta isolada, com arquivo externo preservado.
+- Reset bloqueado por Java aberto.
+- Junction recusada, com o alvo externo preservado.
+- Arquivo ocupado recusado antes da exclusão.
+- Perfil Microsoft com outros perfis, configurações e backup preservados.
+- Extração de ZIP e recusa de download HTTP.
+- Reutilização de arquivos com hash correto; conteúdo inválido não é finalizado.
+- Fila de downloads aguarda os trabalhadores após uma falha.
 
-O reset em testes usa dados artificiais em uma pasta chamada `hollow-reset-test`. A instalação real do jogador não é apagada pelas verificações.
+A recusa por Java aberto usa uma simulação do detector. Arquivo ocupado e junction foram testados com recursos reais do Windows em pastas artificiais.
 
-## Motor de instalação
+## Interface Electron
 
-O motor foi validado anteriormente com download real do Java 21, Minecraft 1.21.1, 3.888 recursos únicos e instalação do NeoForge 21.1.253. O cliente iniciou com NeoForge e AutoModpack usando o Java baixado pelo launcher. O registro de perfil oficial foi verificado em arquivos de teste, preservando outros perfis e criando backup.
+`npm run test:ui` passou: 16 trocas de conta, memória sincronizada, animação CSS ativa, fonte incorporada, interface sem acesso a Node e confirmação/cancelamento do reset. Screenshots dos modos Nickname e Microsoft foram gerados e inspecionados. O aplicativo empacotado e o executável portátil também passaram pelo mesmo teste da interface.
 
-Nesta versão, o reset é seguido pelo mesmo instalador. Uma reinstalação completa após apagar dados reais não foi repetida; o teste do reset usa arquivos artificiais e verifica a exclusão isoladamente.
+A captura de teste usa renderização offscreen por software para funcionar sem exibir uma janela de teste. O aplicativo normal usa a aceleração padrão do Chromium.
+
+## Integração real
+
+- O motor JavaScript verificou Java, Minecraft, bibliotecas e 3.888 recursos na instalação isolada já usada nos testes da versão anterior.
+- Os argumentos JavaScript iniciaram um cliente real com Minecraft 1.21.1, NeoForge 21.1.253 e AutoModpack. Texturas e interface foram carregadas.
+- O teste encerrou apenas seu próprio processo Java depois de confirmar a inicialização; não encerrou sessões do jogador.
+- A extração e preparação do Java 21 pelo motor novo foram validadas em uma pasta nova, reaproveitando o ZIP com hash oficial.
 
 ## Limites
 
-- Login Microsoft em conta real pelo programa oficial não foi validado de ponta a ponta.
-- Entrada no servidor e download completo do modpack não foram validados de ponta a ponta.
-- A autenticação por nickname depende das configurações do servidor.
-- O bloqueio de reset por processos Java é conservador: outros programas Java também devem ser fechados.
-- Nenhuma alteração da VPS ou reinício do servidor foi realizado.
-
-## Ajuste da animação em 1.7.1
-
-Redesenho solicitado a cada 16 ms, deslocamento fracionário com ciclo de 10 segundos e imagem pré-redimensionada. O fundo estático é reutilizado, e o relógio pausa ao minimizar. Verificações de limites, passo por quadro e pausa/retomada incluídas. A fluidez percebida também depende da carga do computador.
-
+- Não foi repetido um download completo de todos os arquivos sem cache.
+- O instalador NeoForge JavaScript foi executado em uma instalação nova: processamento de patches, criação da versão e bibliotecas passaram, reutilizando o JAR e bibliotecas previamente verificados.
+- Login Microsoft em conta real e entrada no servidor com download completo do modpack não foram verificados de ponta a ponta.
+- A entrada por nickname depende das regras do servidor.
+- Nenhuma configuração da VPS foi alterada e nenhum reinício do servidor foi realizado.

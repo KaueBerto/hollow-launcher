@@ -4,8 +4,8 @@ AutoModpack 5.0.0-rc.2
 Copyright de seus respectivos autores.
 https://github.com/Skidamek/AutoModpack
 https://github.com/Skidamek/AutoModpack/releases
-Licença LGPL-3.0. O JAR original, sem alterações, está incorporado no .exe
-como arquivo de recurso e é extraído separadamente para a pasta mods.
+Licença LGPL-3.0. O JAR original, sem alterações, é distribuído junto ao aplicativo
+e é copiado separadamente para a pasta mods.
 Suas licenças originais também estão preservadas dentro do JAR e na
 pasta licenses deste pacote. O código do launcher e o JAR original estão
 no pacote de fontes, permitindo reconstruir o executável.
@@ -26,3 +26,12 @@ Monocraft: fonte pixelada inspirada na tipografia do Minecraft.
 Copyright (c) 2022, Idrees Hassan. SIL Open Font License 1.1.
 https://github.com/IdreesInc/Monocraft
 Licença preservada em licenses/Monocraft-LICENSE.txt.
+
+Electron 44.5.1 — licença MIT.
+https://www.electronjs.org/
+Licença em licenses/Electron-LICENSE.txt. Os avisos de terceiros do
+Chromium são preservados no runtime e no ZIP de distribuição.
+
+adm-zip 0.6.1 — licença MIT.
+https://github.com/cthackers/adm-zip
+Licença em licenses/adm-zip-LICENSE.txt.

@@ -1,0 +1,32 @@
+{
+  "name": "hollow-launcher",
+  "version": "2.0.0",
+  "description": "Launcher Electron do Hollow SMP para Windows",
+  "author": "Hollow SMP",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "src/main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/*.test.cjs",
+    "test:ui": "node scripts/smoke.cjs",
+    "build": "electron-builder --win portable --x64 --publish never",
+    "package": "node scripts/package.cjs"
+  },
+  "dependencies": { "adm-zip": "0.6.1" },
+  "devDependencies": { "electron": "44.5.1", "electron-builder": "26.15.3" },
+  "build": {
+    "appId": "br.com.hollowsmp.launcher",
+    "productName": "Hollow Launcher",
+    "directories": { "output": "dist" },
+    "files": ["src/**/*.cjs", "renderer/**/*", "assets/logo_smp.png", "assets/hollow.ico", "assets/Monocraft*.ttf", "package.json"],
+    "extraResources": [
+      { "from": "assets/automodpack-5.0.0-rc.2.jar", "to": "assets/automodpack-5.0.0-rc.2.jar" },
+      { "from": "licenses", "to": "licenses" },
+      { "from": "THIRD-PARTY.txt", "to": "THIRD-PARTY.txt" }
+    ],
+    "asar": true,
+    "win": { "target": "portable", "icon": "assets/hollow.ico", "artifactName": "HollowSMP-Launcher-${version}.exe", "signAndEditExecutable": true },
+    "portable": { "requestExecutionLevel": "user" }
+  }
+}

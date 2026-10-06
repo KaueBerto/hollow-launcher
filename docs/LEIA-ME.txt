@@ -1,4 +1,4 @@
-HOLLOW SMP LAUNCHER — 1.7.1
+HOLLOW SMP LAUNCHER — 2.0.0 — Electron
 
 1. Extraia o pacote e abra HollowSMP-Launcher.exe.
 2. Escolha Nickname ou Microsoft e ajuste a memória na barra.
@@ -13,7 +13,7 @@ o perfil. Depois selecione a instalação Hollow SMP no launcher oficial.
 Nickname não autentica uma conta Microsoft: o servidor precisa permitir
 esse modo de entrada. O Hollow não coleta senhas de conta.
 
-Requer Windows 10/11 de 64 bits com .NET Framework 4.8, internet e espaço
+Requer Windows 10/11 de 64 bits com internet e espaço
 livre para o pack. Java 21 é baixado automaticamente. A primeira
 instalação pode levar vários minutos. O pack é baixado dentro do jogo,
 na primeira conexão ao servidor. Não escolha mais RAM que seu PC possui.
@@ -36,3 +36,7 @@ Interface com fonte Monocraft inspirada no Minecraft, em negrito,
 logo animada e controles superiores sem borda.
 Créditos: THIRD-PARTY.txt e pasta licenses.
 Projeto independente, sem vínculo oficial com Mojang ou Microsoft.
+
+VERSÃO ELECTRON
+Feche o launcher antigo antes de usar esta versão. A instalação existente
+e as preferências são reaproveitadas. Não é preciso instalar Node.js.

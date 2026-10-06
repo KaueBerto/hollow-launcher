@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Hollow Launcher</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <header class="titlebar">
+    <div class="drag-region" aria-hidden="true"></div>
+    <nav aria-label="Janela">
+      <button class="text-action" id="reset">Resetar</button>
+      <button class="icon-action" id="minimize" aria-label="Minimizar"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10"/></svg></button>
+      <button class="icon-action" id="close" aria-label="Fechar"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8"/></svg></button>
+    </nav>
+  </header>
+  <main>
+    <section class="controls" aria-label="Jogar">
+      <h1>HOLLOW LAUNCHER</h1>
+      <form id="play-form">
+        <label class="visually-hidden" for="nickname">Nickname</label>
+        <div class="account-input">
+          <input id="nickname" name="nickname" type="text" maxlength="16" autocomplete="off" spellcheck="false" placeholder="Seu nickname" value="Aventureiro">
+          <span id="account-note" hidden>Conta Microsoft</span>
+        </div>
+        <button class="block-button primary" id="play" type="submit">INSTALAR E JOGAR</button>
+        <label class="remember"><input id="remember" type="checkbox" checked><span class="checkbox" aria-hidden="true"></span><span>Lembrar nickname</span></label>
+        <div class="memory-heading"><label for="ram">MEMÓRIA</label><output for="ram" id="ram-value">6 GB</output></div>
+        <input id="ram" type="range" min="2" max="24" step="1" value="6" aria-label="Memória do Minecraft em GB">
+        <button type="button" class="text-action official" id="official" hidden>Baixar launcher oficial</button>
+      </form>
+    </section>
+    <section class="brand" aria-label="Hollow SMP"><img class="logo" src="../assets/logo_smp.png" alt="Hollow SMP Beta" draggable="false"></section>
+    <fieldset class="account-modes"><legend class="visually-hidden">Tipo de conta</legend>
+      <label><input type="radio" name="mode" value="nickname" checked><span>Nickname</span></label>
+      <label><input type="radio" name="mode" value="microsoft"><span>Microsoft</span></label>
+    </fieldset>
+    <div class="progress-area" hidden><progress id="progress" max="100" aria-label="Preparação do jogo"></progress><p id="status" role="status" aria-live="polite"></p></div>
+  </main>
+  <dialog id="confirm-reset" aria-labelledby="reset-title">
+    <h2 id="reset-title">Resetar Hollow</h2>
+    <p>Apagar a instalação local e baixar novamente?</p>
+    <p>Isso remove mods, configurações, mundos salvos, screenshots e preferências. <strong>Não há como desfazer.</strong></p>
+    <p>Feche o Minecraft antes de continuar. O modpack será recebido ao entrar no servidor.</p>
+    <div class="dialog-actions"><button class="block-button secondary" id="cancel-reset" autofocus>CANCELAR</button><button class="block-button primary" id="do-reset">RESETAR</button></div>
+  </dialog>
+  <dialog id="message" aria-labelledby="message-title"><h2 id="message-title">Hollow SMP</h2><p id="message-text"></p><div class="dialog-actions"><button class="block-button primary" id="message-ok">OK</button></div></dialog>
+</body>
+</html>
