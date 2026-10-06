@@ -1,6 +1,6 @@
 # Validação
 
-Versão 1.7.0, Windows de 64 bits, 06/10/2026.
+Versão 1.7.1, Windows de 64 bits, 06/10/2026.
 
 ## Verificações desta versão
 
@@ -33,3 +33,8 @@ Nesta versão, o reset é seguido pelo mesmo instalador. Uma reinstalação comp
 - A autenticação por nickname depende das configurações do servidor.
 - O bloqueio de reset por processos Java é conservador: outros programas Java também devem ser fechados.
 - Nenhuma alteração da VPS ou reinício do servidor foi realizado.
+
+## Ajuste da animação em 1.7.1
+
+Redesenho solicitado a cada 16 ms, deslocamento fracionário com ciclo de 10 segundos e imagem pré-redimensionada. O fundo estático é reutilizado, e o relógio pausa ao minimizar. Verificações de limites, passo por quadro e pausa/retomada incluídas. A fluidez percebida também depende da carga do computador.
+

@@ -28,16 +28,90 @@ sealed class PixelLabel : Label {
     protected override void OnPaint(PaintEventArgs e){var alignment=TextAlign==ContentAlignment.MiddleRight?StringAlignment.Far:TextAlign==ContentAlignment.MiddleCenter?StringAlignment.Center:StringAlignment.Near;PixelText.DrawAligned(e.Graphics,Text,Font,ClientRectangle,ForeColor,alignment);}
 }
 sealed class FloatingLogo : Control {
-    readonly System.Windows.Forms.Timer timer=new System.Windows.Forms.Timer{Interval=33};
-    readonly Stopwatch elapsed=Stopwatch.StartNew();
-    public Image Image {get;set;} public double? PreviewPhase {get;set;}
-    public FloatingLogo(){SetStyle(ControlStyles.UserPaint|ControlStyles.AllPaintingInWmPaint|ControlStyles.OptimizedDoubleBuffer|ControlStyles.SupportsTransparentBackColor,true);BackColor=Color.Transparent;TabStop=false;timer.Tick+=(s,e)=>Invalidate();}
-    public void Animate(bool run){if(run && IsHandleCreated)timer.Start();else timer.Stop();}
-    protected override void OnHandleCreated(EventArgs e){base.OnHandleCreated(e);timer.Start();}
-    protected override void OnHandleDestroyed(EventArgs e){timer.Stop();base.OnHandleDestroyed(e);}
-    protected override void OnPaint(PaintEventArgs e){if(Image==null)return;double phase=PreviewPhase??elapsed.Elapsed.TotalSeconds;float x=10f+(float)Math.Sin(phase*1.25)*2.5f,y=10f+(float)Math.Sin(phase)*4f;e.Graphics.InterpolationMode=InterpolationMode.HighQualityBicubic;e.Graphics.PixelOffsetMode=PixelOffsetMode.HighQuality;e.Graphics.DrawImage(Image,new RectangleF(x,y,335,335));}
-    internal void VerifyMotion(){for(int i=0;i<100;i++){double t=i*.1;double x=10+Math.Sin(t*1.25)*2.5,y=10+Math.Sin(t)*4;if(x<0||y<0||x+335>Width||y+335>Height)throw new Exception("Logo fora da área da animação.");}if(!timer.Enabled)throw new Exception("Animação não iniciou.");}
-    protected override void Dispose(bool disposing){if(disposing){timer.Stop();timer.Dispose();}base.Dispose(disposing);}
+    readonly System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer { Interval = 16 };
+    readonly Stopwatch elapsed = new Stopwatch();
+    Bitmap sprite;
+    Image original;
+    public double? PreviewPhase { get; set; }
+    public Image Image {
+        get { return original; }
+        set {
+            if (sprite != null) sprite.Dispose();
+            original = value;
+            sprite = null;
+            if (value == null) return;
+            // Resize once, with transparent padding for fractional-pixel movement.
+            sprite = new Bitmap(339, 339, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+            using (var graphics = Graphics.FromImage(sprite))
+            using (var attributes = new System.Drawing.Imaging.ImageAttributes()) {
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                attributes.SetWrapMode(WrapMode.TileFlipXY);
+                graphics.DrawImage(value, new Rectangle(2, 2, 335, 335), 0, 0, value.Width, value.Height, GraphicsUnit.Pixel, attributes);
+            }
+        }
+    }
+    public FloatingLogo() {
+        SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.SupportsTransparentBackColor, true);
+        BackColor = Color.Transparent;
+        TabStop = false;
+        timer.Tick += (s, e) => { Invalidate(); Update(); };
+    }
+    public void Animate(bool run) {
+        if (run && IsHandleCreated) { elapsed.Start(); timer.Start(); }
+        else { timer.Stop(); elapsed.Stop(); }
+    }
+    protected override void OnHandleCreated(EventArgs e) { base.OnHandleCreated(e); Animate(true); }
+    protected override void OnHandleDestroyed(EventArgs e) { Animate(false); base.OnHandleDestroyed(e); }
+    static PointF Position(double seconds) {
+        double phase = seconds * Math.PI * 2 / 10;
+        return new PointF(8f + (float)Math.Sin(phase) * 1.8f, 8f + (float)Math.Sin(phase) * 3.5f);
+    }
+    protected override void OnPaint(PaintEventArgs e) {
+        if (sprite == null) return;
+        DrawFrame(e.Graphics, PreviewPhase ?? elapsed.Elapsed.TotalSeconds);
+    }
+    void DrawFrame(Graphics graphics, double seconds) {
+        var position = Position(seconds);
+        graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+        graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+        graphics.DrawImage(sprite, new RectangleF(position.X, position.Y, 339, 339));
+    }
+    internal void VerifyMotion() {
+        PointF previous = Position(0);
+        for (int i = 1; i <= 600; i++) {
+            var position = Position(i / 60.0);
+            if (position.X < 0 || position.Y < 0 || position.X + 339 > Width || position.Y + 339 > Height)
+                throw new Exception("Logo fora da área da animação.");
+            if (Math.Abs(position.X - previous.X) > .04 || Math.Abs(position.Y - previous.Y) > .04)
+                throw new Exception("Movimento da logo com salto.");
+            previous = position;
+        }
+        if (!timer.Enabled || sprite == null) throw new Exception("Animação não iniciou.");
+        // Verify the renderer actually changes subpixel frames, not just the motion formula.
+        int changes = 0;
+        byte[] previousPixels = null;
+        using (var frame = new Bitmap(355, 355, System.Drawing.Imaging.PixelFormat.Format32bppPArgb))
+        using (var graphics = Graphics.FromImage(frame)) {
+            for (int i = 0; i < 8; i++) {
+                graphics.Clear(Color.Black);
+                DrawFrame(graphics, i / 60.0);
+                var data = frame.LockBits(new Rectangle(0, 0, 355, 355), System.Drawing.Imaging.ImageLockMode.ReadOnly, frame.PixelFormat);
+                var pixels = new byte[data.Stride * data.Height];
+                try { Marshal.Copy(data.Scan0, pixels, 0, pixels.Length); } finally { frame.UnlockBits(data); }
+                if (previousPixels != null) for (int j = 0; j < pixels.Length; j++) if (pixels[j] != previousPixels[j]) { changes++; break; }
+                previousPixels = pixels;
+            }
+        }
+        if (changes < 3) throw new Exception("A renderização da logo está arredondando o movimento.");
+        Animate(false);
+        if (elapsed.IsRunning || timer.Enabled) throw new Exception("Animação não pausou.");
+        Animate(true);
+    }
+    protected override void Dispose(bool disposing) {
+        if (disposing) { Animate(false); timer.Dispose(); if (sprite != null) sprite.Dispose(); }
+        base.Dispose(disposing);
+    }
 }
 static class LauncherDialog {
     public static void Show(IWin32Window owner,string message,string title="Hollow SMP") { Display(owner,message,title,false); }
@@ -116,7 +190,7 @@ sealed class BlockButton : Button {
 sealed class LauncherForm : Form {
     readonly Engine engine=new Engine();
     TextBox nick;Label ram,status,nickLabel,accountNote;BlockButton play;TextAction official,reset;MinecraftSlider memorySlider;ProgressBar progress;SquareChoice nicknameMode,microsoftMode;CheckBox remember;FloatingLogo floatingLogo;
-    int mode=0,memoryGb=6,gamePid;bool busy;Image logo;
+    int mode=0,memoryGb=6,gamePid;bool busy;Image logo;Bitmap backgroundFrame;
     readonly Color ink=Color.FromArgb(246,228,255),muted=Color.FromArgb(170,147,189),purple=Color.FromArgb(158,43,232),stone=Color.FromArgb(39,20,60),cardColor=Color.FromArgb(25,13,39);
     string Settings {get{return Path.Combine(engine.Root,"launcher-settings.json");}}
     [DllImport("dwmapi.dll")] static extern int DwmSetWindowAttribute(IntPtr handle,int attribute,ref int value,int size);
@@ -193,8 +267,13 @@ sealed class LauncherForm : Form {
     BlockButton ButtonAt(Control parent,string text,int x,int y,int width,int height,Color bg){var b=new BlockButton{Text=text,Location=new Point(x,y),Size=new Size(width,height),BackColor=bg,ForeColor=ink};parent.Controls.Add(b);return b;}
     TextAction LinkAt(Control parent,string text,int x,int y,int width,int height){var b=new TextAction{Text=text,Location=new Point(x,y),Size=new Size(width,height),ForeColor=muted,Font=MinecraftFont.Make(9)};parent.Controls.Add(b);return b;}
     static void Open(string target){Process.Start(new ProcessStartInfo(target){UseShellExecute=true});}
-    protected override void Dispose(bool disposing){if(disposing && logo!=null){logo.Dispose();logo=null;}base.Dispose(disposing);}
-    protected override void OnPaint(PaintEventArgs e){base.OnPaint(e);var g=e.Graphics;
+    protected override void Dispose(bool disposing){if(disposing){if(logo!=null){logo.Dispose();logo=null;}if(backgroundFrame!=null){backgroundFrame.Dispose();backgroundFrame=null;}}base.Dispose(disposing);}
+    protected override void OnPaint(PaintEventArgs e){base.OnPaint(e);
+        // Transparent controls reuse this static backdrop instead of rebuilding it each frame.
+        if(backgroundFrame==null){backgroundFrame=new Bitmap(ClientSize.Width,ClientSize.Height);using(var graphics=Graphics.FromImage(backgroundFrame))DrawBackdrop(graphics);}
+        e.Graphics.DrawImageUnscaled(backgroundFrame,0,0);
+    }
+    void DrawBackdrop(Graphics g){
         using(var gradient=new LinearGradientBrush(ClientRectangle,Color.FromArgb(19,10,29),Color.FromArgb(38,16,57),25))g.FillRectangle(gradient,ClientRectangle);
         var random=new Random(37);for(int i=0;i<130;i++){int x=random.Next(430,860),y=random.Next(484);using(var b=new SolidBrush(Color.FromArgb(random.Next(8,24),195,98,244)))g.FillRectangle(b,x,y,1,1);}
         using(var glow=new GraphicsPath()){glow.AddEllipse(441,42,391,381);using(var b=new PathGradientBrush(glow)){b.CenterColor=Color.FromArgb(32,201,44,240);b.SurroundColors=new[]{Color.FromArgb(0,201,44,240)};g.FillPath(b,glow);}}

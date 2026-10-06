@@ -1,4 +1,4 @@
-HOLLOW SMP LAUNCHER — 1.7.0
+HOLLOW SMP LAUNCHER — 1.7.1
 
 1. Extraia o pacote e abra HollowSMP-Launcher.exe.
 2. Escolha Nickname ou Microsoft e ajuste a memória na barra.

@@ -10,7 +10,7 @@
   <img alt="Plataforma" src="https://img.shields.io/badge/Windows-10%20%2F%2011-8b2de2">
   <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff">
   <img alt="NeoForge" src="https://img.shields.io/badge/NeoForge-21.1.253-8b2de2">
-  <img alt="Versão" src="https://img.shields.io/badge/Launcher-1.7.0-bb55ff">
+  <img alt="Versão" src="https://img.shields.io/badge/Launcher-1.7.1-bb55ff">
 </p>
 
 ![Interface do Hollow Launcher](docs/launcher.png)
