@@ -60,3 +60,8 @@ Teste Electron: entrada concluída, 12 trocas rápidas de conta sem deslocar a �
 ## Ambiente do End — 2.1.0-rc.3
 
 Seis testes do status Java: frames fragmentados e pong, servidor sem pong, timeout/dados inválidos, resolução SRV, cache/consulta simultânea/atualização manual e pausa de consultas com janela escondida. Consulta real ao Hollow SMP respondeu online, 0/20 jogadores e 19 ms nesta sessão; valores variam. A interface verifica arte carregada, 18 partículas que não bloqueiam controles, brilho durante preparação e limpeza de contagens após falha. Capturas do smoke usam dados de teste.
+
+## Interface simplificada — 2.1.0-rc.4
+
+Título redundante removido e formulário reposicionado. Verificação Electron passou: controles, memória, animações, modos de conta, avisos, ocultar/restaurar e cenário. Captura revisada visualmente.
+

@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/logo_smp.png" alt="Hollow SMP" width="260"></p>
 <h1 align="center">Hollow Launcher</h1>
 <p align="center">Launcher Electron do Hollow SMP para Windows.<br>Instalação automática, visual pixelado e modpack pelo AutoModpack.</p>
-<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-8b2de2"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.1.0-rc.3-8b2de2"></p>
+<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-8b2de2"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.1.0-rc.4-8b2de2"></p>
 
 ![Interface do Hollow Launcher](docs/launcher.png)
 
@@ -80,7 +80,7 @@ npm run build
 npm run package
 ```
 
-`build` gera `dist/HollowSMP-Launcher-2.1.0-rc.3.exe`, um executável portátil. `package` gera `dist/HollowSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
+`build` gera `dist/HollowSMP-Launcher-2.1.0-rc.4.exe`, um executável portátil. `package` gera `dist/HollowSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
 
 O executável não possui certificado de assinatura de código do Hollow. Para uma distribuição assinada, configure seu certificado no electron-builder.
 
