@@ -6,6 +6,8 @@ const { Engine, validateOptions, SERVER } = require('./engine.cjs');
 const { GameWindow } = require('./game-window.cjs');
 const { MicrosoftAuth } = require('./microsoft-auth.cjs');
 const { queryServer, ServerMonitor } = require('./server-status.cjs');
+const { DiscordPresence } = require('./discord-presence.cjs');
+const discordConfig = require('./discord-config.cjs');
 
 const smoke = process.argv.includes('--smoke-ui');
 const integration = process.argv.includes('--verify-engine');
@@ -13,6 +15,7 @@ const verifyRootIndex = process.argv.indexOf('--test-root');
 const verifyOutputIndex = process.argv.indexOf('--test-output');
 if (smoke) app.disableHardwareAcceleration();
 let window, engine, tray, microsoft, serverMonitor;
+let discordPresence, quitting = false;
 const gameWindow = new GameWindow(() => window);
 const state = { busy: false, ready: false, gameRunning: false, text: '', percent: null };
 const pagePath = path.join(__dirname, '..', 'renderer', 'index.html');
@@ -202,7 +205,11 @@ app.whenReady().then(async () => {
   }
   await window.loadFile(pagePath);
   if (smoke) await new Promise(resolve => setTimeout(resolve, 300));
-  if (smoke) await smokeUi(); else { window.show(); serverMonitor.start(); }
+  if (smoke) await smokeUi(); else {
+    window.show(); serverMonitor.start();
+    discordPresence = new DiscordPresence({ applicationId: discordConfig.applicationId });
+    discordPresence.start();
+  }
 }).catch(async error => {
   if ((smoke || integration) && verifyOutputIndex >= 0) {
     const output = path.resolve(process.argv[verifyOutputIndex + 1]); await fs.mkdir(output, { recursive: true }); await fs.writeFile(path.join(output, 'error.txt'), error.stack || String(error));
@@ -211,4 +218,10 @@ app.whenReady().then(async () => {
   app.exit(1);
 });
 app.on('window-all-closed', () => app.quit());
-app.on('before-quit', () => { microsoft?.cancel(); serverMonitor?.stop(); });
+app.on('before-quit', event => {
+  microsoft?.cancel(); serverMonitor?.stop();
+  if (discordPresence && !quitting) {
+    event.preventDefault(); quitting = true;
+    discordPresence.stop().finally(() => app.quit());
+  }
+});

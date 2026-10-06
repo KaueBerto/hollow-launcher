@@ -14,6 +14,7 @@ const metadata = require('../package.json');
   zip.addLocalFile(exe, '', 'HollowSMP-Launcher.exe');
   zip.addLocalFile(path.join(root, 'docs', 'LEIA-ME.txt'));
   zip.addLocalFile(path.join(root, 'docs', 'MICROSOFT.md'));
+  zip.addLocalFile(path.join(root, 'docs', 'DISCORD.md'));
   zip.addLocalFile(path.join(root, 'docs', 'AMBIENTE.md'));
   zip.addLocalFile(path.join(root, 'THIRD-PARTY.txt'));
   zip.addLocalFolder(path.join(root, 'licenses'), 'licenses');

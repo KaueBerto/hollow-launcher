@@ -33,6 +33,7 @@ A versão 2.0 substitui a interface Windows Forms por HTML, CSS e JavaScript, co
 - Memória de 2 a 24 GB por arraste ou teclado.
 - Reset com confirmação e preparação automática da nova instalação.
 - Launcher escondido enquanto o Minecraft está aberto, retornando ao fechar o jogo.
+- Integração preparada para atividade fixa **Jogando HollowSMP** no Discord enquanto o launcher estiver aberto, inclusive escondido. Falta configurar o Application ID próprio: [ativação](docs/DISCORD.md).
 - Downloads HTTPS, hashes, tentativas automáticas e até 12 recursos em paralelo.
 - Janela isolada: Node desabilitado na interface, sandbox e API limitada no preload.
 

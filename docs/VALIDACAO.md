@@ -70,3 +70,7 @@ Título redundante removido e formulário reposicionado. Verificação Electron 
 
 Paisagem enviada pelo responsável copiada sem alteração. Escurecimento ajustado em CSS. Interface Electron passou e captura foi revisada quanto a alinhamento e legibilidade.
 
+## Discord — integração pendente de Application ID
+
+Cinco testes com peer local simulam handshake fragmentado, presença fixa sem detalhes, limpeza ao sair, heartbeat, reconexão, Discord iniciado depois, ID ausente, cancelamento e frames excessivos/recusa. A conexão continua durante minimizar/esconder: nenhum evento de janela altera a presença. Sem ID, nenhum pipe é aberto. A exibição em conta real ainda não foi validada e a ativação depende do Application ID próprio do HollowSMP.
+
