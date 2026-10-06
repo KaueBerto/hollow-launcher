@@ -41,3 +41,6 @@ A captura de teste usa renderização offscreen por software para funcionar sem 
 - Login Microsoft em conta real e entrada no servidor com download completo do modpack não foram verificados de ponta a ponta.
 - A entrada por nickname depende das regras do servidor.
 - Nenhuma configuração da VPS foi alterada e nenhum reinício do servidor foi realizado.
+## Animação — 2.0.1
+
+Flutuação com ciclo de oito segundos, deslocamento vertical de 14 px, lateral de 6 px e inclinação suave de ±0,55°. O teste da interface verifica deslocamento, inclinação e continuidade no reinício do ciclo.

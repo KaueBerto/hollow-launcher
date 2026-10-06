@@ -1,4 +1,4 @@
-HOLLOW SMP LAUNCHER — 2.0.0 — Electron
+HOLLOW SMP LAUNCHER — 2.0.1 — Electron
 
 1. Extraia o pacote e abra HollowSMP-Launcher.exe.
 2. Escolha Nickname ou Microsoft e ajuste a memória na barra.

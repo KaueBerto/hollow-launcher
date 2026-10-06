@@ -94,7 +94,7 @@ async function smokeUi() {
     for (let i=0;i<16;i++) { modes[i%2].click(); check(modes.filter(item=>item.checked).length===1,'Seletores de conta'); }
     modes[0].click();
     const slider=document.querySelector('#ram');slider.value='13';slider.dispatchEvent(new Event('input',{bubbles:true}));check(document.querySelector('#ram-value').textContent==='13 GB','Memória');slider.value='6';slider.dispatchEvent(new Event('input',{bubbles:true}));
-    const logo=document.querySelector('.logo');const animation=logo.getAnimations()[0];check(animation,'Animação ausente');animation.pause();animation.currentTime=0;const first=getComputedStyle(logo).transform;animation.currentTime=1000;check(first!==getComputedStyle(logo).transform,'Logo imóvel');animation.play();
+    const logo=document.querySelector('.logo');const animation=logo.getAnimations()[0];check(animation,'Animação ausente');animation.pause();animation.currentTime=0;const first=new DOMMatrixReadOnly(getComputedStyle(logo).transform);animation.currentTime=4000;const middle=new DOMMatrixReadOnly(getComputedStyle(logo).transform);check(Math.abs(middle.m42-first.m42)>=13,'Flutuação vertical muito pequena');check(Math.abs(middle.m41-first.m41)>=5,'Movimento lateral muito pequeno');check(first.m12<0 && middle.m12>0,'Inclinação da logo ausente');animation.currentTime=8000;const last=new DOMMatrixReadOnly(getComputedStyle(logo).transform);check(Math.abs(last.m42-first.m42)<.01,'Salto no reinício da animação');animation.play();
     check(await document.fonts.load('700 16px Monocraft').then(fonts=>fonts.length>0),'Fonte não carregada');
     check(typeof require==='undefined' && typeof process==='undefined','Node exposto à interface');
     check(document.querySelector('#reset').offsetWidth>0,'Botão reset');
