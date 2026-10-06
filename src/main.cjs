@@ -1,25 +1,30 @@
 'use strict';
-const { app, BrowserWindow, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, Tray, Menu } = require('electron');
 const path = require('node:path');
 const fs = require('node:fs/promises');
 const { spawn } = require('node:child_process');
 const { Engine, validateOptions, exists } = require('./engine.cjs');
+const { GameWindow, OfficialGameWatcher } = require('./game-window.cjs');
 
 const smoke = process.argv.includes('--smoke-ui');
 const integration = process.argv.includes('--verify-engine');
 const verifyRootIndex = process.argv.indexOf('--test-root');
 const verifyOutputIndex = process.argv.indexOf('--test-output');
 if (smoke) app.disableHardwareAcceleration();
-let window, engine;
+let window, engine, tray, officialWatcher;
+const gameWindow = new GameWindow(() => window);
 const state = { busy: false, ready: false, gameRunning: false, text: '', percent: null };
 const pagePath = path.join(__dirname, '..', 'renderer', 'index.html');
 if ((smoke || integration) && verifyRootIndex >= 0) app.setPath('userData', path.join(path.dirname(path.resolve(process.argv[verifyRootIndex + 1])), 'electron-test-profile'));
 
 if (!smoke && !integration && !app.requestSingleInstanceLock()) app.quit();
-app.on('second-instance', () => { if (window) { if (window.isMinimized()) window.restore(); window.focus(); } });
+app.on('second-instance', () => gameWindow.reveal());
 
 function publish(update) {
+  const wasRunning = state.gameRunning;
   Object.assign(state, update);
+  if (!wasRunning && state.gameRunning) gameWindow.started();
+  else if (wasRunning && !state.gameRunning) gameWindow.ended();
   if (window && !window.isDestroyed()) window.webContents.send('launcher:changed', state);
 }
 function trusted(event) {
@@ -51,6 +56,7 @@ function registerHandlers() {
       if (state.gameRunning || engine.gameProcess) throw new Error('O Minecraft já está aberto.');
       await engine.saveSettings(selected);
       if (!await engine.ready()) await engine.install();
+      officialWatcher.stop();
       if (selected.mode === 'microsoft') {
         // Locate the official app before copying libraries or changing its profiles.
         const official = await engine.officialLocation();
@@ -60,7 +66,8 @@ function registerHandlers() {
         } else {
           const error = await shell.openPath(official); if (error) throw new Error('Não consegui abrir o Minecraft Launcher oficial.');
         }
-        return { message: 'No launcher oficial, selecione Hollow SMP e clique em Jogar.' };
+        officialWatcher.start();
+        return { message: 'No launcher oficial, selecione Hollow SMP e clique em Jogar. O Hollow ficará escondido enquanto o jogo estiver aberto.' };
       }
       const pid = await engine.launch(selected.nickname, selected.ram);
       publish({ gameRunning: true });
@@ -88,6 +95,11 @@ async function smokeUi() {
   const errors = [];
   window.webContents.on('console-message', (_event, details) => { if (details.level === 'error') errors.push(details.message); });
   await window.webContents.executeJavaScript(`window.hollowTestReady`);
+  window.show();
+  publish({ gameRunning: true });
+  if (window.isVisible()) throw new Error('Launcher não se escondeu ao abrir o jogo.');
+  publish({ gameRunning: false });
+  if (!window.isVisible()) throw new Error('Launcher não voltou ao fechar o jogo.');
   const report = await window.webContents.executeJavaScript(`(async () => {
     const check = (value, message) => { if (!value) throw new Error(message); };
     const modes = [...document.querySelectorAll('[name="mode"]')];
@@ -101,6 +113,7 @@ async function smokeUi() {
     document.querySelector('#reset').click();check(document.querySelector('#confirm-reset').open,'Confirmação reset');document.querySelector('#cancel-reset').click();check(!document.querySelector('#confirm-reset').open,'Cancelar reset');
     return ['16 trocas de conta: OK','Memória sincronizada: OK','Animação CSS ativa: OK','Fonte incorporada: OK','Interface sem Node: OK','Confirmação e cancelamento de reset: OK'];
   })()`);
+  report.push('Launcher escondido durante o jogo e restaurado ao fechar: OK');
   await fs.writeFile(path.join(output, 'nickname.png'), (await window.webContents.capturePage()).toPNG());
   await window.webContents.executeJavaScript(`document.querySelector('[value="microsoft"]').click()`);
   await new Promise(resolve => setTimeout(resolve, 100));
@@ -114,6 +127,7 @@ app.whenReady().then(async () => {
   const testRoot = (smoke || integration) && verifyRootIndex >= 0 ? path.resolve(process.argv[verifyRootIndex + 1]) : undefined;
   if ((smoke || integration) && !testRoot) throw new Error('As verificações exigem --test-root para isolar os dados do jogador.');
   engine = new Engine({ root: testRoot, assets: app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '..', 'assets'), report: update => publish(update) });
+  officialWatcher = new OfficialGameWatcher({ readPids: () => state.busy ? Promise.reject(new Error('Preparação em andamento.')) : engine.hollowGamePids(), started: () => publish({ gameRunning: true }), ended: () => publish({ gameRunning: false }) });
   if (integration) {
     await engine.install();
     await engine.buildArguments('HollowTeste', 4);
@@ -134,6 +148,16 @@ app.whenReady().then(async () => {
   window.on('close', event => { if (state.busy) { event.preventDefault(); publish({ text: 'Aguarde a preparação terminar para fechar.' }); } });
   window.on('minimize', () => window.webContents.send('launcher:animation', false));
   window.on('restore', () => window.webContents.send('launcher:animation', true));
+  if (!smoke) {
+    tray = new Tray(path.join(__dirname, '..', 'assets', 'hollow.ico'));
+    tray.setToolTip('Hollow SMP — Launcher');
+    tray.on('double-click', () => gameWindow.reveal());
+    tray.setContextMenu(Menu.buildFromTemplate([
+      { label: 'Mostrar launcher', click: () => gameWindow.reveal() },
+      { type: 'separator' },
+      { label: 'Sair', click: () => { if (!state.busy) app.quit(); } },
+    ]));
+  }
   await window.loadFile(pagePath);
   if (smoke) await new Promise(resolve => setTimeout(resolve, 300));
   if (smoke) await smokeUi(); else window.show();
@@ -145,3 +169,4 @@ app.whenReady().then(async () => {
   app.exit(1);
 });
 app.on('window-all-closed', () => app.quit());
+app.on('before-quit', () => { officialWatcher?.stop(); });

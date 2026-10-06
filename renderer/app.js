@@ -58,5 +58,9 @@ $('#cancel-reset').addEventListener('click', () => $('#confirm-reset').close());
 $('#do-reset').addEventListener('click', () => { $('#confirm-reset').close(); execute(() => window.hollow.reset()); });
 $('#message-ok').addEventListener('click', () => $('#message').close());
 document.addEventListener('visibilitychange', () => document.body.classList.toggle('paused', document.hidden));
-window.hollow.onState(value => { current = { ...current, ...value }; render(); });
+window.hollow.onState(value => {
+  if (value.gameRunning && !current.gameRunning && $('#message').open) $('#message').close();
+  current = { ...current, ...value };
+  render();
+});
 window.hollowTestReady = window.hollow.state().then(value => { current = value; settings(value.settings); return true; }).catch(() => { message('Não consegui carregar as preferências. Abra o launcher novamente.'); return false; });

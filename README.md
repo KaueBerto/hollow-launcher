@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/logo_smp.png" alt="Hollow SMP" width="260"></p>
 <h1 align="center">Hollow Launcher</h1>
 <p align="center">Launcher Electron do Hollow SMP para Windows.<br>Instalação automática, visual pixelado e modpack pelo AutoModpack.</p>
-<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-8b2de2"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.0.1-8b2de2"></p>
+<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-8b2de2"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.0.2-8b2de2"></p>
 
 ![Interface do Hollow Launcher](docs/launcher.png)
 
@@ -26,6 +26,7 @@ A versão 2.0 substitui a interface Windows Forms por HTML, CSS e JavaScript, co
 - Flutuação suave da logo com animação CSS por `transform`, pausada ao ocultar a janela. Respeita a preferência do sistema por movimento reduzido.
 - Memória de 2 a 24 GB por arraste ou teclado.
 - Reset com confirmação e preparação automática da nova instalação.
+- Launcher escondido enquanto o Minecraft está aberto, retornando ao fechar o jogo.
 - Downloads HTTPS, hashes, tentativas automáticas e até 12 recursos em paralelo.
 - Janela isolada: Node desabilitado na interface, sandbox e API limitada no preload.
 
@@ -71,7 +72,7 @@ npm run build
 npm run package
 ```
 
-`build` gera `dist/HollowSMP-Launcher-2.0.1.exe`, um executável portátil. `package` gera `dist/HollowSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
+`build` gera `dist/HollowSMP-Launcher-2.0.2.exe`, um executável portátil. `package` gera `dist/HollowSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
 
 O executável não possui certificado de assinatura de código do Hollow. Para uma distribuição assinada, configure seu certificado no electron-builder.
 
@@ -80,6 +81,7 @@ O executável não possui certificado de assinatura de código do Hollow. Para u
 ```text
 src/main.cjs       Janela Electron, estado e IPC
 src/preload.cjs    API limitada exposta à interface
+src/game-window.cjs Visibilidade e acompanhamento do jogo
 src/engine.cjs     Instalação, reset, perfis e inicialização do jogo
 renderer/         HTML, CSS, eventos e animação
 assets/           Logo, ícone, fontes e AutoModpack original
@@ -107,3 +109,6 @@ Monocraft é inspirada no Minecraft, **não a fonte oficial**. AutoModpack, Elec
 O código original e a identidade visual do Hollow SMP não recebem licença de reutilização neste repositório. As licenças de terceiros se aplicam aos respectivos componentes.
 
 Projeto independente do Hollow SMP, sem vínculo oficial com Mojang ou Microsoft.
+## Enquanto o Minecraft está aberto
+
+O Hollow se esconde ao iniciar o Minecraft e volta quando o jogo encerra. No modo Microsoft, aguarda o jogo Hollow SMP iniciar pelo launcher oficial. Para abrir o Hollow durante a partida, use o ícone perto do relógio: clique duas vezes ou escolha **Mostrar launcher**. Abrir o executável novamente também traz a janela existente.

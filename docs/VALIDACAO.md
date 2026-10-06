@@ -44,3 +44,7 @@ A captura de teste usa renderização offscreen por software para funcionar sem 
 ## Animação — 2.0.1
 
 Flutuação com ciclo de oito segundos, deslocamento vertical de 14 px, lateral de 6 px e inclinação suave de ±0,55°. O teste da interface verifica deslocamento, inclinação e continuidade no reinício do ciclo.
+
+## Janela escondida — 2.0.2
+
+16 testes passaram, incluindo ocultar/restaurar, reabertura manual, acompanhamento Microsoft, falha de consulta e cancelamento de consulta antiga. A interface Electron confirmou esconder e restaurar uma BrowserWindow real. O detector Windows identificou e acompanhou o encerramento de um processo Java de teste isolado; não foi realizado login Microsoft real.

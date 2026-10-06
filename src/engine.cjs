@@ -332,6 +332,16 @@ class Engine {
     const { stdout } = await runFile('tasklist.exe', ['/FO', 'CSV', '/NH'], { windowsHide: true, timeout: 15000 });
     return /^"javaw?\.exe"/im.test(stdout);
   }
+  async hollowGamePids() {
+    if (this.platform !== 'win32') return [];
+    const encodedRoot = Buffer.from(this.game).toString('base64');
+    const encodedJava = Buffer.from(this.java).toString('base64');
+    const script = "$ErrorActionPreference='Stop'; $game=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('" + encodedRoot + "')); $java=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('" + encodedJava + "')); $ids=@(Get-CimInstance Win32_Process -Filter \"Name='java.exe' OR Name='javaw.exe'\" | Where-Object { ($_.ExecutablePath -and $_.ExecutablePath -ieq $java) -or ($_.CommandLine -and $_.CommandLine.IndexOf($game,[StringComparison]::OrdinalIgnoreCase) -ge 0) } | Select-Object -ExpandProperty ProcessId); ConvertTo-Json -InputObject $ids -Compress";
+    const { stdout } = await runFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-EncodedCommand', Buffer.from(script, 'utf16le').toString('base64')], { windowsHide: true, timeout: 15000 });
+    const ids = JSON.parse(stdout.trim());
+    if (!Array.isArray(ids) || ids.some(pid => !Number.isInteger(pid) || pid <= 0)) throw new Error('Não consegui acompanhar o Minecraft.');
+    return ids;
+  }
   async assertNoLinks(root) {
     let ancestor = path.resolve(root);
     while (true) {

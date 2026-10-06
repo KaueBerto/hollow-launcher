@@ -1,4 +1,4 @@
-HOLLOW SMP LAUNCHER — 2.0.1 — Electron
+HOLLOW SMP LAUNCHER — 2.0.2 — Electron
 
 1. Extraia o pacote e abra HollowSMP-Launcher.exe.
 2. Escolha Nickname ou Microsoft e ajuste a memória na barra.
@@ -40,3 +40,9 @@ Projeto independente, sem vínculo oficial com Mojang ou Microsoft.
 VERSÃO ELECTRON
 Feche o launcher antigo antes de usar esta versão. A instalação existente
 e as preferências são reaproveitadas. Não é preciso instalar Node.js.
+
+DURANTE O JOGO
+O launcher se esconde quando o Minecraft inicia e retorna ao fechar.
+No modo Microsoft, aguarda você iniciar Hollow SMP no programa oficial.
+Para abrir durante a partida, use o ícone perto do relógio ou abra o
+executável novamente. Não é preciso deixar a janela na frente do jogo.
