@@ -1,12 +1,10 @@
-# Ambiente do End
+# Ambiente do launcher
 
-Arte original criada pelo recurso integrado de geração de imagens, usando a skill imagegen, para o fundo do Hollow Launcher. Arquivo nos fontes: `assets/end-background.png`. A logo original e o ícone não foram alterados.
+O fundo atual é a paisagem Minecraft fornecida pelo responsável do Hollow na versão 2.1.0-rc.5. A imagem foi copiada integralmente para `assets/end-background.png`; esse nome interno foi mantido por compatibilidade. A logo e o ícone permanecem originais.
 
-As partículas, névoa, deslocamento do cenário e reação do portal são feitos em CSS. O campo tem 18 partículas, animações pausadas quando a janela está escondida e alternativa estática para movimento reduzido.
+O escurecimento é aplicado em CSS para manter textos e controles legíveis. Partículas, névoa, deslocamento suave e reação do portal também usam CSS, com pausa ao esconder e alternativa estática para movimento reduzido.
 
-## Prompt final utilizado
-
-Use case: stylized-concept. Asset type: widescreen desktop Minecraft modpack launcher background, landscape 16:9. Create an original cinematic voxel/block-world environment inspired by Minecraft's End dimension, with dark obsidian towers, distant floating islands and blocky pale end-stone ledges, deep charcoal-plum void sky, subdued violet ambient lighting, a faint magenta glow on the horizon and soft purple mist. No characters, no portal, no text, no letters, no logo, no UI. Composition purpose: launcher controls occupy the left 45% and a large existing colorful logo will overlay the right center. Keep left half extremely quiet and dark with empty negative space, mostly dark void and distant mist. Place the most interesting but restrained voxel silhouettes low along the bottom and far right edges. Maintain visible block geometry, clean atmospheric depth, muted colors and moderate contrast; no bright lights behind controls, no busy texture, no yellow sky, no photorealism. Background should evoke an immersive calm End landscape while leaving the launcher UI readable. Finished production-quality environmental art, not a mockup.
+O cenário gerado anteriormente para a versão rc.3 e seu prompt continuam disponíveis no histórico do Git.
 
 ## Painel do servidor
 

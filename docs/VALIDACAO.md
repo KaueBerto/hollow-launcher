@@ -65,3 +65,8 @@ Seis testes do status Java: frames fragmentados e pong, servidor sem pong, timeo
 
 Título redundante removido e formulário reposicionado. Verificação Electron passou: controles, memória, animações, modos de conta, avisos, ocultar/restaurar e cenário. Captura revisada visualmente.
 
+
+## Fundo fornecido — 2.1.0-rc.5
+
+Paisagem enviada pelo responsável copiada sem alteração. Escurecimento ajustado em CSS. Interface Electron passou e captura foi revisada quanto a alinhamento e legibilidade.
+

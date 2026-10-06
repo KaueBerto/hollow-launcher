@@ -3,7 +3,7 @@
 * { box-sizing: border-box; }
 body { margin: 0; color: var(--ink); background: #100917; user-select: none; overflow: hidden; }
 .ambient { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-.ambient::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #100917bb 0%, #10091766 42%, #10091714 67%, #10091733 100%), linear-gradient(0deg, #0e081bbb, transparent 28%, transparent 84%, #0e081b77); }
+.ambient::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #100917db 0%, #100917b3 42%, #10091766 67%, #10091780 100%), linear-gradient(0deg, #0e081b99, transparent 32%, transparent 75%, #0e081b80); }
 .end-scene { position: absolute; inset: -2%; background: url('../assets/end-background.png') center/cover no-repeat; opacity: .88; animation: scene-drift 40s ease-in-out infinite alternate; }
 .end-mist { position: absolute; inset: -20%; opacity: .17; background: radial-gradient(ellipse at 70% 70%, #ba3df55c, transparent 45%), radial-gradient(ellipse at 30% 80%, #9f63ff44, transparent 42%); animation: mist-drift 24s ease-in-out infinite alternate; }
 @keyframes scene-drift { from { transform: translate3d(-4px, 0, 0) scale(1); } to { transform: translate3d(4px, -3px, 0) scale(1.015); } }
