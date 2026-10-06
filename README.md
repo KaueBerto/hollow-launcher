@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/logo_smp.png" alt="Hollow SMP" width="260"></p>
 <h1 align="center">Hollow Launcher</h1>
 <p align="center">Launcher Electron do Hollow SMP para Windows.<br>Instalação automática, visual pixelado e modpack pelo AutoModpack.</p>
-<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-8b2de2"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.1.0-rc.1-8b2de2"></p>
+<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-8b2de2"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.1.0-rc.2-8b2de2"></p>
 
 ![Interface do Hollow Launcher](docs/launcher.png)
 
@@ -24,6 +24,7 @@ A versão 2.0 substitui a interface Windows Forms por HTML, CSS e JavaScript, co
 
 - Cores roxas da logo, fonte Monocraft em negrito e controles superiores sem borda.
 - Flutuação suave da logo com animação CSS por `transform`, pausada ao ocultar a janela. Respeita a preferência do sistema por movimento reduzido.
+- Entrada suave da interface, brilho discreto e pressão nos botões, troca animada de conta, progresso e avisos com transições. Animações não deslocam o layout final nem bloqueiam os controles.
 - Memória de 2 a 24 GB por arraste ou teclado.
 - Reset com confirmação e preparação automática da nova instalação.
 - Launcher escondido enquanto o Minecraft está aberto, retornando ao fechar o jogo.
@@ -74,7 +75,7 @@ npm run build
 npm run package
 ```
 
-`build` gera `dist/HollowSMP-Launcher-2.1.0-rc.1.exe`, um executável portátil. `package` gera `dist/HollowSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
+`build` gera `dist/HollowSMP-Launcher-2.1.0-rc.2.exe`, um executável portátil. `package` gera `dist/HollowSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
 
 O executável não possui certificado de assinatura de código do Hollow. Para uma distribuição assinada, configure seu certificado no electron-builder.
 

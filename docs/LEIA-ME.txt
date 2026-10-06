@@ -1,4 +1,4 @@
-HOLLOW SMP LAUNCHER — 2.1.0-rc.1 — Electron
+HOLLOW SMP LAUNCHER — 2.1.0-rc.2 — Electron
 
 1. Extraia o pacote e abra HollowSMP-Launcher.exe.
 2. Escolha Nickname ou Microsoft e ajuste a memória na barra.
@@ -47,3 +47,8 @@ O launcher se esconde quando o Minecraft inicia e retorna ao fechar.
 Microsoft também abre o jogo diretamente após a autorização.
 Para abrir durante a partida, use o ícone perto do relógio ou abra o
 executável novamente. Não é preciso deixar a janela na frente do jogo.
+
+MOTION DESIGN
+Entrada suave, botões com brilho discreto e efeito de pressão, troca de
+conta animada, barra de progresso e avisos com transições suaves.
+Respeita a opção do Windows de reduzir movimentos e pausa ao ocultar.

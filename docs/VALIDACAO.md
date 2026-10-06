@@ -52,3 +52,7 @@ Flutuação com ciclo de oito segundos, deslocamento vertical de 14 px, lateral 
 ## Prévia 2.1.0-rc.1 — Microsoft direto
 
 Integração OAuth PKCE implementada; nenhum launcher oficial é aberto. Oito testes novos verificam callback local/state/PKCE, renovação, cancelamento, recusa da API, conta sem acesso ao Java, ausência de criptografia, argumentos online e ocultação de tokens. Serviços Microsoft/Xbox/Minecraft simulados; conta real e servidor autenticado ainda não validados. O smoke Electron verifica nome de conta, cancelamento e criptografia Windows real. Um Java real verificou a proteção do arquivo de argumentos e sua remoção ao encerrar. Consulte MICROSOFT.md: falta Client ID próprio aprovado.
+
+## Motion design — 2.1.0-rc.2
+
+Teste Electron: entrada concluída, 12 trocas rápidas de conta sem deslocar a área de entrada, fechamento animado e Escape nos avisos, confirmação de instalação e limpeza do indicador, movimento reduzido e mudança dessa preferência sem esconder a interface. A flutuação original da logo, memória e ocultar/restaurar o launcher continuam verificados.

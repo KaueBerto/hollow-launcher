@@ -93,6 +93,7 @@ async function smokeUi() {
   window.webContents.on('console-message', (_event, details) => { if (details.level === 'error') errors.push(details.message); });
   await window.webContents.executeJavaScript(`window.hollowTestReady`);
   window.show();
+  await window.webContents.executeJavaScript(`if(!document.body.classList.contains('entered') || getComputedStyle(document.querySelector('.controls')).animationName!=='panel-enter') throw new Error('Entrada suave ausente');`);
   publish({ gameRunning: true });
   if (window.isVisible()) throw new Error('Launcher não se escondeu ao abrir o jogo.');
   publish({ gameRunning: false });
@@ -107,8 +108,13 @@ async function smokeUi() {
     check(await document.fonts.load('700 16px Monocraft').then(fonts=>fonts.length>0),'Fonte não carregada');
     check(typeof require==='undefined' && typeof process==='undefined','Node exposto à interface');
     check(document.querySelector('#reset').offsetWidth>0,'Botão reset');
-    document.querySelector('#reset').click();check(document.querySelector('#confirm-reset').open,'Confirmação reset');document.querySelector('#cancel-reset').click();check(!document.querySelector('#confirm-reset').open,'Cancelar reset');
-    return ['16 trocas de conta: OK','Memória sincronizada: OK','Animação CSS ativa: OK','Fonte incorporada: OK','Interface sem Node: OK','Confirmação e cancelamento de reset: OK'];
+    const wait = ms=>new Promise(resolve=>setTimeout(resolve,ms));
+    document.querySelector('#reset').click();check(document.querySelector('#confirm-reset').open,'Confirmação reset');document.querySelector('#cancel-reset').click();await wait(200);check(!document.querySelector('#confirm-reset').open,'Cancelar reset');
+    await wait(850);const box=document.querySelector('.account-input').getBoundingClientRect();
+    for(let i=0;i<12;i++) modes[i%2].click();await wait(280);const nextBox=document.querySelector('.account-input').getBoundingClientRect();check(Math.abs(box.x-nextBox.x)<.1 && Math.abs(box.y-nextBox.y)<.1 && Math.abs(box.width-nextBox.width)<.1,'Troca de conta deslocou o layout');
+    check(getComputedStyle(document.querySelector('.controls')).opacity==='1' && !document.body.classList.contains('entering'),'Entrada não terminou');
+    document.querySelector('#reset').click();await wait(250);document.querySelector('#confirm-reset').dispatchEvent(new Event('cancel',{cancelable:true}));await wait(200);check(!document.querySelector('#confirm-reset').open,'Escape durante animação');
+    return ['16 trocas de conta: OK','Memória sincronizada: OK','Animação CSS ativa: OK','Fonte incorporada: OK','Interface sem Node: OK','Confirmação e cancelamento de reset: OK','Motion: entrada, trocas rápidas sem deslocamento e Escape nos avisos: OK'];
   })()`);
   report.push('Launcher escondido durante o jogo e restaurado ao fechar: OK');
   if (!safeStorage.isEncryptionAvailable()) throw new Error('Criptografia Windows indisponível no teste.');
@@ -119,6 +125,21 @@ async function smokeUi() {
   await window.webContents.executeJavaScript(`document.querySelector('[value="microsoft"]').checked=true; render(); if(document.querySelector('#cancel-login').hidden || document.querySelector('#account-note').textContent!=='HollowTeste') throw new Error('Controles do login Microsoft');`);
   publish({ authPending: false, busy: false, account: null });
   report.push('Nome de conta e cancelamento Microsoft: OK');
+  publish({ busy: true, ready: false, text: 'Preparando…' });
+  publish({ text: 'Instalação concluída.', percent: 100 });
+  await window.webContents.executeJavaScript(`if(!document.querySelector('.progress-area').classList.contains('finishing') || document.querySelector('#progress').value!==100) throw new Error('Confirmação visual de conclusão');`);
+  publish({ busy: false, ready: true, text: '', percent: null });
+  await new Promise(resolve=>setTimeout(resolve,1900));
+  await window.webContents.executeJavaScript(`if(!document.querySelector('.progress-area').hidden) throw new Error('Conclusão ficou presa na tela');`);
+  // Browser emulation verifies reduced motion without changing the user's Windows settings.
+  await window.webContents.debugger.attach('1.3');
+  await window.webContents.debugger.sendCommand('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
+  await window.webContents.executeJavaScript(`(async()=>{document.querySelector('[value="nickname"]').click(); document.querySelector('#reset').click(); document.querySelector('#cancel-reset').click(); if(document.querySelector('#confirm-reset').open || getComputedStyle(document.querySelector('.logo')).animationName!=='none') throw new Error('Preferência por movimento reduzido');})()`);
+  await window.webContents.debugger.sendCommand('Emulation.setEmulatedMedia', { features: [] });
+  window.webContents.debugger.detach();
+  await window.webContents.executeJavaScript(`if(getComputedStyle(document.querySelector('.controls')).opacity!=='1' || getComputedStyle(document.querySelector('.brand')).opacity!=='1') throw new Error('Interface sumiu ao trocar preferência de movimento');`);
+  publish({ busy: false, ready: false, text: '', percent: null, account: null });
+  report.push('Motion: conclusão sem travar controles e preferência por movimento reduzido: OK');
   await window.webContents.executeJavaScript(`document.querySelector('[value="nickname"]').click()`);
   await fs.writeFile(path.join(output, 'nickname.png'), (await window.webContents.capturePage()).toPNG());
   await window.webContents.executeJavaScript(`document.querySelector('[value="microsoft"]').click()`);
