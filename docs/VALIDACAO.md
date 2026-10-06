@@ -74,3 +74,8 @@ Paisagem enviada pelo responsável copiada sem alteração. Escurecimento ajusta
 
 Cinco testes com peer local simulam handshake fragmentado, presença fixa sem detalhes, limpeza ao sair, heartbeat, reconexão, Discord iniciado depois, ID ausente, cancelamento e frames excessivos/recusa. A conexão continua durante minimizar/esconder: nenhum evento de janela altera a presença. Sem ID, nenhum pipe é aberto. A exibição em conta real ainda não foi validada e a ativação depende do Application ID próprio do HollowSMP.
 
+
+## Discord ativado — 2.1.0-rc.6
+
+Application ID público do HollowSMP configurado. O Discord desktop desta máquina respondeu ao SET_ACTIVITY e confirmou a presença ativa no teste real por IPC. Limpeza enviada ao terminar. Cinco testes do protocolo passaram novamente. A visibilidade no perfil depende das preferências de atividade do jogador; não foi inspecionado o perfil de uma conta.
+

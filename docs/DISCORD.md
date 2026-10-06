@@ -8,7 +8,7 @@ Enquanto o launcher estiver aberto, a atividade é sempre **Jogando HollowSMP**.
 2. Em **General Information**, copie o **Application ID** público.
 3. Preencha `applicationId` em `src/discord-config.cjs` e gere novamente o executável. O mesmo ID funciona para os jogadores que usam essa distribuição.
 
-Não é necessário bot, token de usuário, bot token, client secret ou senha. O ID ainda está vazio: a integração permanece desativada até o responsável fornecê-lo.
+Não é necessário bot, token de usuário, bot token, client secret ou senha. O Application ID público do HollowSMP está configurado: `1557116892945055754`.
 
 O jogador precisa do aplicativo Discord aberto no computador e da exibição de atividade habilitada nas configurações do Discord. Se o Discord abrir depois, o launcher tenta conectar novamente. Falhas não impedem instalar ou abrir o Minecraft.
 
@@ -16,6 +16,6 @@ O jogador precisa do aplicativo Discord aberto no computador e da exibição de 
 
 A conexão usa somente os pipes locais `discord-ipc-0` a `discord-ipc-9`, handshake v1 e `SET_ACTIVITY` com tipo Playing. Sem dependência adicional, autenticação ou acesso a mensagens. Respostas READY não são expostas ao renderer nem registradas. Frames limitados, timeout de conexão, reconexão e encerramento limitado a 250 ms.
 
-Testes usam um servidor IPC simulado: READY fragmentado, atividade fixa/limpeza, heartbeat, reconexão, Discord iniciado depois, ID ausente, cancelamento e frames inválidos. Isso verifica o protocolo e o ciclo de vida; a exibição em uma conta real depende de configurar um Application ID válido.
+Testes usam um servidor IPC simulado: READY fragmentado, atividade fixa/limpeza, heartbeat, reconexão, Discord iniciado depois, ID ausente, cancelamento e frames inválidos. Isso verifica o protocolo e o ciclo de vida. A aceitação pelo Discord desktop é verificada separadamente quando ele está aberto; a exibição depende das preferências de atividade do jogador.
 
 Referências oficiais: [RPC via IPC](https://discord.com/developers/docs/topics/rpc#rpc-over-ipc) e [Rich Presence](https://discord.com/developers/docs/rich-presence/overview).
