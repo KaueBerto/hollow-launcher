@@ -47,10 +47,10 @@ function offlineUuid(nickname) {
   bytes[8] = (bytes[8] & 63) | 128;
   return bytes.toString('hex');
 }
-function validateOptions(options) {
+function validateOptions(options, { requireNickname = true } = {}) {
   if (!options || !['nickname', 'microsoft'].includes(options.mode)) throw new Error('Escolha uma conta válida.');
   if (!Number.isInteger(options.ram) || options.ram < 2 || options.ram > 24) throw new Error('Escolha de 2 a 24 GB de memória.');
-  if (options.mode === 'nickname' && !/^[A-Za-z0-9_]{3,16}$/.test(options.nickname || '')) {
+  if (requireNickname && options.mode === 'nickname' && !/^[A-Za-z0-9_]{3,16}$/.test(options.nickname || '')) {
     throw new Error('Use um nickname de 3 a 16 letras, números ou _.');
   }
   return { mode: options.mode, ram: options.ram, nickname: String(options.nickname || '').slice(0, 16), remember: Boolean(options.remember) };
@@ -139,8 +139,8 @@ class Engine {
       return { mode, ram, nickname: String(value.nickname || '').slice(0, 16), remember: value.remember !== false };
     } catch { return defaults; }
   }
-  async saveSettings(options) {
-    const value = validateOptions(options);
+  async saveSettings(options, validation) {
+    const value = validateOptions(options, validation);
     await writeJson(path.join(this.root, 'launcher-settings.json'), { ...value, nickname: value.remember ? value.nickname : '' });
   }
   async jsonFrom(url) {
@@ -385,14 +385,17 @@ class Engine {
       catch { throw new Error('Não foi possível acessar todos os arquivos. Feche o Minecraft e tente novamente.'); }
     }
     await this.assertNoLinks(this.root);
+    // Keep preferences in place: a failed reset must not strand them in a backup.
+    const preserved = new Set(['launcher-settings.json', 'game/options.txt', 'game/optionsof.txt', 'game/optionsshaders.txt', 'game/servers.dat', 'game/config'].map(name => under(this.root, name).toLowerCase()));
     async function remove(directory) {
       for (const entry of await fs.readdir(directory)) {
         const full = under(directory, entry), stat = await fs.lstat(full);
         if (stat.isSymbolicLink()) throw new Error('Reset bloqueado: link na instalação.');
+        if (preserved.has(full.toLowerCase())) continue;
         if (stat.isDirectory()) await remove(full);
         else { await fs.chmod(full, 0o666); await fs.unlink(full); }
       }
-      await fs.rmdir(directory);
+      if (!(await fs.readdir(directory)).length) await fs.rmdir(directory);
     }
     await remove(this.root);
   }

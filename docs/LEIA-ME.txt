@@ -1,4 +1,4 @@
-HOLLOW SMP LAUNCHER — 2.2.2 — Electron
+HOLLOW SMP LAUNCHER — 2.2.3 — Electron
 
 1. Execute HollowSMP-Instalar.exe e abra o atalho do Hollow.
 2. Escolha Nickname ou Microsoft e ajuste a memória na barra.
@@ -20,10 +20,12 @@ instalação pode levar vários minutos. O pack é baixado dentro do jogo,
 na primeira conexão ao servidor. Não escolha mais RAM que seu PC possui.
 
 RESETAR
-O botão no topo pede confirmação, apaga a instalação do Hollow e baixa
-a base do jogo novamente. Isso remove mods, configurações, mundos
-locais, screenshots, logs, Java e preferências. Não é possível desfazer.
-Faça backup do que deseja guardar. Feche o Minecraft e outros programas
+O botão no topo pede confirmação e reinstala a base do jogo.
+Preserva nickname, memória, opções de teclas, vídeo, sensibilidade,
+áudio, servidores favoritos e configurações dos mods. Remove mods,
+Java, mundos locais, screenshots, logs e sessão Microsoft.
+Faça backup dos mundos e screenshots que deseja guardar.
+Feche o Minecraft e outros programas
 Java antes. O reset não modifica o servidor nem remove os perfis e
 bibliotecas compartilhados do launcher oficial. Entre novamente no
 servidor para receber o modpack após o reset.

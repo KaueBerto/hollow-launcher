@@ -83,16 +83,18 @@ function registerHandlers() {
       return { pid };
     }));
   });
-  ipcMain.handle('launcher:reset', async event => {
+  ipcMain.handle('launcher:reset', async (event, options) => {
     trusted(event);
     return result(() => prepare(async () => {
       if (state.gameRunning) throw new Error('Feche o Minecraft antes de resetar.');
+      const selected = validateOptions(options, { requireNickname: false });
       publish({ text: 'Limpando a instalação…' });
       await engine.reset();
+      await engine.saveSettings(selected, { requireNickname: false });
       microsoft.session = null;
       publish({ account: null });
       await engine.install();
-      return { settings: await engine.loadSettings(), message: 'Instalação renovada. Clique em Jogar e entre no servidor para receber o modpack.' };
+      return { settings: selected, message: 'Instalação renovada. Seu nickname e suas opções foram preservados. Clique em Jogar e entre no servidor para receber o modpack.' };
     }));
   });
   ipcMain.handle('launcher:logout', async event => { trusted(event); return result(async () => {
@@ -195,6 +197,31 @@ async function smokeUi() {
   await window.webContents.executeJavaScript(`if(innerWidth!==920 || innerHeight!==530) throw new Error('Launcher não voltou ao tamanho normal');`);
   await window.webContents.executeJavaScript(`if(!document.querySelector('#startup-update').hidden || document.querySelector('main').inert) throw new Error('Tela inicial não liberou o launcher');`);
   report.push('Tela inicial compacta: controles protegidos, progresso alinhado, aplicação automática e abertura do launcher: OK');
+  // Exercise the real reset IPC and filesystem in the isolated smoke root, without game downloads.
+  const originalInstall = engine.install, originalJavaRunning = engine.javaRunning;
+  engine.install = async () => {};
+  engine.javaRunning = async () => false;
+  const playerOptions = 'renderDistance:14\nmouseSensitivity:0.65\nkey_key.forward:key.keyboard.up\n';
+  await fs.mkdir(path.join(engine.game, 'config'), { recursive: true });
+  await fs.writeFile(path.join(engine.game, 'options.txt'), playerOptions);
+  await fs.writeFile(path.join(engine.game, 'config', 'client.json'), '{"sentinel":true}');
+  try {
+    for (const remember of [true, false]) {
+      await window.webContents.executeJavaScript(`document.querySelector('[value="nickname"]').click(); document.querySelector('#nickname').value='TypedHollow'; document.querySelector('#nickname').dispatchEvent(new Event('input')); document.querySelector('#ram').value='9'; document.querySelector('#remember').checked=${remember}; document.querySelector('#reset').click(); document.querySelector('#do-reset').click();`);
+      let finished = false;
+      for (let i = 0; i < 100; i++) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        if (await window.webContents.executeJavaScript(`document.querySelector('#message').open`)) { finished = true; break; }
+      }
+      if (!finished) throw new Error('Reset não terminou no smoke');
+      await window.webContents.executeJavaScript(`if(document.querySelector('#nickname').value!=='TypedHollow' || document.querySelector('#ram').value!=='9' || document.querySelector('#remember').checked!==${remember} || !document.querySelector('#message-text').textContent.includes('preservados')) throw new Error('Reset perdeu preferências ou falhou'); document.querySelector('#message').close();`);
+      const saved = await engine.loadSettings();
+      if (saved.nickname !== (remember ? 'TypedHollow' : '') || saved.ram !== 9 || saved.remember !== remember) throw new Error('Preferências salvas após reset incorretas');
+      if (await fs.readFile(path.join(engine.game, 'options.txt'), 'utf8') !== playerOptions) throw new Error('Reset perdeu opções do jogo');
+      if (await fs.readFile(path.join(engine.game, 'config', 'client.json'), 'utf8') !== '{"sentinel":true}') throw new Error('Reset perdeu configuração do mod');
+    }
+  } finally { engine.install = originalInstall; engine.javaRunning = originalJavaRunning; }
+  report.push('Reset real isolado: nickname recém-digitado, RAM, lembrar nickname, teclas, vídeo e config de mod preservados: OK');
   await window.webContents.executeJavaScript(`document.querySelector('[value="nickname"]').click()`);
   await new Promise(resolve=>setTimeout(resolve,800));
   await fs.writeFile(path.join(output, 'nickname.png'), (await window.webContents.capturePage()).toPNG());

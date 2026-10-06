@@ -143,7 +143,7 @@ for (const mode of document.querySelectorAll('[name=mode]')) mode.addEventListen
 });
 $('#reset').addEventListener('click', () => { if (!current.busy) { clearTimeout(saveTimer); showDialog($('#confirm-reset')); } });
 $('#cancel-reset').addEventListener('click', () => closeDialog($('#confirm-reset')));
-$('#do-reset').addEventListener('click', () => { closeDialog($('#confirm-reset')); execute(() => window.hollow.reset()); });
+$('#do-reset').addEventListener('click', () => { const selected = options(); closeDialog($('#confirm-reset')); execute(() => window.hollow.reset(selected)); });
 $('#message-ok').addEventListener('click', () => closeDialog($('#message')));
 for (const dialog of document.querySelectorAll('dialog')) dialog.addEventListener('cancel', event => { event.preventDefault(); closeDialog(dialog); });
 document.addEventListener('visibilitychange', () => {

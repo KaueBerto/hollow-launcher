@@ -5,7 +5,7 @@ contextBridge.exposeInMainWorld('hollow', Object.freeze({
   state: () => ipcRenderer.invoke('launcher:state'),
   save: options => ipcRenderer.invoke('launcher:save', options),
   play: options => ipcRenderer.invoke('launcher:play', options),
-  reset: () => ipcRenderer.invoke('launcher:reset'),
+  reset: options => ipcRenderer.invoke('launcher:reset', options),
   checkUpdate: () => ipcRenderer.invoke('launcher:update-check'),
   installUpdate: () => ipcRenderer.invoke('launcher:update-install'),
   refreshServer: () => ipcRenderer.invoke('launcher:server-refresh'),

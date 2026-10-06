@@ -55,6 +55,25 @@ test('reset bloqueia Java aberto sem apagar arquivos', async () => fixture(async
   await assert.rejects(engine.reset(), /Feche o Minecraft/);
   assert.equal((await readJson(path.join(engine.root, 'ready.json'))).sentinel, true);
 }));
+test('reset preserves launcher preferences, all Minecraft options and nested mod config byte-for-byte', async () => fixture(async engine => {
+  const preserved = {
+    'launcher-settings.json': JSON.stringify({ mode: 'nickname', nickname: 'HollowADM', ram: 10, remember: true }),
+    'game/options.txt': 'renderDistance:12\nmouseSensitivity:0.73\nkey_key.forward:key.keyboard.up\nkey_mod.action:key.keyboard.r\n',
+    'game/optionsof.txt': 'ofRenderRegions:true\n', 'game/optionsshaders.txt': 'shaderPack=test\n',
+    'game/servers.dat': Buffer.from([10, 0, 0, 9]),
+    'game/config/client.json': '{"custom":true}', 'game/config/nested/keys.toml': 'key="R"\n',
+  };
+  for (const [relative, content] of Object.entries(preserved)) {
+    const file = path.join(engine.root, relative); await fs.mkdir(path.dirname(file), { recursive: true }); await fs.writeFile(file, content);
+  }
+  const removed = ['ready.json', 'runtime/bin/java.exe', 'game/mods/broken.jar', 'game/assets/old', 'game/saves/world/level.dat', 'game/screenshots/old.png', 'game-args.txt', 'microsoft-session.json'];
+  for (const relative of removed) { const file = path.join(engine.root, relative); await fs.mkdir(path.dirname(file), { recursive: true }); await fs.writeFile(file, 'remove'); }
+  await engine.reset(); await engine.reset();
+  for (const [relative, content] of Object.entries(preserved)) assert.deepEqual(await fs.readFile(path.join(engine.root, relative)), Buffer.from(content));
+  for (const relative of removed) await assert.rejects(fs.access(path.join(engine.root, relative)));
+  assert.equal((await engine.loadSettings()).nickname, 'HollowADM');
+  assert.equal((await engine.loadSettings()).ram, 10);
+}));
 test('reset recusa junction e preserva seu alvo externo', async () => fixture(async (engine, folder) => {
   const target = path.join(folder, 'outside'); await fs.mkdir(target); await fs.writeFile(path.join(target, 'keep.txt'), 'keep');
   await fs.mkdir(engine.root); const link = path.join(engine.root, 'linked');
