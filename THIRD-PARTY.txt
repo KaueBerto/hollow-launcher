@@ -35,3 +35,7 @@ Chromium são preservados no runtime e no ZIP de distribuição.
 adm-zip 0.6.1 — licença MIT.
 https://github.com/cthackers/adm-zip
 Licença em licenses/adm-zip-LICENSE.txt.
+
+electron-updater 6.8.9 — licença MIT.
+https://github.com/electron-userland/electron-builder
+Licença em licenses/electron-updater-LICENSE.txt.

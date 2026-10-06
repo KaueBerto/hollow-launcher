@@ -19,6 +19,8 @@ button:focus-visible, input:focus-visible, .account-modes label:has(input:focus-
 .titlebar { position: relative; z-index: 1; height: 54px; display: flex; align-items: flex-start; padding: 8px 12px 0 0; }
 .drag-region { flex: 1; height: 46px; -webkit-app-region: drag; }
 .titlebar nav { display: flex; align-items: center; gap: 9px; -webkit-app-region: no-drag; }
+.launcher-update { -webkit-app-region: no-drag; }
+#launcher-update { font-size: 10px; color: #d6a0f2; }
 .text-action, .icon-action { border: 0; background: transparent; box-shadow: none; color: var(--muted); }
 .text-action { padding: 10px 12px; font-size: 12px; line-height: 1.5; }
 .text-action:hover, .icon-action:hover { color: #e0a4ff; }

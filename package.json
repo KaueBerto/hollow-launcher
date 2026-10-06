@@ -1,6 +1,6 @@
 {
   "name": "hollow-launcher",
-  "version": "2.1.0-rc.6",
+  "version": "2.2.0",
   "description": "Launcher Electron do Hollow SMP para Windows",
   "author": "Hollow SMP",
   "license": "UNLICENSED",
@@ -10,11 +10,12 @@
     "start": "electron .",
     "test": "node --test tests/*.test.cjs",
     "test:ui": "node scripts/smoke.cjs",
-    "build": "electron-builder --win portable --x64 --publish never",
+    "build": "electron-builder --win nsis --x64 --publish never",
     "package": "node scripts/package.cjs"
   },
   "dependencies": {
-    "adm-zip": "0.6.1"
+    "adm-zip": "0.6.1",
+    "electron-updater": "6.8.9"
   },
   "devDependencies": {
     "electron": "44.5.1",
@@ -51,13 +52,25 @@
     ],
     "asar": true,
     "win": {
-      "target": "portable",
+      "target": "nsis",
       "icon": "assets/hollow.ico",
-      "artifactName": "HollowSMP-Launcher-${version}.exe",
+      "artifactName": "HollowSMP-Launcher-Setup-${version}.exe",
       "signAndEditExecutable": true
     },
-    "portable": {
-      "requestExecutionLevel": "user"
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false,
+      "runAfterFinish": true,
+      "createDesktopShortcut": true
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "KaueBerto",
+      "repo": "hollow-launcher",
+      "releaseType": "release"
     }
   }
 }

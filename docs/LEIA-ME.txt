@@ -1,6 +1,6 @@
-HOLLOW SMP LAUNCHER — 2.1.0-rc.6 — Electron
+HOLLOW SMP LAUNCHER — 2.2.0 — Electron
 
-1. Extraia o pacote e abra HollowSMP-Launcher.exe.
+1. Execute HollowSMP-Instalar.exe e abra o atalho do Hollow.
 2. Escolha Nickname ou Microsoft e ajuste a memória na barra.
 3. Clique em Instalar e jogar e aguarde a preparação inicial.
 4. Abra Multijogador e entre no Hollow SMP.
@@ -58,3 +58,9 @@ Cenário local, névoa e partículas discretas. O portal reage ao clicar
 em Jogar e durante a preparação. O painel mostra status, jogadores
 e ping reais, com atualização automática ou pelo botão circular.
 Se mostrar Sem resposta, você ainda pode tentar entrar normalmente.
+
+ATUALIZAÇÕES DO LAUNCHER
+Instale esta versão uma vez para ativar as próximas atualizações.
+O launcher consulta as Releases do GitHub e baixa versões novas em
+segundo plano. Feche o Minecraft e clique em Atualizar e reiniciar.
+Os dados do jogo e as preferências são preservados.

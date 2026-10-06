@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/logo_smp.png" alt="Hollow SMP" width="260"></p>
 <h1 align="center">Hollow Launcher</h1>
 <p align="center">Launcher Electron do Hollow SMP para Windows.<br>Instalação automática, visual pixelado e modpack pelo AutoModpack.</p>
-<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-8b2de2"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.1.0-rc.6-8b2de2"></p>
+<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-8b2de2"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.2.0-8b2de2"></p>
 
 ![Interface do Hollow Launcher](docs/launcher.png)
 
@@ -9,7 +9,7 @@ O fundo usa a paisagem Minecraft fornecida pelo responsável do Hollow, com escu
 
 ## Baixar e jogar
 
-Baixe o ZIP na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest), extraia e abra `HollowSMP-Launcher.exe`. Também é possível baixar o executável portátil da release diretamente.
+Baixe e execute `HollowSMP-Launcher-Setup-2.2.0.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
 
 1. Escolha **Nickname** ou **Microsoft** e ajuste a memória.
 2. Clique em **Instalar e jogar** e aguarde a preparação inicial.
@@ -18,7 +18,7 @@ Baixe o ZIP na página de [Releases](https://github.com/KaueBerto/hollow-launche
 
 A primeira preparação baixa Java 21, Minecraft 1.21.1, NeoForge 21.1.253 e recursos do jogo. Pode levar vários minutos. Nas próximas aberturas, o launcher reutiliza a instalação. O modpack é recebido **dentro do Minecraft**, ao entrar no servidor; a barra do launcher mostra a preparação da base.
 
-O repositório é privado. Para jogadores sem acesso ao GitHub, compartilhe o ZIP por seu canal de downloads.
+O repositório e os downloads são públicos. O launcher consulta as versões estáveis e baixa atualizações em segundo plano. Clique em **Atualizar e reiniciar** quando o download terminar; o botão fica bloqueado durante o jogo e a preparação. A pasta do jogo é preservada. Versões portáteis antigas precisam instalar esta versão uma vez. Veja [como publicar atualizações](docs/LAUNCHER-UPDATES.md).
 
 ## Versão Electron
 
@@ -83,7 +83,7 @@ npm run build
 npm run package
 ```
 
-`build` gera `dist/HollowSMP-Launcher-2.1.0-rc.6.exe`, um executável portátil. `package` gera `dist/HollowSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
+`build` gera `dist/HollowSMP-Launcher-Setup-2.2.0.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/HollowSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
 
 O executável não possui certificado de assinatura de código do Hollow. Para uma distribuição assinada, configure seu certificado no electron-builder.
 
@@ -91,6 +91,7 @@ O executável não possui certificado de assinatura de código do Hollow. Para u
 
 ```text
 src/main.cjs       Janela Electron, estado e IPC
+src/launcher-update.cjs Atualização do launcher por Releases do GitHub
 src/preload.cjs    API limitada exposta à interface
 src/game-window.cjs Visibilidade e acompanhamento do jogo
 src/engine.cjs     Instalação, reset, perfis e inicialização do jogo
@@ -118,7 +119,7 @@ Logs: `%LOCALAPPDATA%\HollowSMP\launcher-error.log`, `neoforge-install.log`, `ga
 
 ## Créditos
 
-Monocraft é inspirada no Minecraft, **não a fonte oficial**. AutoModpack, Electron, Chromium e adm-zip mantêm suas licenças; veja [THIRD-PARTY.txt](THIRD-PARTY.txt) e [licenses/](licenses/). O pacote também inclui os avisos de terceiros do Chromium.
+Monocraft é inspirada no Minecraft, **não a fonte oficial**. AutoModpack, Electron, Chromium, electron-updater e adm-zip mantêm suas licenças; veja [THIRD-PARTY.txt](THIRD-PARTY.txt) e [licenses/](licenses/). O pacote também inclui os avisos de terceiros do Chromium.
 
 O código original e a identidade visual do Hollow SMP não recebem licença de reutilização neste repositório. As licenças de terceiros se aplicam aos respectivos componentes.
 

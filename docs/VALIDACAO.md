@@ -79,3 +79,9 @@ Cinco testes com peer local simulam handshake fragmentado, presença fixa sem de
 
 Application ID público do HollowSMP configurado. O Discord desktop desta máquina respondeu ao SET_ACTIVITY e confirmou a presença ativa no teste real por IPC. Limpeza enviada ao terminar. Cinco testes do protocolo passaram novamente. A visibilidade no perfil depende das preferências de atividade do jogador; não foi inspecionado o perfil de uma conta.
 
+
+## Atualizador — 2.2.0
+
+42 testes passaram, incluindo sete do atualizador: versões estáveis, bloqueio de downgrade e instalação ao sair, progresso, instalação explícita, preparação/jogo aberto, reserva durante consulta de processos, falhas de rede/download e recuperação dos controles após falha do instalador. Smoke Electron verificou download sem bloquear Jogar, bloqueio durante preparação/aplicação e nova tentativa após falha. Captura revisada visualmente. Dependências de produção sem avisos no npm audit desta sessão.
+
+Instalador NSIS por usuário, metadados GitHub e blockmap gerados. As versões portáteis anteriores precisam de instalação manual única; novos arquivos no Git não atualizam o aplicativo sem uma Release estável completa.

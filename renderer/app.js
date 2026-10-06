@@ -61,6 +61,12 @@ function settings(value) {
   render();
 }
 function render() {
+  const update = current.update || {};
+  const updating = Boolean(current.updating);
+  const updateButton = $('#launcher-update');
+  updateButton.textContent = update.kind === 'ready' ? 'Atualizar e reiniciar' : update.kind === 'downloading' ? `Atualizando ${Math.round(update.percent || 0)}%` : update.kind === 'checking' ? 'Verificando…' : update.kind === 'error' ? 'Tentar atualização' : `v${current.version || ''}`;
+  updateButton.disabled = updating || ['checking', 'downloading', 'disabled'].includes(update.kind) || update.kind === 'ready' && (current.busy || current.gameRunning);
+  updateButton.title = update.kind === 'ready' && current.gameRunning ? 'Feche o Minecraft para atualizar' : update.kind === 'error' ? 'Não foi possível verificar. Você pode jogar normalmente e tentar novamente.' : 'Verificar atualização do launcher';
   const microsoft = options().mode === 'microsoft';
   $('.brand').classList.toggle('preparing', current.busy && !current.authPending);
   serverStatus(current.server);
@@ -71,8 +77,8 @@ function render() {
   $('#logout').hidden = !microsoft || !current.account || current.busy || current.gameRunning;
   $('#cancel-login').hidden = !current.authPending;
   $('#play').textContent = current.authPending ? 'AGUARDANDO LOGIN…' : current.busy ? 'PREPARANDO…' : current.gameRunning ? 'JOGO ABERTO' : microsoft && !current.account ? 'ENTRAR E JOGAR' : !current.ready ? 'INSTALAR E JOGAR' : 'JOGAR';
-  for (const element of document.querySelectorAll('#reset, #play, #nickname, #ram, [name=mode]')) element.disabled = current.busy || element.id === 'play' && current.gameRunning;
-  $('#close').disabled = current.busy;
+  for (const element of document.querySelectorAll('#reset, #play, #nickname, #ram, [name=mode]')) element.disabled = updating || current.busy || element.id === 'play' && current.gameRunning;
+  $('#close').disabled = current.busy || updating;
   $('#ram-value').textContent = `${$('#ram').value} GB`;
   $('.progress-area').hidden = !current.busy && !completed;
   $('.progress-area').classList.toggle('finishing', completed);
@@ -99,6 +105,7 @@ function save() {
   saveTimer = setTimeout(() => { if (!current.busy) window.hollow.save(options()).catch(() => {}); }, 300);
 }
 $('#minimize').addEventListener('click', () => window.hollow.minimize());
+$('#launcher-update').addEventListener('click', () => execute(() => current.update?.kind === 'ready' ? window.hollow.installUpdate() : window.hollow.checkUpdate()));
 $('#close').addEventListener('click', () => window.hollow.close());
 $('#logout').addEventListener('click', () => execute(() => window.hollow.logout()));
 $('#cancel-login').addEventListener('click', () => window.hollow.cancelLogin());

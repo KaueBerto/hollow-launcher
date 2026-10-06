@@ -8,6 +8,7 @@ const { MicrosoftAuth } = require('./microsoft-auth.cjs');
 const { queryServer, ServerMonitor } = require('./server-status.cjs');
 const { DiscordPresence } = require('./discord-presence.cjs');
 const discordConfig = require('./discord-config.cjs');
+const { LauncherUpdate } = require('./launcher-update.cjs');
 
 const smoke = process.argv.includes('--smoke-ui');
 const integration = process.argv.includes('--verify-engine');
@@ -15,7 +16,7 @@ const verifyRootIndex = process.argv.indexOf('--test-root');
 const verifyOutputIndex = process.argv.indexOf('--test-output');
 if (smoke) app.disableHardwareAcceleration();
 let window, engine, tray, microsoft, serverMonitor;
-let discordPresence, quitting = false;
+let discordPresence, launcherUpdate, quitting = false;
 const gameWindow = new GameWindow(() => window);
 const state = { busy: false, ready: false, gameRunning: false, text: '', percent: null };
 const pagePath = path.join(__dirname, '..', 'renderer', 'index.html');
@@ -42,17 +43,19 @@ async function result(operation) {
   }
 }
 async function prepare(operation) {
-  if (state.busy) throw new Error('Aguarde a preparação terminar.');
+  if (state.busy || state.updating) throw new Error('Aguarde a preparação ou atualização terminar.');
   publish({ busy: true, text: 'Preparando…', percent: null });
   try { return await operation(); }
   finally { publish({ busy: false, ready: await engine.ready(), text: '', percent: null }); }
 }
 function registerHandlers() {
+  ipcMain.handle('launcher:update-check', async event => { trusted(event); return result(async () => { await launcherUpdate?.check(); return {}; }); });
+  ipcMain.handle('launcher:update-install', async event => { trusted(event); return result(async () => { await launcherUpdate?.install(); return {}; }); });
   ipcMain.handle('launcher:server-refresh', async event => { trusted(event); if (!smoke) await serverMonitor.refresh(true); return { ok: true }; });
   ipcMain.handle('launcher:state', async event => { trusted(event); return { ...state, account: await microsoft.publicAccount(), ready: await engine.ready(), settings: await engine.loadSettings(), version: app.getVersion() }; });
   ipcMain.handle('launcher:save', async (event, options) => {
     trusted(event);
-    return result(async () => { if (state.busy) return {}; await engine.saveSettings(options); return {}; });
+    return result(async () => { if (state.busy || state.updating) return {}; await engine.saveSettings(options); return {}; });
   });
   ipcMain.handle('launcher:play', async (event, options) => {
     trusted(event);
@@ -154,6 +157,16 @@ async function smokeUi() {
   await window.webContents.executeJavaScript(`if(document.querySelector('#server-details').textContent.includes('3/100') || document.querySelector('.brand').classList.contains('preparing')) throw new Error('Estado antigo permaneceu na interface');`);
   report.push('End: cenário carregado, partículas sem bloquear controles, portal reativo e status/ping sem dados inventados: OK');
   publish({ busy: false, ready: false, gameRunning: false, text: '', percent: null, server: { kind: 'online', players: 0, maxPlayers: 20, ping: 19, checking: false } });
+  publish({ update: { kind: 'downloading', version: '2.2.1', percent: 45 } });
+  await window.webContents.executeJavaScript(`if(document.querySelector('#launcher-update').textContent!=='Atualizando 45%' || !document.querySelector('#launcher-update').disabled || document.querySelector('#play').disabled) throw new Error('Download de atualização bloqueou o jogo');`);
+  publish({ update: { kind: 'ready', version: '2.2.1' }, busy: true });
+  await window.webContents.executeJavaScript(`if(!document.querySelector('#launcher-update').disabled) throw new Error('Atualização liberada durante preparação');`);
+  publish({ busy: false, updating: true });
+  await window.webContents.executeJavaScript(`if(!document.querySelector('#play').disabled || !document.querySelector('#reset').disabled) throw new Error('Instalação de atualização não bloqueou controles');`);
+  publish({ updating: false, update: { kind: 'error' } });
+  await window.webContents.executeJavaScript(`if(document.querySelector('#play').disabled || document.querySelector('#launcher-update').textContent!=='Tentar atualização') throw new Error('Falha de atualização bloqueou o jogo');`);
+  publish({ update: { kind: 'current' } });
+  report.push('Atualizações: download sem bloquear jogo, aplicação bloqueada durante preparação e falha com nova tentativa: OK');
   await window.webContents.executeJavaScript(`document.querySelector('[value="nickname"]').click()`);
   await new Promise(resolve=>setTimeout(resolve,800));
   await fs.writeFile(path.join(output, 'nickname.png'), (await window.webContents.capturePage()).toPNG());
@@ -187,7 +200,7 @@ app.whenReady().then(async () => {
   window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   window.webContents.on('will-navigate', event => event.preventDefault());
   window.webContents.session.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
-  window.on('close', event => { if (state.busy) { event.preventDefault(); publish({ text: 'Aguarde a preparação terminar para fechar.' }); } });
+  window.on('close', event => { if (state.busy && !quitting) { event.preventDefault(); publish({ text: 'Aguarde a preparação terminar para fechar.' }); } });
   window.on('minimize', () => window.webContents.send('launcher:animation', false));
   window.on('restore', () => window.webContents.send('launcher:animation', true));
   serverMonitor = new ServerMonitor({ query: () => { const [host, port] = SERVER.split(':'); return queryServer({ host, port: Number(port) }); }, report: server => publish({ server }), visible: () => window && !window.isDestroyed() && window.isVisible() && !window.isMinimized() });
@@ -209,6 +222,17 @@ app.whenReady().then(async () => {
     window.show(); serverMonitor.start();
     discordPresence = new DiscordPresence({ applicationId: discordConfig.applicationId });
     discordPresence.start();
+    launcherUpdate = new LauncherUpdate({
+      updater: require('electron-updater').autoUpdater,
+      enabled: app.isPackaged && !process.env.PORTABLE_EXECUTABLE_DIR,
+      report: publish,
+      active: () => state.busy || state.gameRunning || Boolean(engine.gameProcess),
+      gamePids: () => engine.hollowGamePids(),
+      beforeInstall: async () => { await discordPresence?.stop(); serverMonitor.stop(); quitting = true; },
+      failedInstall: () => { quitting = false; serverMonitor.start(); discordPresence.start(); },
+    });
+    publish({ update: launcherUpdate.state });
+    launcherUpdate.start();
   }
 }).catch(async error => {
   if ((smoke || integration) && verifyOutputIndex >= 0) {
@@ -219,6 +243,7 @@ app.whenReady().then(async () => {
 });
 app.on('window-all-closed', () => app.quit());
 app.on('before-quit', event => {
+  launcherUpdate?.stop();
   microsoft?.cancel(); serverMonitor?.stop();
   if (discordPresence && !quitting) {
     event.preventDefault(); quitting = true;
