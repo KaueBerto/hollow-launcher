@@ -39,6 +39,8 @@ A versão 2.0 substitui a interface Windows Forms por HTML, CSS e JavaScript, co
 
 A pasta `%LOCALAPPDATA%\HollowSMP` e as preferências da versão 1.x são reaproveitadas. **Feche o launcher antigo antes de usar o novo.** O Electron inclui Chromium: o executável e o consumo de memória são maiores que na versão C#.
 
+A política do modpack mantém configurações Java Properties locais para evitar que datas regravadas pelos mods invalidem a instalação do AutoModpack. A prevenção é aplicada na publicação do pacote e vale para o launcher atual. Consulte [a regra e a verificação de atualizações](docs/ATUALIZACOES.md).
+
 ## Contas
 
 | Modo | Funcionamento |
