@@ -1,4 +1,4 @@
-HOLLOW SMP LAUNCHER — 2.2.0 — Electron
+HOLLOW SMP LAUNCHER — 2.2.2 — Electron
 
 1. Execute HollowSMP-Instalar.exe e abra o atalho do Hollow.
 2. Escolha Nickname ou Microsoft e ajuste a memória na barra.
@@ -61,6 +61,7 @@ Se mostrar Sem resposta, você ainda pode tentar entrar normalmente.
 
 ATUALIZAÇÕES DO LAUNCHER
 Instale esta versão uma vez para ativar as próximas atualizações.
-O launcher consulta as Releases do GitHub e baixa versões novas em
-segundo plano. Feche o Minecraft e clique em Atualizar e reiniciar.
+Ao abrir, a tela com a logo verifica, baixa e aplica atualizações
+automaticamente. O launcher reabre sozinho. Se o Minecraft estiver
+aberto, a aplicação é adiada. Sem conexão, você pode jogar normalmente.
 Os dados do jogo e as preferências são preservados.

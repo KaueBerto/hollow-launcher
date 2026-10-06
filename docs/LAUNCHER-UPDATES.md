@@ -1,12 +1,16 @@
 # Atualizações do launcher
 
-A partir de 2.2.0, o Hollow usa um instalador Windows e consulta as Releases públicas de `KaueBerto/hollow-launcher` ao abrir e a cada seis horas enquanto estiver aberto. Somente versões estáveis mais novas são consideradas. Commits no repositório, tags sem release e prévias não atualizam os jogadores.
+A partir de 2.2.2, o Hollow usa um instalador Windows e consulta as Releases públicas de `KaueBerto/hollow-launcher` ao abrir e a cada seis horas enquanto estiver aberto. Somente versões estáveis mais novas são consideradas. Commits no repositório, tags sem release e prévias não atualizam os jogadores.
 
 ## Para jogadores
 
-Feche o launcher portátil antigo e instale `HollowSMP-Launcher-Setup-2.2.0.exe` uma vez. Abra pelo atalho criado. As versões portáteis antigas não têm este atualizador e precisam dessa instalação inicial.
+Feche o launcher portátil antigo e instale `HollowSMP-Launcher-Setup-2.2.2.exe` uma vez. Abra pelo atalho criado. As versões portáteis antigas não têm este atualizador e precisam dessa instalação inicial.
 
-Uma versão nova é baixada em segundo plano. **Atualizar e reiniciar** aparece no topo quando o download termina. Feche o Minecraft e clique para aplicar: o instalador substitui o aplicativo e o reabre. A instalação não é aplicada ao simplesmente fechar o launcher. Se houver falha de conexão, o jogo continua disponível; **Tentar atualização** permite tentar novamente.
+Ao abrir o Hollow, uma janela compacta com a logo e animação mostra a verificação, o progresso do download e a aplicação. Se houver versão nova, o launcher instala silenciosamente e reabre sozinho. Se estiver atualizado, a janela se transforma no launcher normal. Falha de rede ou uma consulta inicial que demore mais de 15 segundos libera o launcher; você pode tentar novamente pelo número da versão no topo. Resultados que cheguem depois desse limite permanecem em segundo plano e não interrompem o jogador.
+
+Com Minecraft aberto ou preparação em andamento, a aplicação é adiada e a versão baixada fica pronta para a próxima abertura ou para o botão **Atualizar e reiniciar**. Verificações periódicas enquanto o launcher está aberto continuam em segundo plano. Fechar o launcher durante uma partida não aplica atualização.
+
+Quem está na 2.2.0 ou 2.2.1 deve usar o botão antigo para aplicar a 2.2.2 uma vez. Depois disso, a atualização na abertura é automática.
 
 A pasta do jogo `%LOCALAPPDATA%\HollowSMP`, os mundos, mods, configurações e preferências são reaproveitados. Atualização do launcher e atualização do modpack são processos separados: o AutoModpack continua cuidando do pacote do servidor dentro do jogo.
 

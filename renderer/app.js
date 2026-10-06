@@ -6,6 +6,7 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const motion = new Map();
 let completionTimer, completed = false;
 let portalTimer;
+let wasStartup = true;
 // A fixed, sparse particle field keeps the atmosphere calm and reproducible.
 for (let i = 0; i < 18; i++) {
   const particle = document.createElement('span'); particle.className = 'end-particle';
@@ -61,6 +62,17 @@ function settings(value) {
   render();
 }
 function render() {
+  const startup = current.startup || { visible: true, kind: 'checking' };
+  if (wasStartup && !startup.visible && document.body.classList.contains('entered') && !reducedMotion.matches) document.body.classList.add('entering');
+  wasStartup = Boolean(startup.visible);
+  $('#startup-update').hidden = !startup.visible;
+  $('header').inert = Boolean(startup.visible);
+  $('main').inert = Boolean(startup.visible);
+  $('#startup-close').disabled = Boolean(current.updating);
+  $('#startup-title').textContent = startup.kind === 'installing' ? 'Aplicando atualização…' : startup.kind === 'downloading' ? 'Baixando atualização…' : startup.kind === 'ready' ? 'Preparando atualização…' : 'Verificando atualizações…';
+  $('#startup-note').textContent = startup.kind === 'installing' ? 'O Hollow já vai abrir de novo' : startup.kind === 'downloading' ? `${Math.round(startup.percent || 0)}% · Hollow ${startup.version}` : 'Preparando sua próxima aventura';
+  $('#startup-progress').hidden = startup.kind !== 'downloading';
+  $('#startup-progress').value = Number(startup.percent) || 0;
   const update = current.update || {};
   const updating = Boolean(current.updating);
   const updateButton = $('#launcher-update');
@@ -105,6 +117,7 @@ function save() {
   saveTimer = setTimeout(() => { if (!current.busy) window.hollow.save(options()).catch(() => {}); }, 300);
 }
 $('#minimize').addEventListener('click', () => window.hollow.minimize());
+$('#startup-close').addEventListener('click', () => window.hollow.close());
 $('#launcher-update').addEventListener('click', () => execute(() => current.update?.kind === 'ready' ? window.hollow.installUpdate() : window.hollow.checkUpdate()));
 $('#close').addEventListener('click', () => window.hollow.close());
 $('#logout').addEventListener('click', () => execute(() => window.hollow.logout()));

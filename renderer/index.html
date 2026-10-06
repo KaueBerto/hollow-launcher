@@ -9,6 +9,16 @@
   <script defer src="app.js"></script>
 </head>
 <body>
+  <section id="startup-update" class="startup-update" aria-label="Atualização do Hollow" aria-busy="true">
+    <button id="startup-close" class="icon-action" aria-label="Fechar"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8"/></svg></button>
+    <div class="startup-card">
+      <img class="startup-logo" src="../assets/logo_smp.png" alt="Hollow SMP" draggable="false">
+      <div class="startup-loader" aria-hidden="true"><span></span><span></span><span></span></div>
+      <p id="startup-title" role="status">Verificando atualizações…</p>
+      <p id="startup-note">Preparando sua próxima aventura</p>
+      <progress id="startup-progress" max="100" aria-label="Download da atualização" hidden></progress>
+    </div>
+  </section>
   <div class="ambient" aria-hidden="true"><div class="end-scene"></div><div class="end-mist"></div><div class="particles"></div></div>
   <header class="titlebar">
     <div class="drag-region" aria-hidden="true"></div>

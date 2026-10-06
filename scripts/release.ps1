@@ -24,7 +24,7 @@ try {
     try { $release = Invoke-RestMethod ($api+'/releases/tags/v'+$version) -Headers $headers }
     catch {
         if ([int]$_.Exception.Response.StatusCode -ne 404) { throw }
-        $body = @{tag_name=('v'+$version); target_commitish=(git rev-parse HEAD); name=('Hollow Launcher '+$version); body='Instalador Windows com atualização automática pelo GitHub. Instale uma vez e abra pelo atalho. As próximas versões são baixadas em segundo plano: feche o Minecraft e clique em Atualizar e reiniciar. Dados do jogo preservados. Microsoft ainda depende do cadastro próprio aprovado do Hollow.'; draft=$true; prerelease=$false} | ConvertTo-Json
+        $body = @{tag_name=('v'+$version); target_commitish=(git rev-parse HEAD); name=('Hollow Launcher '+$version); body='Instalador Windows com tela de atualização automática. Ao abrir, o Hollow verifica, baixa e aplica versões novas sozinho e reabre o launcher. Minecraft aberto adia a aplicação e falha de conexão permite jogar. Versões 2.2.0 e 2.2.1 precisam atualizar uma vez pelo botão antigo para ativar este fluxo. Dados do jogo preservados. Microsoft ainda depende do cadastro próprio aprovado do Hollow.'; draft=$true; prerelease=$false} | ConvertTo-Json
         $release = Invoke-RestMethod ($api+'/releases') -Method Post -Headers $headers -Body ([Text.Encoding]::UTF8.GetBytes($body)) -ContentType 'application/json; charset=utf-8'
     }
     if (-not $release.draft) { throw 'Release publicada: não substituir arquivos.' }

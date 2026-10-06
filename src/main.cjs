@@ -18,16 +18,26 @@ if (smoke) app.disableHardwareAcceleration();
 let window, engine, tray, microsoft, serverMonitor;
 let discordPresence, launcherUpdate, quitting = false;
 const gameWindow = new GameWindow(() => window);
-const state = { busy: false, ready: false, gameRunning: false, text: '', percent: null };
+const state = { busy: false, ready: false, gameRunning: false, text: '', percent: null, startup: { visible: !smoke, kind: 'checking' } };
 const pagePath = path.join(__dirname, '..', 'renderer', 'index.html');
 if ((smoke || integration) && verifyRootIndex >= 0) app.setPath('userData', path.join(path.dirname(path.resolve(process.argv[verifyRootIndex + 1])), 'electron-test-profile'));
 
 if (!smoke && !integration && !app.requestSingleInstanceLock()) app.quit();
 app.on('second-instance', () => gameWindow.reveal());
 
+function resizeWindow(width, height) {
+  // Windows constrains a non-resizable window to its current size.
+  window.setResizable(true); window.setSize(width, height); window.setResizable(false);
+}
+
 function publish(update) {
   const wasRunning = state.gameRunning;
   Object.assign(state, update);
+  if (update.startup && window && !window.isDestroyed() && !smoke) {
+    const [width] = window.getSize();
+    const desired = update.startup.visible ? 380 : 920;
+    if (width !== desired) { resizeWindow(desired, update.startup.visible ? 440 : 530); window.center(); }
+  }
   if (!wasRunning && state.gameRunning) gameWindow.started();
   else if (wasRunning && !state.gameRunning) gameWindow.ended();
   if (window && !window.isDestroyed()) window.webContents.send('launcher:changed', state);
@@ -43,19 +53,19 @@ async function result(operation) {
   }
 }
 async function prepare(operation) {
-  if (state.busy || state.updating) throw new Error('Aguarde a preparação ou atualização terminar.');
+  if (state.busy || state.updating || state.startup?.visible) throw new Error('Aguarde a preparação ou atualização terminar.');
   publish({ busy: true, text: 'Preparando…', percent: null });
   try { return await operation(); }
   finally { publish({ busy: false, ready: await engine.ready(), text: '', percent: null }); }
 }
 function registerHandlers() {
-  ipcMain.handle('launcher:update-check', async event => { trusted(event); return result(async () => { await launcherUpdate?.check(); return {}; }); });
+  ipcMain.handle('launcher:update-check', async event => { trusted(event); return result(async () => { await launcherUpdate?.boot(); return {}; }); });
   ipcMain.handle('launcher:update-install', async event => { trusted(event); return result(async () => { await launcherUpdate?.install(); return {}; }); });
   ipcMain.handle('launcher:server-refresh', async event => { trusted(event); if (!smoke) await serverMonitor.refresh(true); return { ok: true }; });
   ipcMain.handle('launcher:state', async event => { trusted(event); return { ...state, account: await microsoft.publicAccount(), ready: await engine.ready(), settings: await engine.loadSettings(), version: app.getVersion() }; });
   ipcMain.handle('launcher:save', async (event, options) => {
     trusted(event);
-    return result(async () => { if (state.busy || state.updating) return {}; await engine.saveSettings(options); return {}; });
+    return result(async () => { if (state.busy || state.updating || state.startup?.visible) return {}; await engine.saveSettings(options); return {}; });
   });
   ipcMain.handle('launcher:play', async (event, options) => {
     trusted(event);
@@ -86,7 +96,7 @@ function registerHandlers() {
     }));
   });
   ipcMain.handle('launcher:logout', async event => { trusted(event); return result(async () => {
-    if (state.busy || state.gameRunning) throw new Error('Feche o jogo e aguarde a preparação para sair da conta.');
+    if (state.busy || state.gameRunning || state.updating || state.startup?.visible) throw new Error('Feche o jogo e aguarde a preparação para sair da conta.');
     await microsoft.logout(); publish({ account: null }); return {};
   }); });
   ipcMain.on('launcher:cancel-login', event => { trusted(event); microsoft.cancel(); });
@@ -167,6 +177,24 @@ async function smokeUi() {
   await window.webContents.executeJavaScript(`if(document.querySelector('#play').disabled || document.querySelector('#launcher-update').textContent!=='Tentar atualização') throw new Error('Falha de atualização bloqueou o jogo');`);
   publish({ update: { kind: 'current' } });
   report.push('Atualizações: download sem bloquear jogo, aplicação bloqueada durante preparação e falha com nova tentativa: OK');
+  resizeWindow(380, 440);
+  publish({ startup: { visible: true, kind: 'checking' } });
+  await window.webContents.executeJavaScript(`if(document.querySelector('#startup-update').hidden || !document.querySelector('header').inert || !document.querySelector('main').inert) throw new Error('Tela inicial não protege os controles');`);
+  await new Promise(resolve => setTimeout(resolve, 250));
+  await window.webContents.executeJavaScript(`if(innerWidth!==380 || innerHeight!==440) throw new Error('Janela inicial não ficou compacta');`);
+  await fs.writeFile(path.join(output, 'startup-checking.png'), (await window.webContents.capturePage()).toPNG());
+  publish({ startup: { visible: true, kind: 'downloading', version: '2.2.3', percent: 42 } });
+  await window.webContents.executeJavaScript(`if(document.querySelector('#startup-progress').value!==42 || !document.querySelector('#startup-note').textContent.includes('42%')) throw new Error('Progresso da tela inicial'); const rect=document.querySelector('.startup-card').getBoundingClientRect(); if(rect.x<0 || rect.right>innerWidth || rect.y<0 || rect.bottom>innerHeight) throw new Error('Tela inicial fora da janela');`);
+  await new Promise(resolve => setTimeout(resolve, 150));
+  await fs.writeFile(path.join(output, 'startup-download.png'), (await window.webContents.capturePage()).toPNG());
+  publish({ updating: true, startup: { visible: true, kind: 'installing' } });
+  await window.webContents.executeJavaScript(`if(!document.querySelector('#startup-close').disabled || document.querySelector('#startup-title').textContent!=='Aplicando atualização…') throw new Error('Aplicação na tela inicial');`);
+  publish({ updating: false, startup: { visible: false }, update: { kind: 'current' } });
+  resizeWindow(920, 530);
+  await new Promise(resolve => setTimeout(resolve, 150));
+  await window.webContents.executeJavaScript(`if(innerWidth!==920 || innerHeight!==530) throw new Error('Launcher não voltou ao tamanho normal');`);
+  await window.webContents.executeJavaScript(`if(!document.querySelector('#startup-update').hidden || document.querySelector('main').inert) throw new Error('Tela inicial não liberou o launcher');`);
+  report.push('Tela inicial compacta: controles protegidos, progresso alinhado, aplicação automática e abertura do launcher: OK');
   await window.webContents.executeJavaScript(`document.querySelector('[value="nickname"]').click()`);
   await new Promise(resolve=>setTimeout(resolve,800));
   await fs.writeFile(path.join(output, 'nickname.png'), (await window.webContents.capturePage()).toPNG());
@@ -191,7 +219,7 @@ app.whenReady().then(async () => {
   }
   registerHandlers();
   window = new BrowserWindow({
-    width: 920, height: 530, resizable: false, maximizable: false, frame: false,
+    width: smoke ? 920 : 380, height: smoke ? 530 : 440, resizable: false, maximizable: false, frame: false,
     backgroundColor: '#160b22', show: false, autoHideMenuBar: true,
     icon: path.join(__dirname, '..', 'assets', 'hollow.ico'),
     webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true, webSecurity: true, offscreen: smoke, backgroundThrottling: !smoke },
@@ -200,7 +228,7 @@ app.whenReady().then(async () => {
   window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   window.webContents.on('will-navigate', event => event.preventDefault());
   window.webContents.session.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
-  window.on('close', event => { if (state.busy && !quitting) { event.preventDefault(); publish({ text: 'Aguarde a preparação terminar para fechar.' }); } });
+  window.on('close', event => { if ((state.busy || state.updating) && !quitting) { event.preventDefault(); publish({ text: 'Aguarde a preparação terminar para fechar.' }); } });
   window.on('minimize', () => window.webContents.send('launcher:animation', false));
   window.on('restore', () => window.webContents.send('launcher:animation', true));
   serverMonitor = new ServerMonitor({ query: () => { const [host, port] = SERVER.split(':'); return queryServer({ host, port: Number(port) }); }, report: server => publish({ server }), visible: () => window && !window.isDestroyed() && window.isVisible() && !window.isMinimized() });
@@ -232,7 +260,7 @@ app.whenReady().then(async () => {
       failedInstall: () => { quitting = false; serverMonitor.start(); discordPresence.start(); },
     });
     publish({ update: launcherUpdate.state });
-    launcherUpdate.start();
+    void launcherUpdate.boot().finally(() => { if (!launcherUpdate.installing) launcherUpdate.start({ checkNow: false }); });
   }
 }).catch(async error => {
   if ((smoke || integration) && verifyOutputIndex >= 0) {

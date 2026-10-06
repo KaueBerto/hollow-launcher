@@ -16,6 +16,23 @@ button { color: inherit; cursor: pointer; transition: color 160ms ease, backgrou
 button:disabled { cursor: default; opacity: .45; }
 button:focus-visible, input:focus-visible, .account-modes label:has(input:focus-visible) span { outline: 2px solid #de9bff; outline-offset: 5px; }
 [hidden] { display: none !important; }
+.startup-update { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; background: radial-gradient(ellipse at center, #311145, #100917 70%); -webkit-app-region: drag; }
+#startup-close { position: absolute; top: 8px; right: 12px; -webkit-app-region: no-drag; }
+.startup-card { width: 350px; text-align: center; }
+.startup-logo { width: 210px; height: 210px; object-fit: contain; filter: drop-shadow(0 0 20px #ab2ce530); animation: startup-float 4s ease-in-out infinite; }
+@keyframes startup-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.startup-loader { display: flex; justify-content: center; gap: 7px; margin: 18px 0 22px; }
+.startup-loader span { width: 6px; height: 6px; background: #d186ff; animation: startup-pulse 1.2s ease-in-out infinite; }
+.startup-loader span:nth-child(2) { animation-delay: .15s; }
+.startup-loader span:nth-child(3) { animation-delay: .3s; }
+@keyframes startup-pulse { 0%, 100% { opacity: .3; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-4px); } }
+#startup-title { font-size: 12px; color: #f0dcff; line-height: 1.8; margin: 0 0 8px; }
+#startup-note { font-size: 10px; color: #ad94bd; line-height: 1.8; margin: 0; }
+#startup-progress { width: 250px; height: 5px; margin: 22px auto 0; appearance: none; border: 0; }
+#startup-progress::-webkit-progress-bar { background: #21132d; }
+#startup-progress::-webkit-progress-value { background: #ba35f5; transition: width 180ms ease; }
+@media (prefers-reduced-motion: reduce) { .startup-logo, .startup-loader span { animation: none; } }
+body.paused .startup-logo, body.paused .startup-loader span { animation-play-state: paused; }
 .titlebar { position: relative; z-index: 1; height: 54px; display: flex; align-items: flex-start; padding: 8px 12px 0 0; }
 .drag-region { flex: 1; height: 46px; -webkit-app-region: drag; }
 .titlebar nav { display: flex; align-items: center; gap: 9px; -webkit-app-region: no-drag; }

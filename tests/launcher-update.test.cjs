@@ -72,3 +72,44 @@ test('development/portable modes never check or start timers', async () => {
   assert.equal(f.checks(), 0); assert.equal(f.manager.timer, undefined);
   await assert.rejects(f.manager.install(), /Aguarde/);
 });
+
+test('startup without an update opens home, then schedules checks without repeating immediately', async () => {
+  const f = fixture(); await f.manager.boot();
+  assert.equal(f.checks(), 1); assert.deepEqual(f.reports.at(-1), { startup: { visible: false } });
+  f.manager.start({ checkNow: false }); assert.equal(f.checks(), 1); f.manager.stop();
+});
+test('startup downloads and applies automatically, retaining splash until restart', async () => {
+  const f = fixture();
+  f.updater.checkForUpdates = async () => {
+    f.updater.emit('checking-for-update'); f.updater.emit('update-available', { version: '2.2.3' });
+    return { downloadPromise: Promise.resolve().then(() => f.updater.emit('update-downloaded', { version: '2.2.3' })) };
+  };
+  await f.manager.boot();
+  assert.deepEqual(f.installs, [[true, true]]);
+  assert.equal(f.reports.at(-1).startup.kind, 'installing');
+  assert.equal(f.reports.at(-1).startup.visible, true);
+  f.manager.stop();
+});
+test('startup preserves an externally running game and leaves the update ready on home', async () => {
+  const f = fixture({ gamePids: async () => [42] });
+  f.updater.checkForUpdates = async () => { f.updater.emit('update-downloaded', { version: '2.2.3' }); };
+  await f.manager.boot(); assert.equal(f.installs.length, 0);
+  assert.equal(f.manager.state.kind, 'ready'); assert.deepEqual(f.reports.at(-1), { startup: { visible: false } });
+});
+test('startup network failure and installer refusal both release home', async () => {
+  const f = fixture(); f.updater.checkForUpdates = async () => { throw new Error('offline'); };
+  await f.manager.boot(); assert.equal(f.manager.state.kind, 'error'); assert.equal(f.reports.at(-1).startup.visible, false);
+  f.updater.checkForUpdates = async () => { f.updater.emit('update-downloaded', { version: '2.2.3' }); };
+  f.updater.quitAndInstall = () => f.updater.emit('error', new Error('failed'));
+  await f.manager.boot(); assert.equal(f.manager.installing, false); assert.equal(f.reports.at(-1).startup.visible, false);
+});
+test('stalled metadata releases home; a late download never installs over user activity', async () => {
+  const f = fixture({ checkTimeoutMs: 10 }); let resolve;
+  f.updater.checkForUpdates = () => new Promise(r => { resolve = r; });
+  const keepAlive = setTimeout(() => {}, 100);
+  await f.manager.boot(); clearTimeout(keepAlive);
+  assert.equal(f.reports.some(r => r.startup?.visible === false), true);
+  f.updater.emit('update-downloaded', { version: '2.2.3' }); resolve();
+  await new Promise(r => setImmediate(r));
+  assert.equal(f.installs.length, 0); assert.equal(f.manager.state.kind, 'ready');
+});

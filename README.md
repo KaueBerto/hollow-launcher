@@ -1,15 +1,17 @@
 <p align="center"><img src="assets/logo_smp.png" alt="Hollow SMP" width="260"></p>
 <h1 align="center">Hollow Launcher</h1>
 <p align="center">Launcher Electron do Hollow SMP para Windows.<br>Instalação automática, visual pixelado e modpack pelo AutoModpack.</p>
-<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-8b2de2"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.2.0-8b2de2"></p>
+<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-8b2de2"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.2.2-8b2de2"></p>
 
 ![Interface do Hollow Launcher](docs/launcher.png)
+
+<p align="center"><img src="docs/startup-update.png" alt="Exemplo da tela de atualização automática" width="380"></p>
 
 O fundo usa a paisagem Minecraft fornecida pelo responsável do Hollow, com escurecimento para leitura, névoa e partículas discretas. O painel consulta o servidor diretamente: números na captura são ilustrativos e variam na execução.
 
 ## Baixar e jogar
 
-Baixe e execute `HollowSMP-Launcher-Setup-2.2.0.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
+Baixe e execute `HollowSMP-Launcher-Setup-2.2.2.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
 
 1. Escolha **Nickname** ou **Microsoft** e ajuste a memória.
 2. Clique em **Instalar e jogar** e aguarde a preparação inicial.
@@ -18,7 +20,7 @@ Baixe e execute `HollowSMP-Launcher-Setup-2.2.0.exe` na página de [Releases](ht
 
 A primeira preparação baixa Java 21, Minecraft 1.21.1, NeoForge 21.1.253 e recursos do jogo. Pode levar vários minutos. Nas próximas aberturas, o launcher reutiliza a instalação. O modpack é recebido **dentro do Minecraft**, ao entrar no servidor; a barra do launcher mostra a preparação da base.
 
-O repositório e os downloads são públicos. O launcher consulta as versões estáveis e baixa atualizações em segundo plano. Clique em **Atualizar e reiniciar** quando o download terminar; o botão fica bloqueado durante o jogo e a preparação. A pasta do jogo é preservada. Versões portáteis antigas precisam instalar esta versão uma vez. Veja [como publicar atualizações](docs/LAUNCHER-UPDATES.md).
+O repositório e os downloads são públicos. Ao abrir, uma tela compacta com a logo verifica as atualizações, baixa e instala versões novas automaticamente, e reabre o Hollow. Sem atualização, abre o launcher normalmente. Falha de conexão libera o jogo; Minecraft aberto impede a aplicação. A pasta do jogo é preservada. Versões 2.2.0 e 2.2.1 precisam aplicar esta atualização pelo botão antigo uma vez; versões portáteis precisam do instalador. Veja [como publicar atualizações](docs/LAUNCHER-UPDATES.md).
 
 ## Versão Electron
 
@@ -83,7 +85,7 @@ npm run build
 npm run package
 ```
 
-`build` gera `dist/HollowSMP-Launcher-Setup-2.2.0.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/HollowSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
+`build` gera `dist/HollowSMP-Launcher-Setup-2.2.2.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/HollowSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
 
 O executável não possui certificado de assinatura de código do Hollow. Para uma distribuição assinada, configure seu certificado no electron-builder.
 
