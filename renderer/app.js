@@ -52,13 +52,14 @@ function clearCompletion() {
 }
 
 function options() {
-  return { mode: $('[name=mode]:checked').value, nickname: $('#nickname').value.trim(), ram: Number($('#ram').value), remember: $('#remember').checked };
+  return { mode: $('[name=mode]:checked').value, nickname: $('#nickname').value.trim(), ram: Number($('#ram').value), remember: $('#remember').checked, landscape: $('#landscape').checked };
 }
 function settings(value) {
   $(`[name=mode][value="${value.mode === 'microsoft' ? 'microsoft' : 'nickname'}"]`).checked = true;
   $('#nickname').value = value.nickname || '';
   $('#ram').value = value.ram;
   $('#remember').checked = value.remember;
+  $('#landscape').checked = value.landscape === true;
   render();
 }
 function render() {
@@ -91,6 +92,8 @@ function render() {
   $('#play').textContent = current.authPending ? 'AGUARDANDO LOGIN…' : current.busy ? 'PREPARANDO…' : current.gameRunning ? 'JOGO ABERTO' : microsoft && !current.account ? 'ENTRAR E JOGAR' : !current.ready ? 'INSTALAR E JOGAR' : 'JOGAR';
   for (const element of document.querySelectorAll('#reset, #play, #nickname, #ram, [name=mode]')) element.disabled = updating || current.busy || element.id === 'play' && current.gameRunning;
   $('#close').disabled = current.busy || updating;
+  $('#landscape').disabled = current.busy || updating || current.gameRunning;
+  $('#download-landscape').disabled = current.busy || updating || current.gameRunning;
   $('#ram-value').textContent = `${$('#ram').value} GB`;
   $('.progress-area').hidden = !current.busy && !completed;
   $('.progress-area').classList.toggle('finishing', completed);
@@ -137,6 +140,8 @@ $('#refresh-server').addEventListener('click', async () => {
 $('#ram').addEventListener('input', () => { render(); save(); });
 $('#nickname').addEventListener('input', save);
 $('#remember').addEventListener('change', save);
+$('#landscape').addEventListener('change', save);
+$('#download-landscape').addEventListener('click', () => execute(() => window.hollow.landscape(options())));
 for (const mode of document.querySelectorAll('[name=mode]')) mode.addEventListener('change', () => {
   render(); save();
   animate(options().mode === 'microsoft' ? $('#account-note') : $('#nickname'), [{ opacity: 0, transform: 'translateY(4px)' }, { opacity: 1, transform: 'translateY(0)' }]);

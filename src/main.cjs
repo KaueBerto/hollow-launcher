@@ -9,6 +9,7 @@ const { queryServer, ServerMonitor } = require('./server-status.cjs');
 const { DiscordPresence } = require('./discord-presence.cjs');
 const discordConfig = require('./discord-config.cjs');
 const { LauncherUpdate } = require('./launcher-update.cjs');
+const { installLandscape } = require('./landscape.cjs');
 
 const smoke = process.argv.includes('--smoke-ui');
 const integration = process.argv.includes('--verify-engine');
@@ -59,6 +60,15 @@ async function prepare(operation) {
   finally { publish({ busy: false, ready: await engine.ready(), text: '', percent: null }); }
 }
 function registerHandlers() {
+  ipcMain.handle('launcher:landscape', async (event, options) => {
+    trusted(event);
+    return result(() => prepare(async () => {
+      if (state.gameRunning || engine.gameProcess) throw new Error('Feche o Minecraft antes de baixar a paisagem.');
+      await engine.saveSettings(options, { requireNickname: false });
+      const installed = await installLandscape(engine);
+      return { message: installed.alreadyInstalled ? 'Essa paisagem já está instalada.' : 'Paisagem instalada. O Distant Horizons continua com a opção de ativação que você escolheu.' };
+    }));
+  });
   ipcMain.handle('launcher:update-check', async event => { trusted(event); return result(async () => { await launcherUpdate?.boot(); return {}; }); });
   ipcMain.handle('launcher:update-install', async event => { trusted(event); return result(async () => { await launcherUpdate?.install(); return {}; }); });
   ipcMain.handle('launcher:server-refresh', async event => { trusted(event); if (!smoke) await serverMonitor.refresh(true); return { ok: true }; });
@@ -76,6 +86,7 @@ function registerHandlers() {
       const account = selected.mode === 'microsoft' ? await microsoft.authenticate() : undefined;
       publish({ account: await microsoft.publicAccount() });
       if (!await engine.ready()) await engine.install();
+      if (selected.landscape) await installLandscape(engine);
       // A first installation can outlast a short session. Refresh before launching.
       const identity = account ? await microsoft.authenticate() : undefined;
       const pid = await engine.launch(identity?.name || selected.nickname, selected.ram, identity);
@@ -128,6 +139,9 @@ async function smokeUi() {
   const report = await window.webContents.executeJavaScript(`(async () => {
     const check = (value, message) => { if (!value) throw new Error(message); };
     const modes = [...document.querySelectorAll('[name="mode"]')];
+    check(!document.querySelector('#landscape').checked, 'Paisagem deve vir desmarcada');
+    check(document.querySelector('.landscape-choice').textContent.includes('baixar paisagem do distant horizons do servidor'), 'Texto da paisagem');
+    check(typeof window.hollow.landscape === 'function', 'Download opcional indisponível');
     for (let i=0;i<16;i++) { modes[i%2].click(); check(modes.filter(item=>item.checked).length===1,'Seletores de conta'); }
     modes[0].click();
     const slider=document.querySelector('#ram');slider.value='13';slider.dispatchEvent(new Event('input',{bubbles:true}));check(document.querySelector('#ram-value').textContent==='13 GB','Memória');slider.value='6';slider.dispatchEvent(new Event('input',{bubbles:true}));

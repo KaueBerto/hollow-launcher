@@ -73,6 +73,9 @@ main { position: relative; z-index: 1; height: 476px; }
 .remember input:checked + .checkbox::after { content: ''; width: 6px; height: 6px; background: #ce6dff; }
 .remember input:focus-visible + .checkbox { outline: 2px solid #de9bff; outline-offset: 3px; }
 .remember:has(input:disabled) { opacity: .45; cursor: default; }
+.landscape-choice { height: auto; min-height: 36px; font-size: 10px; line-height: 1.6; }
+.landscape-note { display: flex; align-items: center; gap: 10px; font-size: 9px; color: var(--muted); margin-top: 3px; }
+.landscape-note button { font-size: 10px; white-space: nowrap; }
 .memory-heading { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 12px; height: 32px; margin-top: 2px; }
 input[type=range] { display: block; appearance: none; background: transparent; width: 100%; height: 30px; margin: 0; cursor: pointer; }
 input[type=range]::-webkit-slider-runnable-track { height: 8px; border: 2px solid #09050f; background: #431e60; }

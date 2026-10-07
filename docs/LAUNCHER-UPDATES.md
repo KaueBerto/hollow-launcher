@@ -34,3 +34,8 @@ O aplicativo ainda não tem certificado de assinatura do Hollow. O atualizador v
 `npm start` e o smoke test não consultam atualizações. Os testes verificam estados, concorrência entre Jogar e atualização, jogo aberto, falhas de rede e falhas de instalação. Para conferir a cadeia real, use duas versões instaladas em uma pasta de teste e um perfil isolado; nunca use a instalação de um jogador como teste de downgrade.
 
 O script `powershell -File scripts/release.ps1` envia o código e os arquivos para uma release em rascunho, usando a credencial local do GitHub sem incorporá-la ao launcher. Acrescente `-Publish` para publicar após a conferência. Ele verifica versão, arquivos e hashes remotos e recusa substituir uma release já publicada.
+
+## Paisagem do Distant Horizons (2.3.0)
+
+A opção baixar paisagem do distant horizons do servidor vem desmarcada. Baixar agora instala a paisagem com o Minecraft fechado. São 1,86 GB de download e 1,93 GB instalados; mantenha pelo menos 6 GB livres durante a preparação. O launcher baixa quatro partes simultaneamente, retoma partes interrompidas e verifica os arquivos antes de instalar. Um banco anterior é preservado em landscape-backups. A instalação não ativa o Distant Horizons. Desmarcar a opção não apaga a paisagem. O arquivo é distribuído separadamente por HTTPS e não aumenta o instalador.
+
