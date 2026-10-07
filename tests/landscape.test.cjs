@@ -26,7 +26,7 @@ test('installation streams gzip, backs up existing database and does not downloa
  m.databaseBytes=raw.length;m.databaseSha256=crypto.createHash('sha256').update(raw).digest('hex');
  const oldFetch=global.fetch;let requests=0;
  const engine={root,game:path.join(root,'game'),gameProcess:null,javaRunning:async()=>false,jsonFrom:async()=>m,progress:()=>{}};
- const target=path.join(engine.game,'Distant_Horizons_server_data',DIRECTORY,'DistantHorizons.sqlite');
+ const target=path.join(engine.game,'Distant_Horizons_server_data','Hollow+SMP',DIRECTORY.split('/')[1],'DistantHorizons.sqlite');
  try{
   await fs.mkdir(path.dirname(target),{recursive:true});await fs.writeFile(target,'previous cache');
   global.fetch=async(url,options)=>{requests++;const [,start,end]=/bytes=(\d+)-(\d+)/.exec(options.headers.Range);return new Response(packed.subarray(+start,+end+1),{status:206,headers:{'content-range':`bytes ${start}-${end}/${packed.length}`}})};

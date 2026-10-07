@@ -8,6 +8,7 @@ const { pipeline } = require('node:stream/promises');
 const { createGunzip } = require('node:zlib');
 const MANIFEST = 'https://painel.hollowsmp.com.br/hollow-landscape/manifest.json';
 const DIRECTORY = 'Minecraft+Server/b4c77i87dhs4g@minecraft@@overworld';
+const { landscapeDirectory } = require('./landscape-folder.cjs');
 async function digest(file) { const h = crypto.createHash('sha256'); for await (const b of createReadStream(file)) h.update(b); return h.digest('hex'); }
 async function size(file) { try { return (await fs.stat(file)).size; } catch { return 0; } }
 function validate(m) {
@@ -65,8 +66,9 @@ async function installLandscape(engine) {
   if(engine.gameProcess || await engine.javaRunning()) throw new Error('Feche o Minecraft antes de baixar a paisagem.');
   const m=validate(await engine.jsonFrom(MANIFEST));
   const marker=path.join(engine.root,'landscape-installed.json');
-  const target=path.join(engine.game,'Distant_Horizons_server_data',DIRECTORY,'DistantHorizons.sqlite');
-  try { const installed=JSON.parse(await fs.readFile(marker,'utf8')); if(installed.sha256===m.databaseSha256 && await size(target)>0) return {alreadyInstalled:true}; } catch {}
+  const directory=await landscapeDirectory(engine.game,DIRECTORY.split('/')[1]);
+  const target=path.join(engine.game,'Distant_Horizons_server_data',directory,'DistantHorizons.sqlite');
+  try { const installed=JSON.parse(await fs.readFile(marker,'utf8')); if(installed.sha256===m.databaseSha256 && installed.directory===directory && await size(target)>0) return {alreadyInstalled:true}; } catch {}
   engine.progress('Baixando paisagem do Distant Horizons…');
   const folder=path.join(engine.root,'downloads',`landscape-${m.sha256}`);
   const archive=await downloadParts(m,folder,(done,total)=>engine.progress(`Baixando paisagem: ${(done/1048576).toFixed(0)} / ${(total/1048576).toFixed(0)} MB`,done,total));
@@ -86,7 +88,7 @@ async function installLandscape(engine) {
       for(const suffix of ['','-wal','-shm']) { try{await fs.rename(target+suffix,path.join(backup,'DistantHorizons.sqlite'+suffix));}catch(e){if(e.code!=='ENOENT')throw e;} }
     }
     await fs.rename(temporary,target);
-    await fs.writeFile(marker,JSON.stringify({sha256:m.databaseSha256,version:m.version}));
+    await fs.writeFile(marker,JSON.stringify({sha256:m.databaseSha256,version:m.version,directory}));
     await fs.rm(archive,{force:true});
     engine.progress('Paisagem instalada.',1,1);
     return {alreadyInstalled:false};

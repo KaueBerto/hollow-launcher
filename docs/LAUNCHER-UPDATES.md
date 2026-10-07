@@ -39,3 +39,8 @@ O script `powershell -File scripts/release.ps1` envia o código e os arquivos pa
 
 A opção baixar paisagem do distant horizons do servidor vem desmarcada. Baixar agora instala a paisagem com o Minecraft fechado. São 1,86 GB de download e 1,93 GB instalados; mantenha pelo menos 6 GB livres durante a preparação. O launcher baixa quatro partes simultaneamente, retoma partes interrompidas e verifica os arquivos antes de instalar. Um banco anterior é preservado em landscape-backups. A instalação não ativa o Distant Horizons. Desmarcar a opção não apaga a paisagem. O arquivo é distribuído separadamente por HTTPS e não aumenta o instalador.
 
+
+## Correção de pasta (2.3.1)
+
+O destino da paisagem segue o nome do cadastro de hollowsmp.com.br em servers.dat e o modo de pasta da configuração do Distant Horizons. Minecraft Server usa Minecraft+Server; Hollow SMP usa Hollow+SMP. A pasta interna do mundo é b4c77i87dhs4g@minecraft@@overworld, confirmada no log da conexão. O manifesto mantém o nome da origem, mas o launcher resolve o destino de cada cliente. Cadastros duplicados com nomes diferentes pedem que o jogador mantenha um único cadastro antes de instalar.
+
