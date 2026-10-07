@@ -44,3 +44,7 @@ A opção baixar paisagem do distant horizons do servidor vem desmarcada. Baixar
 
 O destino da paisagem segue o nome do cadastro de hollowsmp.com.br em servers.dat e o modo de pasta da configuração do Distant Horizons. Minecraft Server usa Minecraft+Server; Hollow SMP usa Hollow+SMP. A pasta interna do mundo é b4c77i87dhs4g@minecraft@@overworld, confirmada no log da conexão. O manifesto mantém o nome da origem, mas o launcher resolve o destino de cada cliente. Cadastros duplicados com nomes diferentes pedem que o jogador mantenha um único cadastro antes de instalar.
 
+
+## Reaproveitamento de paisagem (2.3.2)
+
+A instalação da versão 2.3.0 é reconhecida mesmo sem a pasta no registro antigo. Se necessário, o banco existente é copiado localmente para a pasta correta, preservando o original e evitando outro download. O registro é atualizado uma vez. Nas próximas aberturas, o launcher confere o registro e o cabeçalho SQLite; alterações normais feitas pelo Distant Horizons não invalidam a instalação. Arquivos ausentes ou inválidos continuam exigindo nova instalação.

@@ -36,3 +36,43 @@ test('installation streams gzip, backs up existing database and does not downloa
   engine.gameProcess={};await assert.rejects(installLandscape(engine),/Feche o Minecraft/);
  }finally{global.fetch=oldFetch;await fs.rm(root,{recursive:true,force:true})}
 });
+
+test('legacy receipt reuses local landscape once, including databases changed during play',async()=>{
+ const root=await fs.mkdtemp(path.join(os.tmpdir(),'hollow-landscape-legacy-'));
+ const raw=Buffer.concat([Buffer.from('SQLite format 3\0'),Buffer.alloc(100)]),m=manifest(Buffer.from('unused'));
+ m.databaseBytes=raw.length;m.databaseSha256=crypto.createHash('sha256').update(raw).digest('hex');
+ const engine={root,game:path.join(root,'game'),gameProcess:null,javaRunning:async()=>false,jsonFrom:async()=>m,progress:()=>{}};
+ const original=path.join(engine.game,'Distant_Horizons_server_data',DIRECTORY,'DistantHorizons.sqlite');
+ const target=path.join(engine.game,'Distant_Horizons_server_data','Hollow+SMP',DIRECTORY.split('/')[1],'DistantHorizons.sqlite');
+ const oldFetch=global.fetch;
+ try{
+  global.fetch=async()=>{assert.fail('Paisagem já instalada não deve baixar novamente');};
+  await fs.mkdir(path.dirname(original),{recursive:true});await fs.writeFile(original,raw);
+  await fs.writeFile(original+'-wal','pending terrain journal');
+  await fs.writeFile(path.join(root,'landscape-installed.json'),JSON.stringify({sha256:m.databaseSha256,version:1}));
+  assert.equal((await installLandscape(engine)).alreadyInstalled,true);
+  assert.deepEqual(await fs.readFile(target),raw);assert.deepEqual(await fs.readFile(original),raw);
+  assert.equal(await fs.readFile(target+'-wal','utf8'),'pending terrain journal');
+  await fs.appendFile(target,'terrain discovered during play');
+  assert.equal((await installLandscape(engine)).alreadyInstalled,true);
+  assert.equal((JSON.parse(await fs.readFile(path.join(root,'landscape-installed.json')))).directory,path.join('Hollow+SMP',DIRECTORY.split('/')[1]));
+ }finally{global.fetch=oldFetch;await fs.rm(root,{recursive:true,force:true});}
+});
+
+test('legacy receipt upgrades in place and does not trust a truncated database',async()=>{
+ const root=await fs.mkdtemp(path.join(os.tmpdir(),'hollow-landscape-receipt-'));
+ const raw=Buffer.concat([Buffer.from('SQLite format 3\0'),Buffer.alloc(100)]),{gzipSync}=require('node:zlib'),packed=gzipSync(raw),m=manifest(packed);
+ m.databaseBytes=raw.length;m.databaseSha256=crypto.createHash('sha256').update(raw).digest('hex');
+ const engine={root,game:path.join(root,'game'),gameProcess:null,javaRunning:async()=>false,jsonFrom:async()=>m,progress:()=>{}};
+ const target=path.join(engine.game,'Distant_Horizons_server_data','Hollow+SMP',DIRECTORY.split('/')[1],'DistantHorizons.sqlite');
+ const oldFetch=global.fetch;let requests=0;
+ try{
+  global.fetch=async(url,options)=>{requests++;const [,start,end]=/bytes=(\d+)-(\d+)/.exec(options.headers.Range);return new Response(packed.subarray(+start,+end+1),{status:206,headers:{'content-range':`bytes ${start}-${end}/${packed.length}`}})};
+  await fs.mkdir(path.dirname(target),{recursive:true});await fs.writeFile(target,raw);
+  await fs.writeFile(path.join(root,'landscape-installed.json'),JSON.stringify({sha256:m.databaseSha256,version:1}));
+  assert.equal((await installLandscape(engine)).alreadyInstalled,true);assert.equal(requests,0);
+  await fs.writeFile(target,'corrupt');
+  assert.equal((await installLandscape(engine)).alreadyInstalled,false);assert.equal(requests,1);
+  assert.deepEqual(await fs.readFile(target),raw);
+ }finally{global.fetch=oldFetch;await fs.rm(root,{recursive:true,force:true});}
+});
