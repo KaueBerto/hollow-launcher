@@ -39,3 +39,11 @@ Licença em licenses/adm-zip-LICENSE.txt.
 electron-updater 6.8.9 — licença MIT.
 https://github.com/electron-userland/electron-builder
 Licença em licenses/electron-updater-LICENSE.txt.
+
+O launcher inclui hollow-pack-preflight.jar: integração com AutoModpack 5.0.0-rc.2
+(LGPL-3.0) com ajustes isolados em ReviewedUpdatePlan e ClientGenerationStore.
+As modificações reconhecem comentários/datas sem mudanças nos valores de arquivos
+Properties e usam a geração finalizada do cliente como base de atualizações futuras
+quando documentos de gerações intermediárias não estão no cache. O JAR original do
+AutoModpack permanece intacto. Código completo dos ajustes e ponte Java: java/preflight
+no repositório público e pacote de fontes. Licença: licenses/AutoModpack-LICENSE.txt.

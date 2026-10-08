@@ -48,3 +48,7 @@ O destino da paisagem segue o nome do cadastro de hollowsmp.com.br em servers.da
 ## Reaproveitamento de paisagem (2.3.2)
 
 A instalação da versão 2.3.0 é reconhecida mesmo sem a pasta no registro antigo. Se necessário, o banco existente é copiado localmente para a pasta correta, preservando o original e evitando outro download. O registro é atualizado uma vez. Nas próximas aberturas, o launcher confere o registro e o cabeçalho SQLite; alterações normais feitas pelo Distant Horizons não invalidam a instalação. Arquivos ausentes ou inválidos continuam exigindo nova instalação.
+
+## Atualização do modpack antes de abrir o jogo (2.3.3)
+
+O launcher aguarda o Minecraft e o helper anterior encerrarem antes de iniciar Java. Se existe uma transação do AutoModpack pendente, conclui-a com o jogo fechado usando a API original de planejamento e aplicação. Configurações Properties com diferenças só em comentários ou datas mantêm a equivalência da revisão; mudanças de valores continuam exigindo revisão. O histórico da geração já finalizada é usado apenas para avançar no mesmo pacote quando faltam documentos intermediários, mantendo a verificação da política de destino. Falha bloqueia a abertura com diagnóstico em modpack-preflight.log, em vez de repetir o ciclo silenciosamente. Não limpa mods, preferências ou mundos. Não altera o JAR original nem publica dados do servidor.

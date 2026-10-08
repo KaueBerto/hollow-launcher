@@ -9,6 +9,8 @@ const metadata = require('../package.json');
   const root = path.resolve(__dirname, '..');
   const dist = path.join(root, 'dist');
   if (await hashFile(path.join(root, 'assets', 'automodpack-5.0.0-rc.2.jar'), 'sha256') !== MOD_HASH) throw new Error('AutoModpack inválido.');
+  const { PREFLIGHT_HASH } = require('../src/modpack-preflight.cjs');
+  if (await hashFile(path.join(root, 'assets', 'hollow-pack-preflight.jar'), 'sha256') !== PREFLIGHT_HASH) throw new Error('Verificador do modpack inválido.');
   const exe = path.join(dist, `HollowSMP-Launcher-Setup-${metadata.version}.exe`);
   const zip = new AdmZip();
   zip.addLocalFile(exe, '', 'HollowSMP-Instalar.exe');
@@ -19,6 +21,7 @@ const metadata = require('../package.json');
   zip.addLocalFile(path.join(root, 'docs', 'AMBIENTE.md'));
   zip.addLocalFile(path.join(root, 'THIRD-PARTY.txt'));
   zip.addLocalFolder(path.join(root, 'licenses'), 'licenses');
+  zip.addLocalFolder(path.join(root, 'java', 'preflight'), 'preflight-source');
   // Chromium notices are distributed by Electron alongside its runtime.
   zip.addLocalFile(path.join(root, 'node_modules', 'electron', 'dist', 'LICENSE'), 'licenses', 'Electron-LICENSE.txt');
   zip.addLocalFile(path.join(root, 'node_modules', 'electron', 'dist', 'LICENSES.chromium.html'), 'licenses');

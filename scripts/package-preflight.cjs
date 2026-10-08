@@ -1,0 +1,13 @@
+'use strict';
+const fs=require('node:fs');
+const path=require('node:path');
+const crypto=require('node:crypto');
+const AdmZip=require('adm-zip');
+const classes=path.resolve(process.argv[2]||'work/preflight-classes');
+if(!fs.existsSync(path.join(classes,'pl/skidam/automodpack_core/client/HollowPackPreflight.class')))throw Error('Compile o verificador antes de empacotar.');
+const zip=new AdmZip();zip.addLocalFolder(classes);zip.addFile('META-INF/MANIFEST.MF',Buffer.from('Manifest-Version: 1.0\nMain-Class: pl.skidam.automodpack_core.client.HollowPackPreflight\n\n'));
+const output=path.resolve(__dirname,'../assets/hollow-pack-preflight.jar');zip.writeZip(output);
+const hash=crypto.createHash('sha256').update(fs.readFileSync(output)).digest('hex');
+const moduleFile=path.resolve(__dirname,'../src/modpack-preflight.cjs');
+fs.writeFileSync(moduleFile,fs.readFileSync(moduleFile,'utf8').replace(/const PREFLIGHT_HASH='[a-f0-9]{64}';/,`const PREFLIGHT_HASH='${hash}';`));
+console.log(`Verificador empacotado: ${hash}`);

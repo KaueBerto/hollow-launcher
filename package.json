@@ -1,6 +1,6 @@
 {
   "name": "hollow-launcher",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "Launcher Electron do Hollow SMP para Windows",
   "author": "Hollow SMP",
   "license": "UNLICENSED",
@@ -48,6 +48,14 @@
       {
         "from": "THIRD-PARTY.txt",
         "to": "THIRD-PARTY.txt"
+      },
+      {
+        "from": "assets/hollow-pack-preflight.jar",
+        "to": "assets/hollow-pack-preflight.jar"
+      },
+      {
+        "from": "java/preflight",
+        "to": "preflight-source"
       }
     ],
     "asar": true,

@@ -322,6 +322,8 @@ class Engine {
   }
   async launch(nickname, ram, account) {
     if (this.gameProcess && this.gameProcess.exitCode === null) throw new Error('O Minecraft já está aberto.');
+    const { prepareModpack } = require('./modpack-preflight.cjs');
+    await prepareModpack(this, { run: runFile });
     const argumentsList = await this.buildArguments(nickname, ram, account);
     const argumentFile = path.join(this.root, 'game-args.txt');
     await fs.writeFile(argumentFile, '', { mode: 0o600 });
