@@ -105,7 +105,7 @@ function registerHandlers() {
       microsoft.session = null;
       publish({ account: null });
       await engine.install();
-      return { settings: selected, message: 'Instalação renovada. Seu nickname e suas opções foram preservados. Clique em Jogar e entre no servidor para receber o modpack.' };
+      return { settings: selected, message: 'Instalação renovada. Nickname, opções, paisagem do Distant Horizons e schematics foram preservados. Clique em Jogar e entre no servidor para receber o modpack.' };
     }));
   });
   ipcMain.handle('launcher:logout', async event => { trusted(event); return result(async () => {

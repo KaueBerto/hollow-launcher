@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/logo_smp.png" alt="Hollow SMP" width="260"></p>
 <h1 align="center">Hollow Launcher</h1>
 <p align="center">Launcher Electron do Hollow SMP para Windows.<br>Instalação automática, visual pixelado e modpack pelo AutoModpack.</p>
-<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-8b2de2"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.3.3-8b2de2"></p>
+<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-8b2de2"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.3.4-8b2de2"></p>
 
 ![Interface do Hollow Launcher](docs/launcher.png)
 
@@ -11,7 +11,7 @@ O fundo usa a paisagem Minecraft fornecida pelo responsável do Hollow, com escu
 
 ## Baixar e jogar
 
-Baixe e execute `HollowSMP-Launcher-Setup-2.3.3.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
+Baixe e execute `HollowSMP-Launcher-Setup-2.3.4.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
 
 1. Escolha **Nickname** ou **Microsoft** e ajuste a memória.
 2. Clique em **Instalar e jogar** e aguarde a preparação inicial.
@@ -58,7 +58,7 @@ A autenticação do servidor é responsabilidade da configuração da VPS. Este 
 
 ## Resetar
 
-O botão **Resetar** pede confirmação e reinstala a base do jogo. Preserva o nickname atual, modo de conta, memória e opção de lembrar nickname, além de teclas, distância de renderização, sensibilidade, áudio, vídeo, servidores favoritos e configurações dos mods. Os arquivos de preferências ficam no lugar durante a limpeza, inclusive se houver falha.
+O botão **Resetar** pede confirmação e reinstala a base do jogo. Preserva o nickname atual, modo de conta, memória e opção de lembrar nickname, além de teclas, distância de renderização, sensibilidade, áudio, vídeo, servidores favoritos e configurações dos mods. Mantém também toda a pasta `Distant_Horizons_server_data`, seus bancos e arquivos auxiliares, a pasta `schematics` e o registro da paisagem instalada, evitando baixá-la novamente após o reset. Os arquivos de preferências ficam no lugar durante a limpeza, inclusive se houver falha.
 
 Mods, Java, bibliotecas, recursos, mundos locais, screenshots, logs e sessão Microsoft são removidos. **A exclusão desses arquivos não pode ser desfeita.** Faça backup dos mundos e screenshots que deseja guardar.
 
@@ -87,7 +87,7 @@ npm run build
 npm run package
 ```
 
-`build` gera `dist/HollowSMP-Launcher-Setup-2.3.3.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/HollowSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
+`build` gera `dist/HollowSMP-Launcher-Setup-2.3.4.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/HollowSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
 
 O executável não possui certificado de assinatura de código do Hollow. Para uma distribuição assinada, configure seu certificado no electron-builder.
 
@@ -115,7 +115,7 @@ Versões do jogo e servidor ficam em `src/engine.cjs`. O layout está em `render
 
 ## Verificações e problemas
 
-Na versão 2.3.3, o launcher aguarda o Minecraft e o helper do AutoModpack encerrarem e conclui atualizações pendentes antes de abrir o jogo. Uma falha bloqueia a abertura e registra `modpack-preflight.log`, preservando a atualização para diagnóstico. Os ajustes Java, testes e instruções para recompilar estão em [java/preflight](java/preflight/README.md).
+Desde a versão 2.3.3, o launcher aguarda o Minecraft e o helper do AutoModpack encerrarem e conclui atualizações pendentes antes de abrir o jogo. Uma falha bloqueia a abertura e registra `modpack-preflight.log`, preservando a atualização para diagnóstico. Os ajustes Java, testes e instruções para recompilar estão em [java/preflight](java/preflight/README.md).
 
 `npm test` verifica UUID, manifestos, caminhos, preferências, reset, arquivos ocupados, junctions, ZIPs, downloads e autenticação Microsoft simulada. `npm run test:ui` abre a interface em renderização isolada, testa os controles e a criptografia Windows, e gera screenshots. Todos os dados de teste ficam em `dist/`.
 

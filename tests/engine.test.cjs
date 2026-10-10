@@ -55,24 +55,59 @@ test('reset bloqueia Java aberto sem apagar arquivos', async () => fixture(async
   await assert.rejects(engine.reset(), /Feche o Minecraft/);
   assert.equal((await readJson(path.join(engine.root, 'ready.json'))).sentinel, true);
 }));
-test('reset preserves launcher preferences, all Minecraft options and nested mod config byte-for-byte', async () => fixture(async engine => {
+test('reset preserves preferences, nested configs, DH databases and schematics byte-for-byte across repeated resets', async () => fixture(async engine => {
   const preserved = {
     'launcher-settings.json': JSON.stringify({ mode: 'nickname', nickname: 'HollowADM', ram: 10, remember: true }),
     'game/options.txt': 'renderDistance:12\nmouseSensitivity:0.73\nkey_key.forward:key.keyboard.up\nkey_mod.action:key.keyboard.r\n',
     'game/optionsof.txt': 'ofRenderRegions:true\n', 'game/optionsshaders.txt': 'shaderPack=test\n',
     'game/servers.dat': Buffer.from([10, 0, 0, 9]),
     'game/config/client.json': '{"custom":true}', 'game/config/nested/keys.toml': 'key="R"\n',
+    'landscape-installed.json': '{"sha256":"installed-landscape","directory":"Hollow+SMP/dimension"}',
+    'game/Distant_Horizons_server_data/Hollow+SMP/dimension/DistantHorizons.sqlite': Buffer.from([0, 1, 2, 255]),
+    'game/Distant_Horizons_server_data/Hollow+SMP/dimension/DistantHorizons.sqlite-wal': Buffer.from([7, 8, 9]),
+    'game/Distant_Horizons_server_data/Hollow+SMP/dimension/DistantHorizons.sqlite-shm': Buffer.from([4, 5, 6]),
+    'game/Distant_Horizons_server_data/Other+Server/custom.dat': 'other server landscape',
+    'game/schematics/castle.litematic': Buffer.from([10, 0, 255, 5]),
+    'game/schematics/nested/farm.schem': Buffer.from([9, 8, 7, 0]),
   };
   for (const [relative, content] of Object.entries(preserved)) {
     const file = path.join(engine.root, relative); await fs.mkdir(path.dirname(file), { recursive: true }); await fs.writeFile(file, content);
   }
   const removed = ['ready.json', 'runtime/bin/java.exe', 'game/mods/broken.jar', 'game/assets/old', 'game/saves/world/level.dat', 'game/screenshots/old.png', 'game-args.txt', 'microsoft-session.json'];
   for (const relative of removed) { const file = path.join(engine.root, relative); await fs.mkdir(path.dirname(file), { recursive: true }); await fs.writeFile(file, 'remove'); }
+  await fs.mkdir(path.join(engine.game, 'schematics', 'empty'), { recursive: true });
   await engine.reset(); await engine.reset();
   for (const [relative, content] of Object.entries(preserved)) assert.deepEqual(await fs.readFile(path.join(engine.root, relative)), Buffer.from(content));
   for (const relative of removed) await assert.rejects(fs.access(path.join(engine.root, relative)));
+  assert.equal((await fs.stat(path.join(engine.game, 'schematics', 'empty'))).isDirectory(), true);
   assert.equal((await engine.loadSettings()).nickname, 'HollowADM');
   assert.equal((await engine.loadSettings()).ram, 10);
+}));
+test('reset keeps the installed landscape receipt and subsequent preparation makes no new download', async () => fixture(async engine => {
+  const { installLandscape, DIRECTORY } = require('../src/landscape.cjs');
+  const raw = Buffer.concat([Buffer.from('SQLite format 3\0'), Buffer.alloc(128)]);
+  const packed = require('node:zlib').gzipSync(raw);
+  const digest = data => crypto.createHash('sha256').update(data).digest('hex');
+  engine.jsonFrom = async () => ({ version: 1, directory: DIRECTORY, url: 'https://painel.hollowsmp.com.br/hollow-landscape/test.gz', bytes: packed.length, sha256: digest(packed), databaseBytes: raw.length, databaseSha256: digest(raw) });
+  const originalFetch = global.fetch; let requests = 0;
+  try {
+    global.fetch = async (_url, options) => {
+      requests++; const [, start, end] = /bytes=(\d+)-(\d+)/.exec(options.headers.Range);
+      return new Response(packed.subarray(+start, +end + 1), { status: 206, headers: { 'content-range': `bytes ${start}-${end}/${packed.length}` } });
+    };
+    assert.equal((await installLandscape(engine)).alreadyInstalled, false);
+    const receipt = await fs.readFile(path.join(engine.root, 'landscape-installed.json'));
+    const installed = JSON.parse(receipt);
+    const database = path.join(engine.game, 'Distant_Horizons_server_data', installed.directory, 'DistantHorizons.sqlite');
+    const changed = Buffer.concat([raw, Buffer.from('player explored more terrain')]);
+    await fs.writeFile(database, changed);
+    await engine.reset();
+    assert.deepEqual(await fs.readFile(path.join(engine.root, 'landscape-installed.json')), receipt);
+    const requestsBefore = requests;
+    assert.equal((await installLandscape(engine)).alreadyInstalled, true);
+    assert.equal(requests, requestsBefore);
+    assert.deepEqual(await fs.readFile(database), changed);
+  } finally { global.fetch = originalFetch; }
 }));
 test('reset recusa junction e preserva seu alvo externo', async () => fixture(async (engine, folder) => {
   const target = path.join(folder, 'outside'); await fs.mkdir(target); await fs.writeFile(path.join(target, 'keep.txt'), 'keep');

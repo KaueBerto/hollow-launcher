@@ -394,8 +394,13 @@ class Engine {
       catch { throw new Error('Não foi possível acessar todos os arquivos. Feche o Minecraft e tente novamente.'); }
     }
     await this.assertNoLinks(this.root);
-    // Keep preferences in place: a failed reset must not strand them in a backup.
-    const preserved = new Set(['launcher-settings.json', 'game/options.txt', 'game/optionsof.txt', 'game/optionsshaders.txt', 'game/servers.dat', 'game/config'].map(name => under(this.root, name).toLowerCase()));
+    // Keep player data in place, including DH databases and their installation receipt.
+    const preserved = new Set([
+      'launcher-settings.json', 'landscape-installed.json',
+      'game/options.txt', 'game/optionsof.txt', 'game/optionsshaders.txt',
+      'game/servers.dat', 'game/config',
+      'game/Distant_Horizons_server_data', 'game/schematics',
+    ].map(name => under(this.root, name).toLowerCase()));
     async function remove(directory) {
       for (const entry of await fs.readdir(directory)) {
         const full = under(directory, entry), stat = await fs.lstat(full);

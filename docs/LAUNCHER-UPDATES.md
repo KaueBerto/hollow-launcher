@@ -52,3 +52,7 @@ A instalação da versão 2.3.0 é reconhecida mesmo sem a pasta no registro ant
 ## Atualização do modpack antes de abrir o jogo (2.3.3)
 
 O launcher aguarda o Minecraft e o helper anterior encerrarem antes de iniciar Java. Se existe uma transação do AutoModpack pendente, conclui-a com o jogo fechado usando a API original de planejamento e aplicação. Configurações Properties com diferenças só em comentários ou datas mantêm a equivalência da revisão; mudanças de valores continuam exigindo revisão. O histórico da geração já finalizada é usado apenas para avançar no mesmo pacote quando faltam documentos intermediários, mantendo a verificação da política de destino. Falha bloqueia a abertura com diagnóstico em modpack-preflight.log, em vez de repetir o ciclo silenciosamente. Não limpa mods, preferências ou mundos. Não altera o JAR original nem publica dados do servidor.
+
+## Reset preserva paisagem e schematics (2.3.4)
+
+O reset mantém integralmente game/Distant_Horizons_server_data e game/schematics, incluindo subpastas, bancos SQLite, arquivos WAL/SHM e pastas vazias. O registro landscape-installed.json também permanece para reconhecer a paisagem já instalada e evitar outro download. A confirmação do reset informa essa preservação.
