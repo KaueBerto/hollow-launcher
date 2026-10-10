@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/logo_smp.png" alt="Hollow SMP" width="260"></p>
 <h1 align="center">Hollow Launcher</h1>
 <p align="center">Launcher Electron do Hollow SMP para Windows.<br>Instalação automática, visual pixelado e modpack pelo AutoModpack.</p>
-<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-8b2de2"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.3.4-8b2de2"></p>
+<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-8b2de2"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.3.5-8b2de2"></p>
 
 ![Interface do Hollow Launcher](docs/launcher.png)
 
@@ -11,7 +11,7 @@ O fundo usa a paisagem Minecraft fornecida pelo responsável do Hollow, com escu
 
 ## Baixar e jogar
 
-Baixe e execute `HollowSMP-Launcher-Setup-2.3.4.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
+Baixe e execute `HollowSMP-Launcher-Setup-2.3.5.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
 
 1. Escolha **Nickname** ou **Microsoft** e ajuste a memória.
 2. Clique em **Instalar e jogar** e aguarde a preparação inicial.

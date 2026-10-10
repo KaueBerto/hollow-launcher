@@ -11,6 +11,7 @@ const { pipeline } = require('node:stream/promises');
 const { createReadStream, createWriteStream } = require('node:fs');
 const AdmZip = require('adm-zip');
 const runFile = promisify(execFile);
+const { alive, trackGameProcess, relevantJavaPids } = require('./game-process.cjs');
 
 const MC = '1.21.1';
 const NF = '21.1.253';
@@ -321,7 +322,7 @@ class Engine {
       ...[vanilla, neo].flatMap(version => argumentsOf(version, 'game').map(expand))];
   }
   async launch(nickname, ram, account) {
-    if (this.gameProcess && this.gameProcess.exitCode === null) throw new Error('O Minecraft já está aberto.');
+    if (alive(this.gameProcess)) throw new Error('O Minecraft já está aberto.');
     const { prepareModpack } = require('./modpack-preflight.cjs');
     await prepareModpack(this, { run: runFile });
     const argumentsList = await this.buildArguments(nickname, ram, account);
@@ -337,33 +338,34 @@ class Engine {
     const output = createWriteStream(path.join(this.root, 'game-launch.log'), { flags: 'w' });
     output.write(`Hollow Launcher Electron — ${new Date().toISOString()}\n`);
     const child = spawn(this.java, [`@${argumentFile}`], { cwd: this.game, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
-    this.gameProcess = child;
-    const cleanupArgs = () => fs.rm(argumentFile, { force: true }).catch(() => {});
+    let argumentCleanup;
+    const cleanupArgs = () => argumentCleanup ||= fs.rm(argumentFile, { force: true }).catch(() => {});
     const { redactedLog } = require('./redacted-log.cjs');
-    child.stdout.pipe(redactedLog(account?.accessToken)).pipe(output, { end: false });
-    child.stderr.pipe(redactedLog(account?.accessToken)).pipe(output, { end: false });
+    const stdout = child.stdout.pipe(redactedLog(account?.accessToken));
+    const stderr = child.stderr.pipe(redactedLog(account?.accessToken));
+    stdout.pipe(output, { end: false }); stderr.pipe(output, { end: false });
     // First Java output means the VM has parsed the argument file.
     child.stdout.once('data', cleanupArgs); child.stderr.once('data', cleanupArgs);
-    child.once('close', code => { cleanupArgs(); output.end(`\nExit code: ${code}\n`); if (this.gameProcess === child) this.gameProcess = null; this.report({ text: code === 0 ? 'Minecraft fechado.' : 'O Minecraft encerrou. Confira game-launch.log.', gameRunning: false }); });
+    const finish = trackGameProcess(this, child, { cleanup: cleanupArgs, finishLog: code => {
+      stdout.unpipe(output); stderr.unpipe(output);
+      stdout.resume(); stderr.resume(); // Drain inherited helper output without keeping the game active.
+      return new Promise(resolve => output.end(`\nExit code: ${code}\n`, resolve));
+    } });
     try { await new Promise((resolve, reject) => { child.once('spawn', resolve); child.once('error', reject); }); }
-    catch (error) { await cleanupArgs(); output.end(); this.gameProcess = null; throw error; }
+    catch (error) { await finish(null); throw error; }
     return child.pid;
   }
   async javaRunning() {
-    if (this.gameProcess && this.gameProcess.exitCode === null) return true;
-    if (this.platform !== 'win32') return false;
-    const { stdout } = await runFile('tasklist.exe', ['/FO', 'CSV', '/NH'], { windowsHide: true, timeout: 15000 });
-    return /^"javaw?\.exe"/im.test(stdout);
+    if (alive(this.gameProcess)) return true;
+    return (await this.hollowGamePids()).length > 0;
   }
   async hollowGamePids() {
     if (this.platform !== 'win32') return [];
     const encodedRoot = Buffer.from(this.game).toString('base64');
     const encodedJava = Buffer.from(this.java).toString('base64');
-    const script = "$ErrorActionPreference='Stop'; $game=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('" + encodedRoot + "')); $java=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('" + encodedJava + "')); $ids=@(Get-CimInstance Win32_Process -Filter \"Name='java.exe' OR Name='javaw.exe'\" | Where-Object { ($_.ExecutablePath -and $_.ExecutablePath -ieq $java) -or ($_.CommandLine -and $_.CommandLine.IndexOf($game,[StringComparison]::OrdinalIgnoreCase) -ge 0) } | Select-Object -ExpandProperty ProcessId); ConvertTo-Json -InputObject $ids -Compress";
+    const script = "$ErrorActionPreference='Stop'; $game=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('" + encodedRoot + "')); $java=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('" + encodedJava + "')); $rows=@(Get-CimInstance Win32_Process -Filter \"Name='java.exe' OR Name='javaw.exe'\" | Where-Object { ($_.ExecutablePath -and $_.ExecutablePath -ieq $java) -or ($_.CommandLine -and $_.CommandLine.IndexOf($game,[StringComparison]::OrdinalIgnoreCase) -ge 0) } | ForEach-Object { @{pid=[int]$_.ProcessId; executable=$_.ExecutablePath; command=$_.CommandLine} }); ConvertTo-Json -InputObject $rows -Compress";
     const { stdout } = await runFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-EncodedCommand', Buffer.from(script, 'utf16le').toString('base64')], { windowsHide: true, timeout: 15000 });
-    const ids = JSON.parse(stdout.trim());
-    if (!Array.isArray(ids) || ids.some(pid => !Number.isInteger(pid) || pid <= 0)) throw new Error('Não consegui acompanhar o Minecraft.');
-    return ids;
+    return relevantJavaPids(JSON.parse(stdout.trim()), { game: this.game, java: this.java });
   }
   async assertNoLinks(root) {
     let ancestor = path.resolve(root);
@@ -384,7 +386,7 @@ class Engine {
   async reset() {
     const protectedRoots = [path.parse(this.root).root, os.homedir(), process.env.LOCALAPPDATA, process.env.APPDATA].filter(Boolean).map(value => path.resolve(value).toLowerCase());
     if (protectedRoots.includes(this.root.toLowerCase()) || path.basename(this.root).toLowerCase() !== 'hollowsmp') throw new Error('Pasta de reset inválida.');
-    if (await this.javaRunning()) throw new Error('Feche o Minecraft e outros programas Java antes de resetar.');
+    if (await this.javaRunning()) throw new Error('Feche o Minecraft e aguarde a atualização do modpack antes de resetar.');
     await this.assertNoLinks(this.root);
     if (!await exists(this.root)) return;
     // Preflight all files with exclusive Windows handles before any deletion.

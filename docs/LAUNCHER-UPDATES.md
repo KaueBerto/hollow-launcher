@@ -56,3 +56,7 @@ O launcher aguarda o Minecraft e o helper anterior encerrarem antes de iniciar J
 ## Reset preserva paisagem e schematics (2.3.4)
 
 O reset mantém integralmente game/Distant_Horizons_server_data e game/schematics, incluindo subpastas, bancos SQLite, arquivos WAL/SHM e pastas vazias. O registro landscape-installed.json também permanece para reconhecer a paisagem já instalada e evitar outro download. A confirmação do reset informa essa preservação.
+
+## Detecção de fechamento (2.3.5)
+
+O launcher libera o jogo no evento de saída do processo do Minecraft, após finalizar o log e remover os argumentos de sessão. Não espera processos de diagnóstico fecharem os canais de saída herdados. Eventos atrasados de uma partida anterior não alteram o estado da nova partida. A verificação de Java considera somente a instalação do Hollow e ignora o companion do Crash Assistant. O Minecraft ainda salvando e os helpers de atualização do AutoModpack continuam protegendo a instalação contra escrita simultânea; fechar apenas a janela não autoriza interromper esses processos.
