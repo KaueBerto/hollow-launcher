@@ -1,26 +1,26 @@
-<p align="center"><img src="assets/logo_smp.png" alt="Hollow SMP" width="260"></p>
-<h1 align="center">Hollow Launcher</h1>
-<p align="center">Launcher Electron do Hollow SMP para Windows.<br>Instalação automática, visual pixelado e modpack pelo AutoModpack.</p>
-<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-8b2de2"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-bb55ff"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.3.5-8b2de2"></p>
+<p align="center"><img src="assets/averon-smp.png" alt="AVERON SMP" width="260"></p>
+<h1 align="center">Averon Launcher</h1>
+<p align="center">Launcher Electron do AVERON SMP para Windows.<br>Instalação automática, visual pixelado e modpack pelo AutoModpack.</p>
+<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-f6c844"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-c9362a"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.4.0-f6c844"></p>
 
-![Interface do Hollow Launcher](docs/launcher.png)
+![Interface do Averon Launcher](docs/launcher.png)
 
 <p align="center"><img src="docs/startup-update.png" alt="Exemplo da tela de atualização automática" width="380"></p>
 
-O fundo usa a paisagem Minecraft fornecida pelo responsável do Hollow, com escurecimento para leitura, névoa e partículas discretas. O painel consulta o servidor diretamente: números na captura são ilustrativos e variam na execução.
+O fundo usa a paisagem Minecraft fornecida pelo responsável do Averon, com escurecimento para leitura, névoa e partículas douradas discretas. A identidade AVERON combina a logo voxel com dourado, vermelho, pedra e verde; mantém Monocraft em negrito e flutuação suave da logo. O painel consulta o servidor diretamente: números na captura são ilustrativos e variam na execução.
 
 ## Baixar e jogar
 
-Baixe e execute `HollowSMP-Launcher-Setup-2.3.5.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
+Baixe e execute `AveronSMP-Launcher-Setup-2.4.0.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
 
 1. Escolha **Nickname** ou **Microsoft** e ajuste a memória.
 2. Clique em **Instalar e jogar** e aguarde a preparação inicial.
-3. Abra **Multijogador** e entre no **Hollow SMP**.
+3. Abra **Multijogador** e entre no **AVERON SMP**.
 4. Confirme o download do modpack pelo AutoModpack. Se ele pedir reinício, feche o Minecraft, abra pelo launcher e conecte novamente.
 
 A primeira preparação baixa Java 21, Minecraft 1.21.1, NeoForge 21.1.253 e recursos do jogo. Pode levar vários minutos. Nas próximas aberturas, o launcher reutiliza a instalação. O modpack é recebido **dentro do Minecraft**, ao entrar no servidor; a barra do launcher mostra a preparação da base.
 
-O repositório e os downloads são públicos. Ao abrir, uma tela compacta com a logo verifica as atualizações, baixa e instala versões novas automaticamente, e reabre o Hollow. Sem atualização, abre o launcher normalmente. Falha de conexão libera o jogo; Minecraft aberto impede a aplicação. A pasta do jogo é preservada. Versões 2.2.0 e 2.2.1 precisam aplicar esta atualização pelo botão antigo uma vez; versões portáteis precisam do instalador. Veja [como publicar atualizações](docs/LAUNCHER-UPDATES.md).
+O repositório e os downloads são públicos. Ao abrir, uma tela compacta com a logo verifica as atualizações, baixa e instala versões novas automaticamente, e reabre o Averon. Sem atualização, abre o launcher normalmente. Falha de conexão libera o jogo; Minecraft aberto impede a aplicação. A pasta do jogo é preservada. Versões 2.2.0 e 2.2.1 precisam aplicar esta atualização pelo botão antigo uma vez; versões portáteis precisam do instalador. Veja [como publicar atualizações](docs/LAUNCHER-UPDATES.md).
 
 ## Versão Electron
 
@@ -30,12 +30,12 @@ A versão 2.0 substitui a interface Windows Forms por HTML, CSS e JavaScript, co
 - Flutuação suave da logo com animação CSS por `transform`, pausada ao ocultar a janela. Respeita a preferência do sistema por movimento reduzido.
 - Entrada suave da interface, brilho discreto e pressão nos botões, troca animada de conta, progresso e avisos com transições. Animações não deslocam o layout final nem bloqueiam os controles.
 - Paisagem Minecraft, névoa e 18 partículas quadradas, com movimento reduzido e pausa ao ocultar.
-- Brilho do portal ao clicar em Jogar e durante a preparação.
+- Brilho dourado da logo ao clicar em Jogar e durante a preparação.
 - Status Java direto, jogadores e ping por pong, atualização a cada 45 segundos enquanto visível e botão para atualizar. Falha de consulta mostra **Sem resposta**, permite jogar e não inventa estado offline.
 - Memória de 2 a 24 GB por arraste ou teclado.
 - Reset com confirmação e preparação automática da nova instalação.
 - Launcher escondido enquanto o Minecraft está aberto, retornando ao fechar o jogo.
-- Atividade fixa **Jogando HollowSMP** no Discord enquanto o launcher estiver aberto, inclusive escondido. Reconecta se o Discord abrir depois e limpa ao sair: [configuração](docs/DISCORD.md).
+- Atividade fixa **Jogando AveronSMP** no Discord enquanto o launcher estiver aberto, inclusive escondido. Reconecta se o Discord abrir depois e limpa ao sair: [configuração](docs/DISCORD.md).
 - Downloads HTTPS, hashes, tentativas automáticas e até 12 recursos em paralelo.
 - Janela isolada: Node desabilitado na interface, sandbox e API limitada no preload.
 
@@ -48,11 +48,11 @@ A política do modpack mantém configurações Java Properties locais para evita
 | Modo | Funcionamento |
 | --- | --- |
 | Nickname | Inicia diretamente com um nome de 3 a 16 letras, números ou `_`. Não autentica uma conta Microsoft; a entrada depende de o servidor permitir esse modo. |
-| Microsoft | Autoriza a conta no navegador e inicia o Minecraft diretamente pelo Hollow. Exige acesso ativo ao Minecraft Java e cadastro do aplicativo aprovado. |
+| Microsoft | Autoriza a conta no navegador e inicia o Minecraft diretamente pelo Averon. Exige acesso ativo ao Minecraft Java e cadastro do aplicativo aprovado. |
 
-O launcher oficial não é necessário. O Hollow usa OAuth com PKCE no navegador do sistema, valida o acesso ao Minecraft Java e utiliza seu nome e UUID oficiais. O refresh token é protegido pelo Windows via Electron `safeStorage`; senha e access tokens não são salvos na conta. **Sair da conta** remove a sessão salva. O botão **Cancelar login** encerra a autorização em andamento.
+O launcher oficial não é necessário. O Averon usa OAuth com PKCE no navegador do sistema, valida o acesso ao Minecraft Java e utiliza seu nome e UUID oficiais. O refresh token é protegido pelo Windows via Electron `safeStorage`; senha e access tokens não são salvos na conta. **Sair da conta** remove a sessão salva. O botão **Cancelar login** encerra a autorização em andamento.
 
-**Integração em prévia:** o Client ID do Hollow ainda não foi fornecido/aprovado. Sem esse cadastro, Microsoft exibe uma mensagem de configuração pendente antes de baixar o jogo. Nickname continua funcionando. O login com uma conta real só poderá ser validado após a aprovação. Consulte [o cadastro Microsoft](docs/MICROSOFT.md).
+**Integração em prévia:** o Client ID do Averon ainda não foi fornecido/aprovado. Sem esse cadastro, Microsoft exibe uma mensagem de configuração pendente antes de baixar o jogo. Nickname continua funcionando. O login com uma conta real só poderá ser validado após a aprovação. Consulte [o cadastro Microsoft](docs/MICROSOFT.md).
 
 A autenticação do servidor é responsabilidade da configuração da VPS. Este projeto não altera essas regras.
 
@@ -64,13 +64,13 @@ Mods, Java, bibliotecas, recursos, mundos locais, screenshots, logs e sessão Mi
 
 Depois, a base do jogo é preparada novamente. Entre no servidor para receber o modpack. O reset preserva o servidor e os perfis e bibliotecas compartilhados do launcher oficial.
 
-Feche Minecraft e outros programas Java antes. O reset recusa processos `java`/`javaw`, arquivos ocupados e links de arquivos ou pastas. Os controles ficam desabilitados durante instalação e reset.
+Feche o Minecraft e aguarde atualizações do modpack antes. O reset recusa processos da instalação ainda ativos, arquivos ocupados e links de arquivos ou pastas. Os controles ficam desabilitados durante instalação e reset.
 
 ## Requisitos
 
 - Windows 10 ou 11 de 64 bits.
 - Internet, espaço para o jogo/modpack e memória suficiente para o pack.
-- Conta com Minecraft Java para Microsoft, e aplicativo Hollow registrado/aprovado.
+- Conta com Minecraft Java para Microsoft, e aplicativo Averon registrado/aprovado.
 
 O jogador não precisa instalar Node.js, Electron, Java ou um SDK. A barra de RAM não verifica a capacidade física: deixe memória livre para Windows e outros programas.
 
@@ -87,9 +87,9 @@ npm run build
 npm run package
 ```
 
-`build` gera `dist/HollowSMP-Launcher-Setup-2.3.4.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/HollowSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
+`build` gera `dist/AveronSMP-Launcher-Setup-2.4.0.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/AveronSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
 
-O executável não possui certificado de assinatura de código do Hollow. Para uma distribuição assinada, configure seu certificado no electron-builder.
+O executável não possui certificado de assinatura de código do Averon. Para uma distribuição assinada, configure seu certificado no electron-builder.
 
 ## Estrutura
 
@@ -100,7 +100,7 @@ src/preload.cjs    API limitada exposta à interface
 src/game-window.cjs Visibilidade e acompanhamento do jogo
 src/engine.cjs     Instalação, reset, perfis e inicialização do jogo
 src/microsoft-auth.cjs Login Microsoft, sessão protegida e perfil Java
-src/microsoft-config.cjs Client ID público próprio do Hollow (pendente)
+src/microsoft-config.cjs Client ID público próprio do Averon (pendente)
 src/server-status.cjs Consulta Java, ping, cache e atualização do painel
 renderer/         HTML, CSS, eventos e animação
 assets/           Logo, ícone, fontes e AutoModpack original
@@ -127,9 +127,9 @@ Logs: `%LOCALAPPDATA%\HollowSMP\launcher-error.log`, `neoforge-install.log`, `ga
 
 Monocraft é inspirada no Minecraft, **não a fonte oficial**. AutoModpack, Electron, Chromium, electron-updater e adm-zip mantêm suas licenças; veja [THIRD-PARTY.txt](THIRD-PARTY.txt) e [licenses/](licenses/). O pacote também inclui os avisos de terceiros do Chromium.
 
-O código original e a identidade visual do Hollow SMP não recebem licença de reutilização neste repositório. As licenças de terceiros se aplicam aos respectivos componentes.
+O código original e a identidade visual do AVERON SMP não recebem licença de reutilização neste repositório. As licenças de terceiros se aplicam aos respectivos componentes.
 
-Projeto independente do Hollow SMP, sem vínculo oficial com Mojang ou Microsoft.
+Projeto independente do AVERON SMP, sem vínculo oficial com Mojang ou Microsoft.
 ## Enquanto o Minecraft está aberto
 
-O Hollow se esconde ao iniciar o Minecraft diretamente, em ambos os modos, e volta quando o jogo encerra. Clicar no **X** ou usar **Alt+F4** durante a partida apenas esconde o launcher, mantendo o jogo e a atividade do Discord funcionando. Sem o Minecraft aberto, o X fecha normalmente. Para abrir o Hollow durante a partida, use o ícone perto do relógio: clique duas vezes ou escolha **Mostrar launcher**. Abrir o executável novamente também traz a janela existente. A opção **Sair** na bandeja continua sendo uma saída explícita.
+O Averon se esconde ao iniciar o Minecraft diretamente, em ambos os modos, e volta quando o jogo encerra. Clicar no **X** ou usar **Alt+F4** durante a partida apenas esconde o launcher, mantendo o jogo e a atividade do Discord funcionando. Sem o Minecraft aberto, o X fecha normalmente. Para abrir o Averon durante a partida, use o ícone perto do relógio: clique duas vezes ou escolha **Mostrar launcher**. Abrir o executável novamente também traz a janela existente. A opção **Sair** na bandeja continua sendo uma saída explícita.

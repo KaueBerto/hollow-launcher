@@ -4,15 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
-  <title>Hollow Launcher</title>
+  <title>Averon Launcher</title>
   <link rel="stylesheet" href="style.css">
   <script defer src="app.js"></script>
 </head>
 <body>
-  <section id="startup-update" class="startup-update" aria-label="Atualização do Hollow" aria-busy="true">
+  <section id="startup-update" class="startup-update" aria-label="Atualização do AVERON" aria-busy="true">
     <button id="startup-close" class="icon-action" aria-label="Fechar"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8"/></svg></button>
     <div class="startup-card">
-      <img class="startup-logo" src="../assets/logo_smp.png" alt="Hollow SMP" draggable="false">
+      <img class="startup-logo" src="../assets/averon-smp.png" alt="AVERON SMP" draggable="false">
       <div class="startup-loader" aria-hidden="true"><span></span><span></span><span></span></div>
       <p id="startup-title" role="status">Verificando atualizações…</p>
       <p id="startup-note">Preparando sua próxima aventura</p>
@@ -30,9 +30,9 @@
     </nav>
   </header>
   <main>
-    <section class="server-status" aria-label="Status do servidor Hollow SMP">
+    <section class="server-status" aria-label="Status do servidor AVERON SMP">
       <div class="server-heading"><span class="server-dot" aria-hidden="true"></span><span id="server-label">Consultando servidor…</span><button type="button" id="refresh-server" class="icon-action" aria-label="Atualizar status do servidor"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M12 6A5 5 0 1 0 13 10M12 2v4H8"/></svg></button></div>
-      <p id="server-details">Hollow SMP</p>
+      <p id="server-details">AVERON SMP</p>
     </section>
     <section class="controls" aria-label="Jogar">
       <form id="play-form">
@@ -51,15 +51,15 @@
         <button type="button" class="text-action official" id="cancel-login" hidden>Cancelar login</button>
       </form>
     </section>
-    <section class="brand" aria-label="Hollow SMP"><img class="logo" src="../assets/logo_smp.png" alt="Hollow SMP Beta" draggable="false"></section>
-    <fieldset class="account-modes"><legend class="visually-hidden">Tipo de conta</legend>
+    <section class="brand" aria-label="AVERON SMP"><img class="logo" src="../assets/averon-smp.png" alt="AVERON SMP" draggable="false"></section>
+    <fieldset class="account-modes"><legend>ENTRAR COM</legend>
       <label><input type="radio" name="mode" value="nickname" checked><span>Nickname</span></label>
       <label><input type="radio" name="mode" value="microsoft"><span>Microsoft</span></label>
     </fieldset>
     <div class="progress-area" hidden><progress id="progress" max="100" aria-label="Preparação do jogo"></progress><p id="status" role="status" aria-live="polite"></p></div>
   </main>
   <dialog id="confirm-reset" aria-labelledby="reset-title">
-    <h2 id="reset-title">Resetar Hollow</h2>
+    <h2 id="reset-title">Resetar AVERON</h2>
     <p>Apagar a instalação local e baixar novamente?</p>
     <p>Seu nickname, memória, teclas, vídeo, sensibilidade e configurações dos mods serão mantidos.</p>
     <p>A paisagem do Distant Horizons e seus schematics também serão mantidos.</p>
@@ -67,6 +67,6 @@
     <p>Feche o Minecraft antes de continuar. O modpack será recebido ao entrar no servidor.</p>
     <div class="dialog-actions"><button class="block-button secondary" id="cancel-reset" autofocus>CANCELAR</button><button class="block-button primary" id="do-reset">RESETAR</button></div>
   </dialog>
-  <dialog id="message" aria-labelledby="message-title"><h2 id="message-title">Hollow SMP</h2><p id="message-text"></p><div class="dialog-actions"><button class="block-button primary" id="message-ok">OK</button></div></dialog>
+  <dialog id="message" aria-labelledby="message-title"><h2 id="message-title">AVERON SMP</h2><p id="message-text"></p><div class="dialog-actions"><button class="block-button primary" id="message-ok">OK</button></div></dialog>
 </body>
 </html>

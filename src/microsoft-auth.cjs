@@ -21,7 +21,7 @@ class MicrosoftAuth {
       try { value = (await readJson(path.join(this.root, 'microsoft-app.json'))).clientId; }
       catch (error) { if (error.code !== 'ENOENT') throw new Error('A configuração Microsoft é inválida.'); }
     }
-    if (!validId(value)) throw new Error('O login Microsoft direto ainda precisa ser ativado pelo responsável do Hollow. Falta cadastrar e aprovar o aplicativo na API do Minecraft.');
+    if (!validId(value)) throw new Error('O login Microsoft direto ainda precisa ser ativado pelo responsável do Averon. Falta cadastrar e aprovar o aplicativo na API do Minecraft.');
     return value;
   }
   async publicAccount() {
@@ -55,7 +55,7 @@ class MicrosoftAuth {
     if (!response.ok) {
       // Never include remote error descriptions, request bodies or tokens in errors/logs.
       const error = new Error(response.status === 403 && url.includes('api.minecraftservices.com/authentication')
-        ? 'O cadastro do Hollow ainda não foi aprovado para a API do Minecraft. Contate o responsável do launcher.'
+        ? 'O cadastro do Averon ainda não foi aprovado para a API do Minecraft. Contate o responsável do launcher.'
         : url.includes('/minecraft/profile') && response.status === 404
           ? 'Esta conta não possui um perfil Minecraft Java. Confira a compra ou assinatura e crie seu perfil no site do Minecraft.'
           : data.XErr === 2148916238 ? 'Esta conta precisa ser configurada em uma família Microsoft antes de entrar no Xbox.'
@@ -88,12 +88,12 @@ class MicrosoftAuth {
           response.setHeader('Cache-Control', 'no-store');
           response.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'");
           if (request.method !== 'GET' || url.pathname !== '/' || request.headers.host !== `localhost:${server.address().port}` || url.searchParams.get('state') !== state) {
-            response.writeHead(400); response.end('Resposta de login inválida. Volte ao Hollow.'); return;
+            response.writeHead(400); response.end('Resposta de login inválida. Volte ao Averon.'); return;
           }
-          if (url.searchParams.has('error')) { response.end('Login não autorizado. Volte ao Hollow.'); reject(new Error('Login não autorizado.')); return; }
+          if (url.searchParams.has('error')) { response.end('Login não autorizado. Volte ao Averon.'); reject(new Error('Login não autorizado.')); return; }
           const code = url.searchParams.get('code');
           if (!code || code.length > 16384) { response.writeHead(400); response.end('Código inválido.'); return; }
-          response.end('Autorização recebida. Volte ao Hollow Launcher para continuar.');
+          response.end('Autorização recebida. Volte ao Averon Launcher para continuar.');
           resolve(code);
         });
       });
@@ -101,7 +101,7 @@ class MicrosoftAuth {
       callback.catch(() => {});
       const url = new URL(`${BASE}/authorize`);
       url.search = new URLSearchParams({ client_id: clientId, response_type: 'code', redirect_uri: redirect, response_mode: 'query', scope: SCOPE, state, code_challenge: challenge, code_challenge_method: 'S256', prompt: 'select_account' }).toString();
-      this.report({ authPending: true, text: 'Autorize sua conta no navegador. Depois, volte ao Hollow.' });
+      this.report({ authPending: true, text: 'Autorize sua conta no navegador. Depois, volte ao Averon.' });
       await this.openBrowser(url.href);
       return await this.request(`${BASE}/token`, { client_id: clientId, grant_type: 'authorization_code', code: await callback, redirect_uri: redirect, code_verifier: verifier, scope: SCOPE }, true);
     } finally {

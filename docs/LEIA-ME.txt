@@ -1,71 +1,57 @@
-HOLLOW SMP LAUNCHER — 2.2.3 — Electron
+AVERON SMP LAUNCHER — 2.4.0 — Electron
 
-1. Execute HollowSMP-Instalar.exe e abra o atalho do Hollow.
+1. Execute AveronSMP-Instalar.exe e abra o atalho Averon Launcher.
 2. Escolha Nickname ou Microsoft e ajuste a memória na barra.
 3. Clique em Instalar e jogar e aguarde a preparação inicial.
-4. Abra Multijogador e entre no Hollow SMP.
+4. Abra Multijogador e entre no servidor já configurado.
 5. Confirme os avisos do AutoModpack. Se ele pedir reinício, feche
    o jogo, abra novamente pelo launcher e volte ao servidor.
 
-Microsoft abre a autorização no navegador e inicia o Minecraft direto.
-PRÉVIA: falta o cadastro aprovado do Hollow para ativar esse login.
-O responsável deve seguir docs/MICROSOFT.md antes de distribuir para
-contas Microsoft. Nickname continua disponível.
-Nickname não autentica uma conta Microsoft: o servidor precisa permitir
-esse modo de entrada. O Hollow não coleta senhas de conta.
+IDENTIDADE AVERON
+Logo voxel com castelo e coroa, botões dourados, detalhes vermelhos,
+superfícies em cinza pedra e verde. Fonte Monocraft Bold, animação
+suave da logo e controles de janela sem borda. As animações respeitam
+a preferência do Windows de reduzir movimentos.
 
-Requer Windows 10/11 de 64 bits com internet e espaço
-livre para o pack. Java 21 é baixado automaticamente. A primeira
-instalação pode levar vários minutos. O pack é baixado dentro do jogo,
-na primeira conexão ao servidor. Não escolha mais RAM que seu PC possui.
+ATUALIZAR DO HOLLOW
+As versões instaladas anteriores recebem a atualização pelo mesmo
+repositório. O instalador preserva a pasta de dados e as preferências.
+Dados e logs continuam em %LOCALAPPDATA%\HollowSMP.
+O endereço atual do servidor continua hollowsmp.com.br:25565.
+
+LOGIN
+Microsoft autoriza no navegador e inicia o Minecraft diretamente.
+Esse modo ainda depende do cadastro aprovado do aplicativo na API
+do Minecraft; consulte MICROSOFT.md. Nickname continua disponível
+conforme a configuração do servidor. Não coletamos senhas de conta.
+
+REQUISITOS
+Windows 10/11 de 64 bits, internet e espaço para o modpack.
+Java 21 é baixado automaticamente. A primeira instalação pode levar
+vários minutos. Não escolha mais RAM que seu PC possui.
 
 RESETAR
-O botão no topo pede confirmação e reinstala a base do jogo.
-Preserva nickname, memória, opções de teclas, vídeo, sensibilidade,
-áudio, servidores favoritos e configurações dos mods. Preserva também
-a pasta do Distant Horizons e seu registro de instalação, além da pasta
-schematics com todas as subpastas. Remove mods,
-Java, mundos locais, screenshots, logs e sessão Microsoft.
+Pede confirmação e reinstala a base do jogo. Preserva nickname,
+memória, teclas, vídeo, sensibilidade, áudio, servidores favoritos,
+configurações dos mods, paisagem do Distant Horizons e schematics.
+Remove mods, Java, mundos locais, screenshots, logs e sessão Microsoft.
 Faça backup dos mundos e screenshots que deseja guardar.
-Feche o Minecraft e outros programas
-Java antes. O reset não modifica o servidor nem remove os perfis e
-bibliotecas compartilhados do launcher oficial. Entre novamente no
-servidor para receber o modpack após o reset.
-
-Dados e logs: %LOCALAPPDATA%\HollowSMP
-Logs principais: launcher-error.log, neoforge-install.log,
-game-launch.log e game\logs.
-Servidor: hollowsmp.com.br:25565
-
-Interface com fonte Monocraft inspirada no Minecraft, em negrito,
-logo animada e controles superiores sem borda.
-Créditos: THIRD-PARTY.txt e pasta licenses.
-Projeto independente, sem vínculo oficial com Mojang ou Microsoft.
-
-VERSÃO ELECTRON
-Feche o launcher antigo antes de usar esta versão. A instalação existente
-e as preferências são reaproveitadas. Não é preciso instalar Node.js.
+Feche o Minecraft e aguarde as atualizações do modpack antes.
 
 DURANTE O JOGO
-O launcher se esconde quando o Minecraft inicia e retorna ao fechar.
-Microsoft também abre o jogo diretamente após a autorização.
-Para abrir durante a partida, use o ícone perto do relógio ou abra o
-executável novamente. Não é preciso deixar a janela na frente do jogo.
+O launcher se esconde quando o Minecraft inicia e retorna ao encerrar.
+Para mostrar durante a partida, use o ícone perto do relógio ou abra
+o executável novamente. Clicar no X com o jogo aberto esconde a janela.
 
-MOTION DESIGN
-Entrada suave, botões com brilho discreto e efeito de pressão, troca de
-conta animada, barra de progresso e avisos com transições suaves.
-Respeita a opção do Windows de reduzir movimentos e pausa ao ocultar.
+PAISAGEM
+A paisagem do Distant Horizons é opcional. Uma instalação válida é
+reconhecida e reaproveitada, inclusive depois do reset. Baixar agora
+exige o Minecraft e os helpers de atualização fechados.
 
-AMBIENTE DO END
-Cenário local, névoa e partículas discretas. O portal reage ao clicar
-em Jogar e durante a preparação. O painel mostra status, jogadores
-e ping reais, com atualização automática ou pelo botão circular.
-Se mostrar Sem resposta, você ainda pode tentar entrar normalmente.
+ATUALIZAÇÕES
+Ao abrir, a tela com a logo verifica, baixa e aplica versões novas
+automaticamente. Com Minecraft aberto, a aplicação é adiada.
+Sem conexão, a verificação de atualização não impede jogar.
 
-ATUALIZAÇÕES DO LAUNCHER
-Instale esta versão uma vez para ativar as próximas atualizações.
-Ao abrir, a tela com a logo verifica, baixa e aplica atualizações
-automaticamente. O launcher reabre sozinho. Se o Minecraft estiver
-aberto, a aplicação é adiada. Sem conexão, você pode jogar normalmente.
-Os dados do jogo e as preferências são preservados.
+Créditos: THIRD-PARTY.txt e pasta licenses.
+Projeto independente, sem vínculo oficial com Mojang ou Microsoft.

@@ -60,3 +60,9 @@ O reset mantém integralmente game/Distant_Horizons_server_data e game/schematic
 ## Detecção de fechamento (2.3.5)
 
 O launcher libera o jogo no evento de saída do processo do Minecraft, após finalizar o log e remover os argumentos de sessão. Não espera processos de diagnóstico fecharem os canais de saída herdados. Eventos atrasados de uma partida anterior não alteram o estado da nova partida. A verificação de Java considera somente a instalação do Hollow e ignora o companion do Crash Assistant. O Minecraft ainda salvando e os helpers de atualização do AutoModpack continuam protegendo a instalação contra escrita simultânea; fechar apenas a janela não autoriza interromper esses processos.
+
+## Identidade AVERON SMP (2.4.0)
+
+O launcher passa a exibir Averon Launcher com a nova logo horizontal, ícone Windows e paleta dourada, vermelha, cinza e verde. Inclui telas de atualização, diálogos, memória, partículas e estados de foco. Mantém fonte Monocraft Bold, animações suaves, redução de movimentos e controles de janela sem borda.
+
+O instalador agora se chama `AveronSMP-Launcher-Setup-2.4.0.exe`; o ZIP é `AveronSMP-Launcher-Windows.zip`. O `latest.yml` aponta para o novo nome e os clientes antigos continuam consultando o mesmo repositório. O appId, o nome interno do pacote, a configuração de login e a pasta de dados não foram alterados. A paisagem do Distant Horizons e a lista de servidores existentes são reaproveitadas.

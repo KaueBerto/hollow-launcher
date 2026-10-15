@@ -1,8 +1,8 @@
 {
   "name": "hollow-launcher",
-  "version": "2.3.5",
-  "description": "Launcher Electron do Hollow SMP para Windows",
-  "author": "Hollow SMP",
+  "version": "2.4.0",
+  "description": "Launcher Electron do AVERON SMP para Windows",
+  "author": "AVERON SMP",
   "license": "UNLICENSED",
   "private": true,
   "main": "src/main.cjs",
@@ -23,16 +23,16 @@
   },
   "build": {
     "appId": "br.com.hollowsmp.launcher",
-    "productName": "Hollow Launcher",
+    "productName": "Averon Launcher",
     "directories": {
       "output": "dist"
     },
     "files": [
       "src/**/*.cjs",
       "renderer/**/*",
-      "assets/logo_smp.png",
+      "assets/averon-smp.png",
       "assets/end-background.png",
-      "assets/hollow.ico",
+      "assets/averon.ico",
       "assets/Monocraft*.ttf",
       "package.json"
     ],
@@ -61,8 +61,8 @@
     "asar": true,
     "win": {
       "target": "nsis",
-      "icon": "assets/hollow.ico",
-      "artifactName": "HollowSMP-Launcher-Setup-${version}.exe",
+      "icon": "assets/averon.ico",
+      "artifactName": "AveronSMP-Launcher-Setup-${version}.exe",
       "signAndEditExecutable": true
     },
     "nsis": {

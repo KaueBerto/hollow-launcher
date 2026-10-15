@@ -162,8 +162,8 @@ async function smokeUi() {
   const protectedToken = safeStorage.encryptString('hollow-test-token');
   if (protectedToken.includes(Buffer.from('hollow-test-token')) || safeStorage.decryptString(protectedToken) !== 'hollow-test-token') throw new Error('Proteção da sessão falhou.');
   report.push('Criptografia Windows de sessão: OK');
-  publish({ authPending: true, busy: true, account: { name: 'HollowTeste' } });
-  await window.webContents.executeJavaScript(`document.querySelector('[value="microsoft"]').checked=true; render(); if(document.querySelector('#cancel-login').hidden || document.querySelector('#account-note').textContent!=='HollowTeste') throw new Error('Controles do login Microsoft');`);
+  publish({ authPending: true, busy: true, account: { name: 'AveronTeste' } });
+  await window.webContents.executeJavaScript(`document.querySelector('[value="microsoft"]').checked=true; render(); if(document.querySelector('#cancel-login').hidden || document.querySelector('#account-note').textContent!=='AveronTeste') throw new Error('Controles do login Microsoft');`);
   publish({ authPending: false, busy: false, account: null });
   report.push('Nome de conta e cancelamento Microsoft: OK');
   publish({ busy: true, ready: false, text: 'Preparando…' });
@@ -228,22 +228,23 @@ async function smokeUi() {
   await fs.writeFile(path.join(engine.game, 'config', 'client.json'), '{"sentinel":true}');
   try {
     for (const remember of [true, false]) {
-      await window.webContents.executeJavaScript(`document.querySelector('[value="nickname"]').click(); document.querySelector('#nickname').value='TypedHollow'; document.querySelector('#nickname').dispatchEvent(new Event('input')); document.querySelector('#ram').value='9'; document.querySelector('#remember').checked=${remember}; document.querySelector('#reset').click(); document.querySelector('#do-reset').click();`);
+      await window.webContents.executeJavaScript(`document.querySelector('[value="nickname"]').click(); document.querySelector('#nickname').value='TypedAveron'; document.querySelector('#nickname').dispatchEvent(new Event('input')); document.querySelector('#ram').value='9'; document.querySelector('#remember').checked=${remember}; document.querySelector('#reset').click(); document.querySelector('#do-reset').click();`);
       let finished = false;
       for (let i = 0; i < 100; i++) {
         await new Promise(resolve => setTimeout(resolve, 100));
         if (await window.webContents.executeJavaScript(`document.querySelector('#message').open`)) { finished = true; break; }
       }
       if (!finished) throw new Error('Reset não terminou no smoke');
-      await window.webContents.executeJavaScript(`if(document.querySelector('#nickname').value!=='TypedHollow' || document.querySelector('#ram').value!=='9' || document.querySelector('#remember').checked!==${remember} || !document.querySelector('#message-text').textContent.includes('preservados')) throw new Error('Reset perdeu preferências ou falhou'); document.querySelector('#message').close();`);
+      await window.webContents.executeJavaScript(`if(document.querySelector('#nickname').value!=='TypedAveron' || document.querySelector('#ram').value!=='9' || document.querySelector('#remember').checked!==${remember} || !document.querySelector('#message-text').textContent.includes('preservados')) throw new Error('Reset perdeu preferências ou falhou'); document.querySelector('#message').close();`);
       const saved = await engine.loadSettings();
-      if (saved.nickname !== (remember ? 'TypedHollow' : '') || saved.ram !== 9 || saved.remember !== remember) throw new Error('Preferências salvas após reset incorretas');
+      if (saved.nickname !== (remember ? 'TypedAveron' : '') || saved.ram !== 9 || saved.remember !== remember) throw new Error('Preferências salvas após reset incorretas');
       if (await fs.readFile(path.join(engine.game, 'options.txt'), 'utf8') !== playerOptions) throw new Error('Reset perdeu opções do jogo');
       if (await fs.readFile(path.join(engine.game, 'config', 'client.json'), 'utf8') !== '{"sentinel":true}') throw new Error('Reset perdeu configuração do mod');
     }
   } finally { engine.install = originalInstall; engine.javaRunning = originalJavaRunning; }
   report.push('Reset real isolado: nickname recém-digitado, RAM, lembrar nickname, teclas, vídeo e config de mod preservados: OK');
-  await window.webContents.executeJavaScript(`document.querySelector('[value="nickname"]').click()`);
+  publish({ ready: true });
+  await window.webContents.executeJavaScript(`document.querySelector('[value="nickname"]').click(); document.querySelector('#nickname').value='Aventureiro'; document.querySelector('#ram').value='6'; document.querySelector('#remember').checked=true; render()`);
   await new Promise(resolve=>setTimeout(resolve,800));
   await fs.writeFile(path.join(output, 'nickname.png'), (await window.webContents.capturePage()).toPNG());
   await window.webContents.executeJavaScript(`document.querySelector('[value="microsoft"]').click()`);
@@ -261,15 +262,15 @@ app.whenReady().then(async () => {
   microsoft = new MicrosoftAuth({ root: engine.root, storage: safeStorage, openBrowser: url => shell.openExternal(url), report: publish });
   if (integration) {
     await engine.install();
-    await engine.buildArguments('HollowTeste', 4);
+    await engine.buildArguments('AveronTeste', 4);
     await fs.writeFile(path.join(engine.root, 'electron-verified.txt'), 'Instalação e argumentos do motor JavaScript: OK\n');
     app.exit(0); return;
   }
   registerHandlers();
   window = new BrowserWindow({
     width: smoke ? 920 : 380, height: smoke ? 530 : 440, resizable: false, maximizable: false, frame: false,
-    backgroundColor: '#160b22', show: false, autoHideMenuBar: true,
-    icon: path.join(__dirname, '..', 'assets', 'hollow.ico'),
+    backgroundColor: '#0d120f', show: false, autoHideMenuBar: true,
+    icon: path.join(__dirname, '..', 'assets', 'averon.ico'),
     webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true, webSecurity: true, offscreen: smoke, backgroundThrottling: !smoke },
   });
   window.setMenu(null);
@@ -289,8 +290,8 @@ app.whenReady().then(async () => {
   window.on('show', () => { if (!smoke) serverMonitor.refresh(); });
   window.on('restore', () => { if (!smoke) serverMonitor.refresh(); });
   if (!smoke) {
-    tray = new Tray(path.join(__dirname, '..', 'assets', 'hollow.ico'));
-    tray.setToolTip('Hollow SMP — Launcher');
+    tray = new Tray(path.join(__dirname, '..', 'assets', 'averon.ico'));
+    tray.setToolTip('AVERON SMP — Launcher');
     tray.on('double-click', () => gameWindow.reveal());
     tray.setContextMenu(Menu.buildFromTemplate([
       { label: 'Mostrar launcher', click: () => gameWindow.reveal() },

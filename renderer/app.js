@@ -21,8 +21,8 @@ for (let i = 0; i < 18; i++) {
 function serverStatus(value = {}) {
   const panel = $('.server-status'); panel.dataset.state = value.kind || 'checking';
   $('#server-label').textContent = value.kind === 'online' ? 'Servidor online' : value.kind === 'unknown' ? 'Sem resposta do servidor' : 'Consultando servidor…';
-  const count = Number.isInteger(value.players) && Number.isInteger(value.maxPlayers) ? `${value.players}/${value.maxPlayers} jogadores` : 'Hollow SMP';
-  $('#server-details').textContent = value.kind === 'online' ? `${count}${Number.isInteger(value.ping) ? ` · ${value.ping} ms` : ''}` : value.kind === 'unknown' ? 'Você pode tentar entrar normalmente.' : 'Hollow SMP';
+  const count = Number.isInteger(value.players) && Number.isInteger(value.maxPlayers) ? `${value.players}/${value.maxPlayers} jogadores` : 'AVERON SMP';
+  $('#server-details').textContent = value.kind === 'online' ? `${count}${Number.isInteger(value.ping) ? ` · ${value.ping} ms` : ''}` : value.kind === 'unknown' ? 'Você pode tentar entrar normalmente.' : 'AVERON SMP';
   $('#refresh-server').disabled = Boolean(value.checking);
 }
 
@@ -71,7 +71,7 @@ function render() {
   $('main').inert = Boolean(startup.visible);
   $('#startup-close').disabled = Boolean(current.updating);
   $('#startup-title').textContent = startup.kind === 'installing' ? 'Aplicando atualização…' : startup.kind === 'downloading' ? 'Baixando atualização…' : startup.kind === 'ready' ? 'Preparando atualização…' : 'Verificando atualizações…';
-  $('#startup-note').textContent = startup.kind === 'installing' ? 'O Hollow já vai abrir de novo' : startup.kind === 'downloading' ? `${Math.round(startup.percent || 0)}% · Hollow ${startup.version}` : 'Preparando sua próxima aventura';
+  $('#startup-note').textContent = startup.kind === 'installing' ? 'O Averon já vai abrir de novo' : startup.kind === 'downloading' ? `${Math.round(startup.percent || 0)}% · Averon ${startup.version}` : 'Preparando sua próxima aventura';
   $('#startup-progress').hidden = startup.kind !== 'downloading';
   $('#startup-progress').value = Number(startup.percent) || 0;
   const update = current.update || {};
@@ -102,7 +102,7 @@ function render() {
   else if (Number.isFinite(current.percent)) $('#progress').value = current.percent;
   else $('#progress').removeAttribute('value');
 }
-function message(text, title = 'Hollow SMP') {
+function message(text, title = 'AVERON SMP') {
   $('#message-title').textContent = title;
   $('#message-text').textContent = text;
   showDialog($('#message'));

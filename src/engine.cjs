@@ -267,7 +267,7 @@ class Engine {
       await this.download(`https://resources.download.minecraft.net/${hash.slice(0, 2)}/${hash}`, under(path.join(this.game, 'assets', 'objects'), `${hash.slice(0, 2)}/${hash}`), hash);
       this.progress(`Recursos: ${++done} / ${objects.length}`, done, objects.length);
     });
-    this.progress('Preparando Hollow SMP…');
+    this.progress('Preparando AVERON SMP…');
     const mods = path.join(this.game, 'mods'); await fs.mkdir(mods, { recursive: true });
     if (!(await fs.readdir(mods)).some(name => /^automodpack-.*\.jar$/.test(name))) {
       const original = path.join(this.assets, 'automodpack-5.0.0-rc.2.jar');

@@ -1,4 +1,4 @@
-param([switch]$Publish)
+param([switch]$Publish, [string]$NotesFile)
 $ErrorActionPreference = 'Stop'
 $env:GIT_TERMINAL_PROMPT = '0'
 $env:GCM_INTERACTIVE = 'never'
@@ -7,9 +7,11 @@ Push-Location $source
 try {
     if ((git remote get-url origin) -ne 'https://github.com/KaueBerto/hollow-launcher.git') { throw 'Repositório inesperado.' }
     if (git status --porcelain) { throw 'Faça commit antes de publicar.' }
-    $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+    $metadata = Get-Content package.json -Raw | ConvertFrom-Json
+    $version = $metadata.version
     if ($version -notmatch '^\d+\.\d+\.\d+$') { throw 'Use uma versão estável.' }
-    $names = @("HollowSMP-Launcher-Setup-$version.exe", "HollowSMP-Launcher-Setup-$version.exe.blockmap", 'latest.yml', 'SHA256.txt', 'HollowSMP-Launcher-Windows.zip')
+    $installer = $metadata.build.win.artifactName.Replace('${version}', $version)
+    $names = @($installer, "$installer.blockmap", 'latest.yml', 'SHA256.txt', 'AveronSMP-Launcher-Windows.zip')
     foreach ($name in $names) { if (-not (Test-Path -LiteralPath "dist/$name")) { throw "Arquivo ausente: $name" } }
     if (-not (Select-String -LiteralPath 'dist/latest.yml' -Pattern ("^version: " + [regex]::Escape($version) + '$') -Quiet)) { throw 'Metadados de outra versão.' }
     $credentialData = @{}
@@ -21,13 +23,22 @@ try {
     if ((Invoke-RestMethod $api -Headers $headers).private) { throw 'A atualização pública requer repositório público.' }
     git push origin main
     if ($LASTEXITCODE -ne 0) { throw 'Falha ao enviar o código.' }
+    $notes = if ($NotesFile) { Get-Content -LiteralPath $NotesFile -Raw -Encoding UTF8 } else { 'Atualização do Averon Launcher. Instale ou reabra o launcher para atualizar automaticamente. Dados do jogo e preferências preservados.' }
+    $releaseName = $metadata.build.productName+' '+$version
     try { $release = Invoke-RestMethod ($api+'/releases/tags/v'+$version) -Headers $headers }
     catch {
         if ([int]$_.Exception.Response.StatusCode -ne 404) { throw }
-        $body = @{tag_name=('v'+$version); target_commitish=(git rev-parse HEAD); name=('Hollow Launcher '+$version); body='Instalador Windows com tela de atualização automática. Ao abrir, o Hollow verifica, baixa e aplica versões novas sozinho e reabre o launcher. Minecraft aberto adia a aplicação e falha de conexão permite jogar. Versões 2.2.0 e 2.2.1 precisam atualizar uma vez pelo botão antigo para ativar este fluxo. Dados do jogo preservados. Microsoft ainda depende do cadastro próprio aprovado do Hollow.'; draft=$true; prerelease=$false} | ConvertTo-Json
-        $release = Invoke-RestMethod ($api+'/releases') -Method Post -Headers $headers -Body ([Text.Encoding]::UTF8.GetBytes($body)) -ContentType 'application/json; charset=utf-8'
+        $allReleases = Invoke-RestMethod ($api+'/releases') -Headers $headers
+        $drafts = @($allReleases | Where-Object { $_.draft -and $_.name -eq $releaseName })
+        if ($drafts.Count -gt 1) { throw 'Mais de um rascunho para a mesma versão.' }
+        if ($drafts.Count -eq 1) { $release = $drafts[0] }
+        else {
+            $body = @{tag_name=('v'+$version); target_commitish=(git rev-parse HEAD); name=$releaseName; body=$notes; draft=$true; prerelease=$false} | ConvertTo-Json
+            $release = Invoke-RestMethod ($api+'/releases') -Method Post -Headers $headers -Body ([Text.Encoding]::UTF8.GetBytes($body)) -ContentType 'application/json; charset=utf-8'
+        }
     }
     if (-not $release.draft) { throw 'Release publicada: não substituir arquivos.' }
+    if ($release.target_commitish -ne (git rev-parse HEAD)) { throw 'Rascunho de outro commit.' }
     $upload = $release.upload_url -replace '\{.*$', ''
     foreach ($name in $names) {
         $hash = (Get-FileHash -LiteralPath "dist/$name" -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -38,8 +49,15 @@ try {
         Write-Output ('Enviado: '+$name)
     }
     $release = Invoke-RestMethod ($api+'/releases/'+$release.id) -Headers $headers
-    foreach ($name in $names) { if ($release.assets.name -notcontains $name) { throw "Upload incompleto: $name" } }
-    if ($Publish) { $release = Invoke-RestMethod ($api+'/releases/'+$release.id) -Method Patch -Headers $headers -Body (@{draft=$false; prerelease=$false; make_latest='true'} | ConvertTo-Json) -ContentType 'application/json' }
+    foreach ($name in $names) {
+        $expectedHash = (Get-FileHash -LiteralPath "dist/$name" -Algorithm SHA256).Hash.ToLowerInvariant()
+        $assets = @($release.assets | Where-Object { $_.name -eq $name })
+        if ($assets.Count -ne 1 -or $assets[0].digest -ne ('sha256:'+$expectedHash)) { throw "Upload incompleto ou divergente: $name" }
+    }
+    if ($Publish) {
+        $body = @{tag_name=('v'+$version); target_commitish=(git rev-parse HEAD); name=$releaseName; body=$notes; draft=$false; prerelease=$false; make_latest='true'} | ConvertTo-Json
+        $release = Invoke-RestMethod ($api+'/releases/'+$release.id) -Method Patch -Headers $headers -Body ([Text.Encoding]::UTF8.GetBytes($body)) -ContentType 'application/json; charset=utf-8'
+    }
     Write-Output ('Release: '+$release.html_url)
     Write-Output ('Rascunho: '+$release.draft)
 } finally { Pop-Location }
