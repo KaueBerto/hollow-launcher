@@ -23,7 +23,7 @@ try {
     if ((Invoke-RestMethod $api -Headers $headers).private) { throw 'A atualização pública requer repositório público.' }
     git push origin main
     if ($LASTEXITCODE -ne 0) { throw 'Falha ao enviar o código.' }
-    $notes = if ($NotesFile) { Get-Content -LiteralPath $NotesFile -Raw -Encoding UTF8 } else { 'Atualização do Averon Launcher. Instale ou reabra o launcher para atualizar automaticamente. Dados do jogo e preferências preservados.' }
+    $notes = if ($NotesFile) { [IO.File]::ReadAllText((Resolve-Path -LiteralPath $NotesFile).Path, [Text.Encoding]::UTF8) } else { 'Atualização do Averon Launcher. Instale ou reabra o launcher para atualizar automaticamente. Dados do jogo e preferências preservados.' }
     $releaseName = $metadata.build.productName+' '+$version
     try { $release = Invoke-RestMethod ($api+'/releases/tags/v'+$version) -Headers $headers }
     catch {
