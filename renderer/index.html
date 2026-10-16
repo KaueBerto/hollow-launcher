@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; media-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Averon Launcher</title>
   <link rel="stylesheet" href="style.css">
+  <script defer src="music.js"></script>
   <script defer src="app.js"></script>
 </head>
 <body>
@@ -24,6 +25,7 @@
     <div class="drag-region" aria-hidden="true"></div>
     <div class="launcher-update" aria-live="polite"><button id="launcher-update" class="text-action" type="button" title="Verificar atualização do launcher">Launcher</button></div>
     <nav aria-label="Janela">
+      <button class="icon-action" id="music-toggle" type="button" aria-label="Silenciar música" aria-pressed="false" title="Silenciar música · volume 25%"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6h3l4-3v10l-4-3H2z"/><path class="music-waves" d="M11 5q3 3 0 6M13 3q5 5 0 10"/><path class="music-cross" d="m11 6 4 4m0-4-4 4"/></svg></button>
       <button class="text-action" id="reset">Resetar</button>
       <button class="icon-action" id="minimize" aria-label="Minimizar"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10"/></svg></button>
       <button class="icon-action" id="close" aria-label="Fechar"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8"/></svg></button>

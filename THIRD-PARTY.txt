@@ -47,3 +47,7 @@ Properties e usam a geração finalizada do cliente como base de atualizações 
 quando documentos de gerações intermediárias não estão no cache. O JAR original do
 AutoModpack permanece intacto. Código completo dos ajustes e ponte Java: java/preflight
 no repositório público e pacote de fontes. Licença: licenses/AutoModpack-LICENSE.txt.
+
+Música de fundo: Tsuki's Odyssey OST - Forest Mixtape, Christina Kuong.
+MP3 fornecido pelo responsável pelo servidor. Direitos dos respectivos titulares.
+Referência: https://www.youtube.com/watch?v=r1PzSzxMDXk

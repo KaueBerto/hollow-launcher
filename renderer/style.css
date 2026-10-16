@@ -52,6 +52,11 @@ body.paused .startup-logo, body.paused .startup-loader span { animation-play-sta
 .text-action:active:enabled, .icon-action:active:enabled { transform: translateY(1px); }
 .icon-action { width: 34px; height: 34px; padding: 8px; }
 .icon-action svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; shape-rendering: crispEdges; }
+#music-toggle { color: var(--gold-light); }
+#music-toggle .music-cross { display: none; }
+#music-toggle[data-muted="true"] { color: var(--muted); }
+#music-toggle[data-muted="true"] .music-waves { display: none; }
+#music-toggle[data-muted="true"] .music-cross { display: initial; }
 main { position: relative; z-index: 1; height: 476px; }
 .server-status { position: absolute; left: 74px; top: 13px; width: 326px; font-size: 10px; color: #d5d8c9; }
 .server-heading { display: flex; align-items: center; gap: 8px; height: 22px; }

@@ -15,3 +15,7 @@ O nome visível, o ícone, o instalador e as telas usam Averon. O identificador 
 Consulta o status do Minecraft Java, sem login ou alteração da VPS. Resolve SRV quando aplicável, lê jogadores e confirma o ping por resposta pong. Não apresenta MOTD ou textos arbitrários do servidor na interface. Falhas mostram **Sem resposta do servidor**, sem bloquear Jogar.
 
 Atualiza a cada 45 segundos enquanto a janela está visível; consultas simultâneas compartilham a mesma conexão e consultas automáticas recentes usam cache de 15 segundos. O botão circular permite atualizar manualmente. Números nas capturas de documentação são ilustrativos.
+
+## Música do launcher
+
+A partir da versão 2.4.1, o launcher reproduz o MP3 fornecido pelo responsável: Tsuki's Odyssey OST - Forest Mixtape, de Christina Kuong. O áudio está incorporado, em loop e volume de 25%, sem depender do YouTube. O botão de alto-falante no topo silencia e lembra a preferência. A música pausa enquanto o Minecraft está aberto ou a janela do launcher está oculta, e retoma da mesma posição ao voltar.

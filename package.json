@@ -1,6 +1,6 @@
 {
   "name": "hollow-launcher",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "Launcher Electron do AVERON SMP para Windows",
   "author": "AVERON SMP",
   "license": "UNLICENSED",
@@ -33,6 +33,7 @@
       "assets/averon-smp.png",
       "assets/end-background.png",
       "assets/averon.ico",
+      "assets/launcher-music.mp3",
       "assets/Monocraft*.ttf",
       "package.json"
     ],

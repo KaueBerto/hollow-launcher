@@ -1,0 +1,1 @@
+Música de fundo incorporada: Forest Mixtape, com volume inicial em 25% e botão para silenciar. A preferência de mudo é lembrada. O áudio pausa durante o Minecraft e quando o launcher fica oculto, retomando ao voltar. Dados e configurações do jogo preservados.

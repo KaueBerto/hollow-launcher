@@ -157,6 +157,23 @@ async function smokeUi() {
     document.querySelector('#reset').click();await wait(250);document.querySelector('#confirm-reset').dispatchEvent(new Event('cancel',{cancelable:true}));await wait(200);check(!document.querySelector('#confirm-reset').open,'Escape durante animação');
     return ['16 trocas de conta: OK','Memória sincronizada: OK','Animação CSS ativa: OK','Fonte incorporada: OK','Interface sem Node: OK','Confirmação e cancelamento de reset: OK','Motion: entrada, trocas rápidas sem deslocamento e Escape nos avisos: OK'];
   })()`);
+  await window.webContents.executeJavaScript(`(async () => {
+    const audio = music.audio;
+    await Promise.race([new Promise((resolve, reject) => {
+      if (audio.readyState >= 1) return resolve();
+      audio.addEventListener('loadedmetadata', resolve, { once: true });
+      audio.addEventListener('error', () => reject(new Error('MP3 não decodifica')), { once: true });
+      audio.load();
+    }), new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout do MP3')), 10000))]);
+    if (!(audio.duration > 0) || audio.volume !== .25 || !audio.loop) throw new Error('Áudio inválido');
+    music.setAllowed(false);
+    const previous = music.muted;
+    document.querySelector('#music-toggle').click();
+    if (music.muted === previous || localStorage.getItem('averon.music.muted') !== String(music.muted)) throw new Error('Mudo não foi salvo');
+    document.querySelector('#music-toggle').click();
+    if (!audio.paused) throw new Error('Música tocando enquanto pausada');
+  })()`);
+  report.push('MP3 incorporado decodifica; volume 25%, loop e botão de mudo persistente: OK');
   report.push('Fechamento nativo e X escondem durante o jogo; janela preservada e restaurada ao encerrar: OK');
   if (!safeStorage.isEncryptionAvailable()) throw new Error('Criptografia Windows indisponível no teste.');
   const protectedToken = safeStorage.encryptString('hollow-test-token');
@@ -271,7 +288,7 @@ app.whenReady().then(async () => {
     width: smoke ? 920 : 380, height: smoke ? 530 : 440, resizable: false, maximizable: false, frame: false,
     backgroundColor: '#0d120f', show: false, autoHideMenuBar: true,
     icon: path.join(__dirname, '..', 'assets', 'averon.ico'),
-    webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true, webSecurity: true, offscreen: smoke, backgroundThrottling: !smoke },
+    webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true, webSecurity: true, autoplayPolicy: 'no-user-gesture-required', offscreen: smoke, backgroundThrottling: !smoke },
   });
   window.setMenu(null);
   window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));

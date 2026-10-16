@@ -7,6 +7,10 @@ const motion = new Map();
 let completionTimer, completed = false;
 let portalTimer;
 let wasStartup = true;
+const music = new window.LauncherMusic(new Audio('../assets/launcher-music.mp3'), $('#music-toggle'), localStorage);
+function syncMusic() {
+  music.setAllowed(!document.hidden && !current.gameRunning && current.startup?.visible === false);
+}
 // A fixed, sparse particle field keeps the atmosphere calm and reproducible.
 for (let i = 0; i < 18; i++) {
   const particle = document.createElement('span'); particle.className = 'end-particle';
@@ -63,6 +67,7 @@ function settings(value) {
   render();
 }
 function render() {
+  syncMusic();
   const startup = current.startup || { visible: true, kind: 'checking' };
   if (wasStartup && !startup.visible && document.body.classList.contains('entered') && !reducedMotion.matches) document.body.classList.add('entering');
   wasStartup = Boolean(startup.visible);
@@ -152,6 +157,7 @@ $('#do-reset').addEventListener('click', () => { const selected = options(); clo
 $('#message-ok').addEventListener('click', () => closeDialog($('#message')));
 for (const dialog of document.querySelectorAll('dialog')) dialog.addEventListener('cancel', event => { event.preventDefault(); closeDialog(dialog); });
 document.addEventListener('visibilitychange', () => {
+  syncMusic();
   document.body.classList.toggle('paused', document.hidden);
   for (const [element, animation] of motion) {
     if (document.hidden && element.tagName === 'DIALOG') animation.finish();
