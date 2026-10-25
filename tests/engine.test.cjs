@@ -63,6 +63,7 @@ test('reset preserves preferences, nested configs, DH databases and schematics b
     'game/servers.dat': Buffer.from([10, 0, 0, 9]),
     'game/config/client.json': '{"custom":true}', 'game/config/nested/keys.toml': 'key="R"\n',
     'landscape-installed.json': '{"sha256":"installed-landscape","directory":"Hollow+SMP/dimension"}',
+    'menu-defaults-installed.json': '{"activatedResourcePacks":["file/AveronSMP.zip"],"fmlConfigured":true}',
     'game/Distant_Horizons_server_data/Hollow+SMP/dimension/DistantHorizons.sqlite': Buffer.from([0, 1, 2, 255]),
     'game/Distant_Horizons_server_data/Hollow+SMP/dimension/DistantHorizons.sqlite-wal': Buffer.from([7, 8, 9]),
     'game/Distant_Horizons_server_data/Hollow+SMP/dimension/DistantHorizons.sqlite-shm': Buffer.from([4, 5, 6]),

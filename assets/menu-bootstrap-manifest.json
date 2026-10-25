@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "id": "averon-fancymenu-20261025",
+  "id": "averon-fancymenu-20261025-resourcepack",
   "minecraft": "1.21.1",
   "files": [
     {
@@ -135,6 +135,16 @@
       "sha256": "cec42ecd5d0790f8ed438f146a8c5f933a08cc29afa37ea8b2eccdcd82b33274",
       "size": 32087361,
       "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/cec42ecd5d0790f8ed438f146a8c5f933a08cc29afa37ea8b2eccdcd82b33274.mp4"
+    },
+    {
+      "path": "resourcepacks/AveronSMP-93fd4b63e142.zip",
+      "kind": "resource-pack",
+      "sha256": "13117baf7baa110c55c18eaf08722172bd02dbeaf903338316187269ef9d6a24",
+      "size": 20125304,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/AveronSMP-93fd4b63e142.zip"
     }
+  ],
+  "enabledResourcePacks": [
+    "file/AveronSMP-93fd4b63e142.zip"
   ]
 }

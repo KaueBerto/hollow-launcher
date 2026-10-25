@@ -1,0 +1,1 @@
+Inclui e ativa automaticamente o resource pack do perfil Dev antes da abertura do Minecraft, inclusive para quem já instalou a versão 2.5.0. As demais opções do jogo e os outros packs selecionados são preservados. O ZIP é reaproveitado nas próximas aberturas, e uma desativação manual posterior é respeitada.

@@ -400,7 +400,7 @@ class Engine {
     await this.assertNoLinks(this.root);
     // Keep player data in place, including DH databases and their installation receipt.
     const preserved = new Set([
-      'launcher-settings.json', 'landscape-installed.json',
+      'launcher-settings.json', 'landscape-installed.json', 'menu-defaults-installed.json',
       'game/options.txt', 'game/optionsof.txt', 'game/optionsshaders.txt',
       'game/servers.dat', 'game/config',
       'game/Distant_Horizons_server_data', 'game/schematics',

@@ -19,7 +19,7 @@ async function fixture(callback) {
   const engine = { root, game: path.join(root, 'game'), progress() {}, async download(url, destination, hash) {
     calls++; await fs.mkdir(path.dirname(destination), { recursive: true }); await fs.writeFile(destination, bytes.get(hash));
   } };
-  try { await callback({ root, engine, manifest, calls: () => calls }); }
+  try { await callback({ root, engine, manifest, bytes, calls: () => calls }); }
   finally { assert(root.startsWith(os.tmpdir())); await fs.rm(root, { recursive: true, force: true }); }
 }
 test('fresh menu installs before first launch; subsequent offline launches do not download or reset player settings', () => fixture(async ({ engine, manifest, calls }) => {
@@ -68,4 +68,42 @@ test('an externally opened game blocks menu installation before any file is chan
   await assert.rejects(prepareMenu(engine, { manifest }), /Feche o Minecraft/);
   assert.equal(calls(), 0);
   await assert.rejects(fs.access(engine.game), /ENOENT/);
+}));
+function addPack(manifest, bytes) {
+  const data = Buffer.from('verified resource pack fixture');
+  const sha256 = crypto.createHash('sha256').update(data).digest('hex');
+  bytes.set(sha256, data);
+  manifest.files.push({ path: 'resourcepacks/AveronSMP-test.zip', kind: 'resource-pack', sha256, size: data.length, url: 'https://painel.hollowsmp.com.br/hollow-packs/AveronSMP-test.zip' });
+  manifest.enabledResourcePacks = ['file/AveronSMP-test.zip'];
+}
+test('fresh game gets the downloaded resource pack already selected before Java starts', () => fixture(async ({ engine, manifest, bytes }) => {
+  addPack(manifest, bytes);
+  await prepareMenu(engine, { manifest });
+  const options = await fs.readFile(path.join(engine.game, 'options.txt'), 'utf8');
+  assert.equal(options, 'resourcePacks:["vanilla","mod_resources","file/AveronSMP-test.zip"]\n');
+  assert.equal(await hashFile(path.join(engine.game, 'resourcepacks/AveronSMP-test.zip'), 'sha256'), manifest.files.at(-1).sha256);
+}));
+test('2.5.0 migration activates once, preserves every other option and selected pack, then respects later deselection offline', () => fixture(async ({ engine, manifest, bytes, calls }) => {
+  await prepareMenu(engine, { manifest });
+  const original = 'mouseSensitivity:0.73\r\nrenderDistance:19\r\nresourcePacks:["vanilla","mod_resources","file/MyCustom.zip"]\r\nincompatibleResourcePacks:["file/OldPack.zip"]\r\nkey_key.forward:key.keyboard.up\r\n';
+  await fs.writeFile(path.join(engine.game, 'options.txt'), original);
+  addPack(manifest, bytes);
+  await prepareMenu(engine, { manifest });
+  const options = await fs.readFile(path.join(engine.game, 'options.txt'), 'utf8');
+  assert.equal(options.replace(',"file/AveronSMP-test.zip"', ''), original);
+  assert.equal(await fs.readFile(path.join(engine.root, 'options-before-menu-resourcepack.txt'), 'utf8'), original);
+  await fs.writeFile(path.join(engine.game, 'options.txt'), original);
+  const downloaded = calls();
+  engine.download = async () => assert.fail('Offline launch downloaded again');
+  await prepareMenu(engine, { manifest });
+  assert.equal(calls(), downloaded);
+  assert.equal(await fs.readFile(path.join(engine.game, 'options.txt'), 'utf8'), original);
+}));
+test('invalid pack selection is preserved rather than replacing the options file', () => fixture(async ({ engine, manifest, bytes }) => {
+  addPack(manifest, bytes);
+  await fs.mkdir(engine.game, { recursive: true });
+  const text = 'renderDistance:24\nresourcePacks:not-json\n';
+  await fs.writeFile(path.join(engine.game, 'options.txt'), text);
+  await assert.rejects(prepareMenu(engine, { manifest }), /configurações foram preservadas/);
+  assert.equal(await fs.readFile(path.join(engine.game, 'options.txt'), 'utf8'), text);
 }));

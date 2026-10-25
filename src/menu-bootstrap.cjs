@@ -22,10 +22,47 @@ function validateManifest(manifest) {
     if (!/^[a-f0-9]{64}$/.test(item.sha256) || !Number.isSafeInteger(item.size) || item.size <= 0 || item.size > 300 * 1024 * 1024) throw Error('Hash ou tamanho do menu inválido.');
     const mod = item.kind === 'mod' && /^mods\/[A-Za-z0-9_.+-]+\.jar$/.test(item.path) && /^[a-z0-9_-]+$/.test(item.modId) && /^[A-Za-z0-9_-]+$/.test(item.prefix);
     const preset = item.kind === 'default' && /^config\/(fancymenu|drippyloadingscreen)\/[A-Za-z0-9_./ -]+$/.test(item.path);
-    if (!mod && !preset) throw Error('Arquivo de menu não permitido.');
-    const expected = `https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/${item.sha256}${path.posix.extname(item.path)}`;
+    const pack = item.kind === 'resource-pack' && /^resourcepacks\/[A-Za-z0-9_.+-]+\.zip$/.test(item.path);
+    if (!mod && !preset && !pack) throw Error('Arquivo de menu não permitido.');
+    const expected = pack ? `https://painel.hollowsmp.com.br/hollow-packs/${path.posix.basename(item.path)}` : `https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/${item.sha256}${path.posix.extname(item.path)}`;
     if (item.url !== expected) throw Error('Origem do menu inválida.');
   }
+  if (manifest.enabledResourcePacks !== undefined && (!Array.isArray(manifest.enabledResourcePacks) || manifest.enabledResourcePacks.some(id => !manifest.files.some(f => f.kind === 'resource-pack' && id === `file/${path.posix.basename(f.path)}`)))) throw Error('Seleção de texturas inválida.');
+}
+async function activateResourcePacks(engine, ids, previous) {
+  const activated = new Set(previous || []);
+  const pending = ids.filter(id => !activated.has(id));
+  if (!pending.length) return [...activated];
+  const options = path.join(engine.game, 'options.txt');
+  await noLinks(engine.root, options);
+  let original = '';
+  try { original = await fs.readFile(options, 'utf8'); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+  const matches = [...original.matchAll(/^resourcePacks:([^\r\n]*)/gm)];
+  if (matches.length > 1) throw Error('Há seleções de resource packs duplicadas em options.txt. O arquivo foi preservado.');
+  let selected = ['vanilla', 'mod_resources'];
+  if (matches.length) {
+    try { selected = JSON.parse(matches[0][1]); } catch { throw Error('A seleção de resource packs em options.txt é inválida. As configurações foram preservadas.'); }
+    if (!Array.isArray(selected) || selected.some(id => typeof id !== 'string')) throw Error('A seleção de resource packs é inválida.');
+  }
+  for (const id of pending) if (!selected.includes(id)) selected.push(id);
+  const line = 'resourcePacks:' + JSON.stringify(selected);
+  const newline = original.includes('\r\n') ? '\r\n' : '\n';
+  const updated = matches.length ? original.replace(/^resourcePacks:[^\r\n]*/m, line) : original + (original && !original.endsWith('\n') ? newline : '') + line + newline;
+  if (updated !== original) {
+    // Back up once for this activation, then atomically replace only the pack selection.
+    const backup = path.join(engine.root, 'options-before-menu-resourcepack.txt');
+    await noLinks(engine.root, backup);
+    try { await fs.writeFile(backup, original, { flag: 'wx' }); } catch (error) { if (error.code !== 'EEXIST') throw error; }
+    const temporary = options + '.menu-pending';
+    await noLinks(engine.root, temporary);
+    await fs.mkdir(path.dirname(options), { recursive: true });
+    await fs.writeFile(temporary, updated);
+    const current = await fs.readFile(options, 'utf8').catch(error => { if (error.code === 'ENOENT') return ''; throw error; });
+    if (current !== original) { await fs.unlink(temporary); throw Error('As opções do jogo mudaram durante a preparação. Tente novamente.'); }
+    await fs.rename(temporary, options);
+  }
+  for (const id of pending) activated.add(id);
+  return [...activated];
 }
 async function prepareMenu(engine, { manifest } = {}) {
   const { hashFile } = require('./engine.cjs');
@@ -44,6 +81,7 @@ async function prepareMenu(engine, { manifest } = {}) {
     await fs.rename(temporary, receiptPath);
   };
   const owned = { ...previous.ownedMods };
+  const activatedBefore = Array.isArray(previous.activatedResourcePacks) ? previous.activatedResourcePacks : [];
   let downloaded = 0, installed = 0;
   for (const item of manifest.files) {
     const destination = path.join(engine.game, ...item.path.split('/'));
@@ -73,6 +111,11 @@ async function prepareMenu(engine, { manifest } = {}) {
         if (await hashFile(destination, 'sha256') !== item.sha256) throw Error(`O arquivo de ${item.modId} difere do menu padrão. Ele foi preservado; confira a instalação.`);
         continue;
       } catch (error) { if (error.code !== 'ENOENT') throw error; }
+    } else if (item.kind === 'resource-pack') {
+      try {
+        if (await hashFile(destination, 'sha256') !== item.sha256) throw Error('O resource pack local difere do padrão. O arquivo foi preservado; confira a instalação.');
+        continue;
+      } catch (error) { if (error.code !== 'ENOENT') throw error; }
     } else {
       try { await fs.access(destination); continue; } catch (error) { if (error.code !== 'ENOENT') throw error; }
     }
@@ -90,7 +133,7 @@ async function prepareMenu(engine, { manifest } = {}) {
     installed++;
     if (item.kind === 'mod') owned[item.path] = item.sha256;
     // Persist ownership after each JAR, so an interrupted first installation can resume safely.
-    await saveReceipt({ id: manifest.id, ownedMods: owned, fmlConfigured: previous.fmlConfigured === true });
+    await saveReceipt({ id: manifest.id, ownedMods: owned, fmlConfigured: previous.fmlConfigured === true, activatedResourcePacks: activatedBefore });
   }
   if (!previous.fmlConfigured) {
     const fml = path.join(engine.game, 'config/fml.toml');
@@ -103,7 +146,8 @@ async function prepareMenu(engine, { manifest } = {}) {
     await fs.mkdir(path.dirname(fml), { recursive: true });
     await fs.writeFile(fml, text);
   }
-  await saveReceipt({ id: manifest.id, ownedMods: owned, fmlConfigured: true });
+  const activatedResourcePacks = await activateResourcePacks(engine, manifest.enabledResourcePacks || [], activatedBefore);
+  await saveReceipt({ id: manifest.id, ownedMods: owned, fmlConfigured: true, activatedResourcePacks });
   return { downloaded, installed };
 }
 module.exports = { prepareMenu, validateManifest };
