@@ -118,13 +118,16 @@ function registerHandlers() {
 }
 
 async function smokeUi() {
+  const { validateManifest } = require('./menu-bootstrap.cjs');
+  validateManifest(JSON.parse(await fs.readFile(path.join(engine.assets, 'menu-bootstrap-manifest.json'), 'utf8')));
   const output = verifyOutputIndex >= 0 ? path.resolve(process.argv[verifyOutputIndex + 1]) : path.join(__dirname, '..', 'dist', 'ui-check');
   await fs.mkdir(output, { recursive: true });
   const errors = [];
-  window.webContents.on('console-message', (_event, details) => { if (details.level === 'error') errors.push(details.message); });
+  window.webContents.on('console-message', event => { if (event.level === 'error') { errors.push(event.message); console.error(event.message); } });
   await window.webContents.executeJavaScript(`window.hollowTestReady`);
   window.show();
-  await window.webContents.executeJavaScript(`if(!document.body.classList.contains('entered') || getComputedStyle(document.querySelector('.controls')).animationName!=='panel-enter') throw new Error('Entrada suave ausente');`);
+  const entranceError = await window.webContents.executeJavaScript(`!document.body.classList.contains('entered') || getComputedStyle(document.querySelector('.controls')).animationName!=='panel-enter' ? 'Entrada suave ausente' : ''`);
+  if (entranceError) throw new Error(entranceError);
   publish({ gameRunning: true });
   if (window.isVisible()) throw new Error('Launcher não se escondeu ao abrir o jogo.');
   gameWindow.reveal();
@@ -156,7 +159,8 @@ async function smokeUi() {
     check(getComputedStyle(document.querySelector('.controls')).opacity==='1' && !document.body.classList.contains('entering'),'Entrada não terminou');
     document.querySelector('#reset').click();await wait(250);document.querySelector('#confirm-reset').dispatchEvent(new Event('cancel',{cancelable:true}));await wait(200);check(!document.querySelector('#confirm-reset').open,'Escape durante animação');
     return ['16 trocas de conta: OK','Memória sincronizada: OK','Animação CSS ativa: OK','Fonte incorporada: OK','Interface sem Node: OK','Confirmação e cancelamento de reset: OK','Motion: entrada, trocas rápidas sem deslocamento e Escape nos avisos: OK'];
-  })()`);
+  })().catch(error => ({ smokeError: error.stack || String(error) }))`);
+  if (report.smokeError) throw new Error(report.smokeError);
   await window.webContents.executeJavaScript(`(async () => {
     const audio = music.audio;
     await Promise.race([new Promise((resolve, reject) => {

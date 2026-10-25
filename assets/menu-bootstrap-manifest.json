@@ -1,0 +1,140 @@
+{
+  "schema": 1,
+  "id": "averon-fancymenu-20261025",
+  "minecraft": "1.21.1",
+  "files": [
+    {
+      "path": "mods/fancymenu_neoforge_3.9.14_MC_1.21.1.jar",
+      "kind": "mod",
+      "modId": "fancymenu",
+      "prefix": "fancymenu_neoforge_",
+      "sha256": "92f74ef89381ea1f74e1145feab6db4ce4638804b1fb43622302d0a647fc0a66",
+      "size": 25922080,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/92f74ef89381ea1f74e1145feab6db4ce4638804b1fb43622302d0a647fc0a66.jar"
+    },
+    {
+      "path": "mods/konkrete_neoforge_1.9.9_MC_1.21.jar",
+      "kind": "mod",
+      "modId": "konkrete",
+      "prefix": "konkrete_neoforge_",
+      "sha256": "791c5538751dd3015ef3a2ce92d98719e1a28a48ebbd817b78506771256654cd",
+      "size": 618842,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/791c5538751dd3015ef3a2ce92d98719e1a28a48ebbd817b78506771256654cd.jar"
+    },
+    {
+      "path": "mods/melody_neoforge_1.0.10_MC_1.21.jar",
+      "kind": "mod",
+      "modId": "melody",
+      "prefix": "melody_neoforge_",
+      "sha256": "6b973a4564703c531fc0eae09db08b07a38091e0a743c687b8d2049457e84871",
+      "size": 36096,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/6b973a4564703c531fc0eae09db08b07a38091e0a743c687b8d2049457e84871.jar"
+    },
+    {
+      "path": "mods/drippyloadingscreen_neoforge_3.1.5_MC_1.21.1.jar",
+      "kind": "mod",
+      "modId": "drippyloadingscreen",
+      "prefix": "drippyloadingscreen_neoforge_",
+      "sha256": "f1fcb6cf3cbc7a6055fed0912bf284a7c455a0830de42460943fc5e130072759",
+      "size": 168632,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/f1fcb6cf3cbc7a6055fed0912bf284a7c455a0830de42460943fc5e130072759.jar"
+    },
+    {
+      "path": "mods/drippyloadingscreen-earlywindow_neoforge_3.1.5_MC_1.21.1.jar",
+      "kind": "mod",
+      "modId": "drippy_early_window",
+      "prefix": "drippyloadingscreen-earlywindow_neoforge_",
+      "sha256": "7ea6fd30ccb87a6532c66af5472e7d8dccd1d66da944081fda8050701e232870",
+      "size": 133978,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/7ea6fd30ccb87a6532c66af5472e7d8dccd1d66da944081fda8050701e232870.jar"
+    },
+    {
+      "path": "mods/watermedia-3.0.0.23.jar",
+      "kind": "mod",
+      "modId": "watermedia",
+      "prefix": "watermedia-",
+      "sha256": "c3baefc8fbb005e349b3424f7df8f9d89b18524d5f7a358c6df73ca5e1d98b38",
+      "size": 3625444,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/c3baefc8fbb005e349b3424f7df8f9d89b18524d5f7a358c6df73ca5e1d98b38.jar"
+    },
+    {
+      "path": "mods/watermedia_binaries-3.0.0.6.jar",
+      "kind": "mod",
+      "modId": "watermedia_binaries",
+      "prefix": "watermedia_binaries-",
+      "sha256": "2d9333061c3d2330033fe68837a31f546dbf58984455b0cfec0deeff6b1f121e",
+      "size": 143725808,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/2d9333061c3d2330033fe68837a31f546dbf58984455b0cfec0deeff6b1f121e.jar"
+    },
+    {
+      "path": "config/fancymenu/options.txt",
+      "kind": "default",
+      "sha256": "6df834ff0756d1d57f5ff20abcc8d5e716f7736fe38f83f390d5b4f539b407ab",
+      "size": 4400,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/6df834ff0756d1d57f5ff20abcc8d5e716f7736fe38f83f390d5b4f539b407ab.txt"
+    },
+    {
+      "path": "config/fancymenu/customizablemenus.txt",
+      "kind": "default",
+      "sha256": "8e15b8fdd11e054e25d49c37ce6a448807a7e6e34f9c3b46dc4d222aa0aca44b",
+      "size": 149,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/8e15b8fdd11e054e25d49c37ce6a448807a7e6e34f9c3b46dc4d222aa0aca44b.txt"
+    },
+    {
+      "path": "config/fancymenu/custom_gui_screens.txt",
+      "kind": "default",
+      "sha256": "ff492043eaf454c46e949d5eef32ece90cc5a19feb50a161dd29a43b5732c880",
+      "size": 51,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/ff492043eaf454c46e949d5eef32ece90cc5a19feb50a161dd29a43b5732c880.txt"
+    },
+    {
+      "path": "config/fancymenu/legacy_checklist.txt",
+      "kind": "default",
+      "sha256": "9a25d3dc708e43eabafce5479a13c02dae15bc7f673afb2745b8b2ba48a97dc0",
+      "size": 42,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/9a25d3dc708e43eabafce5479a13c02dae15bc7f673afb2745b8b2ba48a97dc0.txt"
+    },
+    {
+      "path": "config/fancymenu/customization/title_screen_layout.txt",
+      "kind": "default",
+      "sha256": "7e9ae2265c313d94087bf8937923043a7129f50cfd22dfc1d4e4193d00624323",
+      "size": 51980,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/7e9ae2265c313d94087bf8937923043a7129f50cfd22dfc1d4e4193d00624323.txt"
+    },
+    {
+      "path": "config/fancymenu/customization/drippy_loading_overlay_layout.txt",
+      "kind": "default",
+      "sha256": "474239960088b4dd0b43f1f24c004353d9af2fa72246f454c64a102e623de886",
+      "size": 18077,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/474239960088b4dd0b43f1f24c004353d9af2fa72246f454c64a102e623de886.txt"
+    },
+    {
+      "path": "config/fancymenu/assets/2026-10-24_22.05.32.png",
+      "kind": "default",
+      "sha256": "c5a7c88572d08b360f3f2183b33f03a5786d24b009a139333e6c32b3d9eb497a",
+      "size": 2917287,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/c5a7c88572d08b360f3f2183b33f03a5786d24b009a139333e6c32b3d9eb497a.png"
+    },
+    {
+      "path": "config/fancymenu/assets/averonsmp.png",
+      "kind": "default",
+      "sha256": "31f7d6942c7ba57d7b7b92f1e0d2c6a664bfcf7f4b7160d4eca5586ce8104106",
+      "size": 1278541,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/31f7d6942c7ba57d7b7b92f1e0d2c6a664bfcf7f4b7160d4eca5586ce8104106.png"
+    },
+    {
+      "path": "config/drippyloadingscreen/options.txt",
+      "kind": "default",
+      "sha256": "aeb84b46b1de15886c999a300391099d8f9edf914cb2701de09944c4982b6e6c",
+      "size": 2259,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/aeb84b46b1de15886c999a300391099d8f9edf914cb2701de09944c4982b6e6c.txt"
+    },
+    {
+      "path": "config/fancymenu/assets/wallpaper.mp4",
+      "kind": "default",
+      "sha256": "cec42ecd5d0790f8ed438f146a8c5f933a08cc29afa37ea8b2eccdcd82b33274",
+      "size": 32087361,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/cec42ecd5d0790f8ed438f146a8c5f933a08cc29afa37ea8b2eccdcd82b33274.mp4"
+    }
+  ]
+}

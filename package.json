@@ -1,6 +1,6 @@
 {
   "name": "hollow-launcher",
-  "version": "2.4.1",
+  "version": "2.5.0",
   "description": "Launcher Electron do AVERON SMP para Windows",
   "author": "AVERON SMP",
   "license": "UNLICENSED",
@@ -38,6 +38,10 @@
       "package.json"
     ],
     "extraResources": [
+      {
+        "from": "assets/menu-bootstrap-manifest.json",
+        "to": "assets/menu-bootstrap-manifest.json"
+      },
       {
         "from": "assets/automodpack-5.0.0-rc.2.jar",
         "to": "assets/automodpack-5.0.0-rc.2.jar"
