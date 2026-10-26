@@ -7,6 +7,6 @@ window.LauncherServerStatus = function createServerStatus($) {
     $('#server-details').textContent = value.kind === 'online' ? `${count}${Number.isInteger(value.ping) ? ` · ${value.ping} ms` : ''}` : value.kind === 'unknown' ? 'Você pode tentar entrar normalmente.' : 'AVERON SMP';
     $('#refresh-server').disabled = Boolean(value.checking);
   }
-  
+
   return serverStatus;
 };
