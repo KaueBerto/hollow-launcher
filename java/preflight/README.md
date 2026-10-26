@@ -1,4 +1,6 @@
-# Verificador de atualização do modpack
+# Verificador legado de atualização do modpack
+
+Desde o launcher 2.6.0, esta ponte é exclusiva da migração de transações AutoModpack 5.x. O sincronizador ativo é AveronSync 4.0.6-averonsync.0.4. Não compile nem execute esta ponte contra o JAR 4.x. O binário 5.x original é mantido nos recursos somente para concluir transações antigas antes de arquivar `automodpack/client`.
 
 As três classes nesta pasta são compiladas para Java 21. ReviewedUpdatePlan e ClientGenerationStore derivam do AutoModpack 5.0.0-rc.2, commit upstream dd5ba41, sob LGPL-3.0. As alterações só são carregadas pelo processo de verificação offline do launcher; o mod original permanece intacto.
 

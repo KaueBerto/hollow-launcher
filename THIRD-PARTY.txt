@@ -1,14 +1,19 @@
-Este launcher é um projeto independente do Hollow SMP.
+Este launcher é um projeto independente do AVERON SMP.
 
-AutoModpack 5.0.0-rc.2
-Copyright de seus respectivos autores.
+AveronSync 4.0.6-averonsync.0.4
+Fork do AutoModpack 4.0.6, por Skidam; modificações por AveronSync contributors.
+Licença LGPL-3.0; avisos originais preservados no JAR fornecido.
+Fontes correspondentes completos, instruções e avisos do fork:
+licenses/AveronSync-0.4-source.zip no instalador e no ZIP de distribuição;
+vendor/averonsync/AveronSync-0.4-source.zip no repositório do launcher.
+Upstream: https://github.com/Skidamek/AutoModpack/tree/v4.0.6
+O JAR é copiado separadamente para mods. Não foi modificado pelo launcher.
+
+AutoModpack 5.0.0-rc.2 (somente migração offline)
 https://github.com/Skidamek/AutoModpack
-https://github.com/Skidamek/AutoModpack/releases
-Licença LGPL-3.0. O JAR original, sem alterações, é distribuído junto ao aplicativo
-e é copiado separadamente para a pasta mods.
-Suas licenças originais também estão preservadas dentro do JAR e na
-pasta licenses deste pacote. O código do launcher e o JAR original estão
-no pacote de fontes, permitindo reconstruir o executável.
+Licença LGPL-3.0. O binário original permanece nos recursos para concluir
+transações antigas com hollow-pack-preflight.jar antes de instalar o fork.
+Ele não é instalado em mods junto do AveronSync.
 
 Downloads realizados quando o jogador prepara o jogo:
 - Java 21: Eclipse Temurin / Adoptium. Metadados e SHA256 oficiais.

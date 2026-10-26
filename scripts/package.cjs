@@ -2,13 +2,16 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const AdmZip = require('adm-zip');
-const { hashFile, MOD_HASH } = require('../src/engine.cjs');
+const { hashFile } = require('../src/core/files.cjs');
+const { SYNC_FILE, SYNC_HASH } = require('../src/modpack-sync.cjs');
+const { LEGACY_MOD_HASH } = require('../src/modpack-preflight.cjs');
 const metadata = require('../package.json');
 
 (async () => {
   const root = path.resolve(__dirname, '..');
   const dist = path.join(root, 'dist');
-  if (await hashFile(path.join(root, 'assets', 'automodpack-5.0.0-rc.2.jar'), 'sha256') !== MOD_HASH) throw new Error('AutoModpack inválido.');
+  if (await hashFile(path.join(root, 'assets', 'automodpack-5.0.0-rc.2.jar'), 'sha256') !== LEGACY_MOD_HASH) throw new Error('AutoModpack inválido.');
+  if (await hashFile(path.join(root, 'assets', SYNC_FILE), 'sha256') !== SYNC_HASH) throw new Error('AveronSync inválido.');
   const { PREFLIGHT_HASH } = require('../src/modpack-preflight.cjs');
   if (await hashFile(path.join(root, 'assets', 'hollow-pack-preflight.jar'), 'sha256') !== PREFLIGHT_HASH) throw new Error('Verificador do modpack inválido.');
   const exe = path.join(dist, metadata.build.win.artifactName.replace('${version}', metadata.version));
@@ -20,11 +23,14 @@ const metadata = require('../package.json');
   zip.addLocalFile(path.join(root, 'docs', 'DISCORD.md'));
   zip.addLocalFile(path.join(root, 'docs', 'AMBIENTE.md'));
   zip.addLocalFile(path.join(root, 'docs', 'MENU.md'));
+  zip.addLocalFile(path.join(root, 'docs', 'AVERONSYNC.md'));
+  zip.addLocalFile(path.join(root, 'docs', 'ARCHITECTURE.md'));
   zip.addLocalFile(path.join(root, 'docs', 'minecraft-menu.png'));
   zip.addLocalFile(path.join(root, 'docs', 'PAISAGEM.md'));
   zip.addLocalFile(path.join(root, 'docs', 'landscape-selection.png'));
   zip.addLocalFile(path.join(root, 'THIRD-PARTY.txt'));
   zip.addLocalFolder(path.join(root, 'licenses'), 'licenses');
+  zip.addLocalFile(path.join(root, 'vendor/averonsync/AveronSync-0.4-source.zip'), 'licenses');
   zip.addLocalFolder(path.join(root, 'java', 'preflight'), 'preflight-source');
   // Chromium notices are distributed by Electron alongside its runtime.
   zip.addLocalFile(path.join(root, 'node_modules', 'electron', 'dist', 'LICENSE'), 'licenses', 'Electron-LICENSE.txt');

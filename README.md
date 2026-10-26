@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/averon-smp.png" alt="AVERON SMP" width="260"></p>
 <h1 align="center">Averon Launcher</h1>
-<p align="center">Launcher Electron do AVERON SMP para Windows.<br>Instalação automática, visual pixelado e modpack pelo AutoModpack.</p>
-<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-f6c844"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-c9362a"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.5.3-f6c844"></p>
+<p align="center">Launcher Electron do AVERON SMP para Windows.<br>Instalação automática, visual pixelado e modpack pelo AveronSync.</p>
+<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-f6c844"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-c9362a"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.6.0-f6c844"></p>
 
 ![Interface do Averon Launcher](docs/launcher.png)
 
@@ -13,12 +13,12 @@ O Minecraft já abre com o menu AVERON personalizado desde a primeira execução
 
 ## Baixar e jogar
 
-Baixe e execute `AveronSMP-Launcher-Setup-2.5.3.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
+Baixe e execute `AveronSMP-Launcher-Setup-2.6.0.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
 
 1. Escolha **Nickname** ou **Microsoft** e ajuste a memória.
 2. Clique em **Instalar e jogar** e aguarde a preparação inicial.
 3. Abra **Multijogador** e entre no **AVERON SMP**.
-4. Confirme o download do modpack pelo AutoModpack. Se ele pedir reinício, feche o Minecraft, abra pelo launcher e conecte novamente.
+4. Confirme o download do modpack pelo AveronSync. Se ele pedir reinício, feche o Minecraft, abra pelo launcher e conecte novamente.
 
 A primeira preparação baixa Java 21, Minecraft 1.21.1, NeoForge 21.1.253 e recursos do jogo. Pode levar vários minutos. Nas próximas aberturas, o launcher reutiliza a instalação. O modpack é recebido **dentro do Minecraft**, ao entrar no servidor; a barra do launcher mostra a preparação da base.
 
@@ -91,7 +91,7 @@ npm run build
 npm run package
 ```
 
-`build` gera `dist/AveronSMP-Launcher-Setup-2.5.3.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/AveronSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
+`build` gera `dist/AveronSMP-Launcher-Setup-2.6.0.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/AveronSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
 
 O executável não possui certificado de assinatura de código do Averon. Para uma distribuição assinada, configure seu certificado no electron-builder.
 
@@ -107,7 +107,7 @@ src/microsoft-auth.cjs Login Microsoft, sessão protegida e perfil Java
 src/microsoft-config.cjs Client ID público próprio do Averon (pendente)
 src/server-status.cjs Consulta Java, ping, cache e atualização do painel
 renderer/         HTML, CSS, eventos e animação
-assets/           Logo, ícone, fontes e AutoModpack original
+assets/           Logo, ícone, fontes, AveronSync e ponte de migração
 scripts/          Smoke test, integração opcional e distribuição
 tests/           Testes isolados do motor (sem dados do jogador)
 licenses/         Licenças de dependências distribuídas
@@ -119,7 +119,7 @@ Versões do jogo e servidor ficam em `src/engine.cjs`. O layout está em `render
 
 ## Verificações e problemas
 
-Desde a versão 2.3.3, o launcher aguarda o Minecraft e o helper do AutoModpack encerrarem e conclui atualizações pendentes antes de abrir o jogo. Uma falha bloqueia a abertura e registra `modpack-preflight.log`, preservando a atualização para diagnóstico. Os ajustes Java, testes e instruções para recompilar estão em [java/preflight](java/preflight/README.md).
+O sincronizador atual é o **AveronSync 4.0.6-averonsync.0.4**, fornecido pelo responsável pelo servidor. A migração da base AutoModpack 5 conclui transações pendentes antes da troca e guarda os JARs e o estado antigo em `sync-backups`, fora da pasta do jogo. O verificador Java antigo continua no instalador apenas para essa transição; não é usado com o armazenamento 4.x do AveronSync. Veja [AVERONSYNC.md](docs/AVERONSYNC.md) e a [arquitetura](docs/ARCHITECTURE.md).
 
 `npm test` verifica UUID, manifestos, caminhos, preferências, reset, arquivos ocupados, junctions, ZIPs, downloads e autenticação Microsoft simulada. `npm run test:ui` abre a interface em renderização isolada, testa os controles e a criptografia Windows, e gera screenshots. Todos os dados de teste ficam em `dist/`.
 
@@ -129,7 +129,7 @@ Logs: `%LOCALAPPDATA%\HollowSMP\launcher-error.log`, `neoforge-install.log`, `ga
 
 ## Créditos
 
-Monocraft é inspirada no Minecraft, **não a fonte oficial**. AutoModpack, Electron, Chromium, electron-updater e adm-zip mantêm suas licenças; veja [THIRD-PARTY.txt](THIRD-PARTY.txt) e [licenses/](licenses/). O pacote também inclui os avisos de terceiros do Chromium.
+Monocraft é inspirada no Minecraft, **não a fonte oficial**. AveronSync, AutoModpack legado, Electron, Chromium, electron-updater e adm-zip mantêm suas licenças; veja [THIRD-PARTY.txt](THIRD-PARTY.txt) e [licenses/](licenses/). O pacote também inclui os avisos de terceiros do Chromium.
 
 O código original e a identidade visual do AVERON SMP não recebem licença de reutilização neste repositório. As licenças de terceiros se aplicam aos respectivos componentes.
 

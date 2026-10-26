@@ -2,6 +2,7 @@
 const fs=require('node:fs/promises');
 const path=require('node:path');
 const PREFLIGHT_HASH='280a29961a20583d3cbac82ec3ae27e2b53bd273f67b1b6dd6f00976cd7ed572';
+const LEGACY_MOD_HASH='96dc57f223b83850a1684ebb8283e1e6aa5cfb89ae5226464de6d5fc85bb1f80';
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function prepareModpack(engine,{readPids=()=>engine.hollowGamePids(),wait=pause,timeout=120000,now=Date.now,run}={}){
  const client=path.join(engine.game,'automodpack','client');
@@ -17,8 +18,8 @@ async function prepareModpack(engine,{readPids=()=>engine.hollowGamePids(),wait=
  engine.progress('Concluindo atualização do modpack antes de abrir o Minecraft…');
  const bridge=path.join(engine.assets,'hollow-pack-preflight.jar');
  const original=path.join(engine.assets,'automodpack-5.0.0-rc.2.jar');
- const {hashFile,MOD_HASH}=require('./engine.cjs');
- if(await hashFile(bridge,'sha256')!==PREFLIGHT_HASH||await hashFile(original,'sha256')!==MOD_HASH)throw Error('O verificador do modpack está inválido. Reinstale o launcher.');
+ const {hashFile}=require('./core/files.cjs');
+ if(await hashFile(bridge,'sha256')!==PREFLIGHT_HASH||await hashFile(original,'sha256')!==LEGACY_MOD_HASH)throw Error('O verificador do modpack está inválido. Reinstale o launcher.');
  const libraries=path.join(engine.game,'libraries');
  const cp=[bridge,original,path.join(libraries,'com/google/code/gson/gson/2.10.1/gson-2.10.1.jar'),path.join(libraries,'org/apache/logging/log4j/log4j-api/2.22.1/log4j-api-2.22.1.jar'),path.join(libraries,'org/apache/logging/log4j/log4j-core/2.22.1/log4j-core-2.22.1.jar')].join(';');
  try{
@@ -31,4 +32,4 @@ async function prepareModpack(engine,{readPids=()=>engine.hollowGamePids(),wait=
   throw Error('A atualização do modpack não terminou. O jogo não foi aberto para evitar repetir a atualização. Confira modpack-preflight.log.');
  }
 }
-module.exports={prepareModpack,PREFLIGHT_HASH};
+module.exports={prepareModpack,PREFLIGHT_HASH,LEGACY_MOD_HASH};

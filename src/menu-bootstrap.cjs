@@ -65,7 +65,7 @@ async function activateResourcePacks(engine, ids, previous) {
   return [...activated];
 }
 async function prepareMenu(engine, { manifest } = {}) {
-  const { hashFile } = require('./engine.cjs');
+  const { hashFile } = require('./core/files.cjs');
   manifest ||= JSON.parse(await fs.readFile(path.join(engine.assets, 'menu-bootstrap-manifest.json'), 'utf8'));
   validateManifest(manifest);
   if (typeof engine.javaRunning === 'function' && await engine.javaRunning()) throw Error('Feche o Minecraft antes de preparar o menu.');

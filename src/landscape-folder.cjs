@@ -2,7 +2,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { gunzipSync } = require('node:zlib');
-const { SERVER, MC } = require('./engine.cjs');
+const { SERVER, MC } = require('./core/minecraft.cjs');
 
 function serverList(buffer) {
   if (buffer[0] === 31 && buffer[1] === 139) buffer = gunzipSync(buffer, { maxOutputLength: 8 * 1024 * 1024 });

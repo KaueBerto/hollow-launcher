@@ -32,7 +32,7 @@ test('caminhos recusam travessia, raiz e caminhos absolutos', () => {
   for (const name of ['../outside', '..\\outside', '.', 'C:\\outside', '/outside']) assert.throws(() => under(directory, name));
   assert.equal(under(directory, 'assets/object'), path.join(directory, 'assets', 'object'));
 });
-test('AutoModpack original preservado', async () => assert.equal(await hashFile(path.resolve(__dirname, '..', 'assets', 'automodpack-5.0.0-rc.2.jar'), 'sha256'), MOD_HASH));
+test('AveronSync fornecido preservado', async () => { const { SYNC_FILE } = require('../src/modpack-sync.cjs'); assert.equal(await hashFile(path.resolve(__dirname, '..', 'assets', SYNC_FILE), 'sha256'), MOD_HASH); });
 test('preferências da versão C# são migradas e nickname não lembrado é removido', async () => fixture(async engine => {
   await writeJson(path.join(engine.root, 'launcher-settings.json'), { mode: 1, nickname: 'Hollow', ram: 8, remember: true });
   assert.deepEqual(await engine.loadSettings(), { mode: 'microsoft', nickname: 'Hollow', ram: 8, remember: true, landscape: false });

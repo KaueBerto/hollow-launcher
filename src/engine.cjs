@@ -3,117 +3,18 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const os = require('node:os');
-const crypto = require('node:crypto');
-const { spawn, execFile } = require('node:child_process');
+const { execFile } = require('node:child_process');
 const { promisify } = require('node:util');
-const { Readable, Transform } = require('node:stream');
-const { pipeline } = require('node:stream/promises');
-const { createReadStream, createWriteStream } = require('node:fs');
-const AdmZip = require('adm-zip');
 const runFile = promisify(execFile);
-const { alive, trackGameProcess, relevantJavaPids } = require('./game-process.cjs');
+const { alive, relevantJavaPids } = require('./game-process.cjs');
 
-const MC = '1.21.1';
-const NF = '21.1.253';
-const VERSION = `neoforge-${NF}`;
-const SERVER = 'hollowsmp.com.br:25565';
-const MOD_HASH = '96dc57f223b83850a1684ebb8283e1e6aa5cfb89ae5226464de6d5fc85bb1f80';
-const INSTALLER_HASH = '8e8a6889b6d7ddcae5f93c4f9c90035e14ea70cdc5b74147773265809c4f9137';
-
-async function exists(file) { try { await fs.access(file); return true; } catch { return false; } }
-async function readJson(file) { return JSON.parse((await fs.readFile(file, 'utf8')).replace(/^\uFEFF/, '')); }
-async function writeJson(file, value) {
-  await fs.mkdir(path.dirname(file), { recursive: true });
-  const temporary = `${file}.hollow-new`;
-  await fs.writeFile(temporary, JSON.stringify(value, null, 2), 'utf8');
-  await fs.rename(temporary, file);
-}
-function under(root, relative) {
-  if (typeof relative !== 'string' || path.isAbsolute(relative) || /[\x00:]/.test(relative)) throw new Error('Caminho de arquivo inválido.');
-  const full = path.resolve(root, relative.replaceAll('/', path.sep));
-  const difference = path.relative(path.resolve(root), full);
-  if (!difference || difference.startsWith(`..${path.sep}`) || difference === '..' || path.isAbsolute(difference)) {
-    throw new Error('Caminho fora da pasta de instalação.');
-  }
-  return full;
-}
-async function hashFile(file, algorithm = 'sha1') {
-  const hash = crypto.createHash(algorithm);
-  for await (const chunk of createReadStream(file)) hash.update(chunk);
-  return hash.digest('hex');
-}
-function offlineUuid(nickname) {
-  const bytes = crypto.createHash('md5').update(`OfflinePlayer:${nickname}`).digest();
-  bytes[6] = (bytes[6] & 15) | 48;
-  bytes[8] = (bytes[8] & 63) | 128;
-  return bytes.toString('hex');
-}
-function validateOptions(options, { requireNickname = true } = {}) {
-  if (!options || !['nickname', 'microsoft'].includes(options.mode)) throw new Error('Escolha uma conta válida.');
-  if (!Number.isInteger(options.ram) || options.ram < 2 || options.ram > 24) throw new Error('Escolha de 2 a 24 GB de memória.');
-  if (requireNickname && options.mode === 'nickname' && !/^[A-Za-z0-9_]{3,16}$/.test(options.nickname || '')) {
-    throw new Error('Use um nickname de 3 a 16 letras, números ou _.');
-  }
-  return { mode: options.mode, ram: options.ram, nickname: String(options.nickname || '').slice(0, 16), remember: Boolean(options.remember), landscape: options.landscape === true };
-}
-function allowed(node, systemVersion = os.release()) {
-  if (!node.rules) return true;
-  let allow = false;
-  for (const rule of node.rules) {
-    const system = rule.os || {};
-    let match = (!system.name || system.name === 'windows') && (!system.arch || ['x86_64', 'amd64'].includes(system.arch));
-    if (system.version && !new RegExp(system.version).test(systemVersion)) match = false;
-    if (Object.values(rule.features || {}).some(Boolean)) match = false;
-    if (match) allow = rule.action === 'allow';
-  }
-  return allow;
-}
-function argumentsOf(version, type) {
-  return (version.arguments?.[type] || []).flatMap(item => {
-    if (typeof item === 'string') return [item];
-    if (!allowed(item)) return [];
-    return Array.isArray(item.value) ? item.value : [item.value];
-  });
-}
-async function extract(zipPath, target, nativesOnly = false) {
-  const zip = new AdmZip(zipPath);
-  // Validate the whole archive before writing even the first file.
-  const entries = zip.getEntries().filter(entry => !nativesOnly || /\.dll$/i.test(entry.entryName));
-  for (const entry of entries) {
-    under(target, entry.entryName);
-    const mode = entry.header.attr >>> 16;
-    if ((mode & 0xf000) === 0xa000) throw new Error('O arquivo ZIP contém um link não permitido.');
-  }
-  for (const entry of entries) {
-    const destination = under(target, entry.entryName);
-    if (entry.isDirectory) await fs.mkdir(destination, { recursive: true });
-    else { await fs.mkdir(path.dirname(destination), { recursive: true }); await fs.writeFile(destination, entry.getData()); }
-  }
-}
-async function copyTree(source, target) {
-  await fs.mkdir(target, { recursive: true });
-  for (const entry of await fs.readdir(source, { withFileTypes: true })) {
-    if (entry.isSymbolicLink()) throw new Error('Link não permitido na instalação.');
-    const from = under(source, entry.name), to = under(target, entry.name);
-    if (entry.isDirectory()) await copyTree(from, to);
-    else if (!await exists(to) || await hashFile(from, 'sha256') !== await hashFile(to, 'sha256')) await fs.copyFile(from, to);
-  }
-}
-async function workers(items, concurrency, operation) {
-  let next = 0;
-  let failure;
-  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, async () => {
-    while (!failure && next < items.length) {
-      const index = next++;
-      try { await operation(items[index], index); } catch (error) { failure ||= error; }
-    }
-  }));
-  if (failure) throw failure;
-}
-function nbtServerList() {
-  const string = text => { const bytes = Buffer.from(text); const length = Buffer.alloc(2); length.writeUInt16BE(bytes.length); return Buffer.concat([length, bytes]); };
-  return Buffer.concat([Buffer.from([10]), string(''), Buffer.from([9]), string('servers'), Buffer.from([10, 0, 0, 0, 1, 8]), string('name'), string('Hollow SMP'), Buffer.from([8]), string('ip'), string(SERVER), Buffer.from([0, 0])]);
-}
+const { MC, NF, VERSION, SERVER, offlineUuid, validateOptions, allowed, argumentsOf, nbtServerList } = require('./core/minecraft.cjs');
+const { exists, readJson, writeJson, under, hashFile, extract, copyTree } = require('./core/files.cjs');
+const { workers } = require('./core/workers.cjs');
+const { buildArguments, launch } = require('./game-launch.cjs');
+const { jsonFrom, download } = require('./downloads.cjs');
+const { installJava, libraries, installer, install } = require('./game-installation.cjs');
+const { syncReady, SYNC_HASH: MOD_HASH } = require('./modpack-sync.cjs');
 
 class Engine {
   constructor({ root, assets, report = () => {}, platform = process.platform } = {}) {
@@ -128,7 +29,7 @@ class Engine {
   versionFile(version) { return path.join(this.game, 'versions', version, `${version}.json`); }
   async ready() {
     if (!await exists(path.join(this.root, 'ready.json')) || !await exists(this.java) || !await exists(this.versionFile(VERSION))) return false;
-    try { return (await fs.readdir(path.join(this.game, 'mods'))).some(name => /^automodpack-.*\.jar$/.test(name)); } catch { return false; }
+    return syncReady(this);
   }
   async loadSettings() {
     const defaults = { mode: 'nickname', nickname: 'Aventureiro', ram: 6, remember: true, landscape: false };
@@ -144,237 +45,20 @@ class Engine {
     const value = validateOptions(options, validation);
     await writeJson(path.join(this.root, 'launcher-settings.json'), { ...value, nickname: value.remember ? value.nickname : '' });
   }
-  async jsonFrom(url) {
-    if (new URL(url).protocol !== 'https:') throw new Error('O download exige HTTPS.');
-    const response = await fetch(url, { signal: AbortSignal.timeout(60000) });
-    if (!response.ok) throw new Error(`Servidor de download respondeu ${response.status}. Tente novamente.`);
-    if (new URL(response.url).protocol !== 'https:') throw new Error('Redirecionamento de download inválido.');
-    return response.json();
-  }
-  async download(url, destination, expected, algorithm = 'sha1', onProgress) {
-    if (new URL(url).protocol !== 'https:') throw new Error('O download exige HTTPS.');
-    if (expected && await exists(destination) && await hashFile(destination, algorithm) === expected.toLowerCase()) return;
-    await fs.mkdir(path.dirname(destination), { recursive: true });
-    const partial = `${destination}.partial`;
-    if (expected && await exists(partial) && await hashFile(partial, algorithm) === expected.toLowerCase()) { await fs.rename(partial, destination); return; }
-    for (let attempt = 0; attempt < 3; attempt++) {
-      try {
-        let offset = expected ? await fs.stat(partial).then(s => s.size).catch(() => 0) : 0;
-        const response = await fetch(url, { headers: offset ? { Range: `bytes=${offset}-`, 'Accept-Encoding': 'identity' } : {}, signal: AbortSignal.timeout(600000) });
-        if (response.status === 416) { await response.body?.cancel(); await fs.rm(partial, { force: true }); throw new Error('Retomando o download novamente.'); }
-        if (!response.ok || !response.body) throw new Error(`Falha no download (${response.status}).`);
-        if (new URL(response.url).protocol !== 'https:') throw new Error('Redirecionamento de download inválido.');
-        if (response.status === 206) {
-          const range = /^bytes (\d+)-(\d+)\/(\d+)$/.exec(response.headers.get('content-range') || '');
-          if (!range || Number(range[1]) !== offset) { await response.body.cancel(); throw new Error('Retomada de download inválida.'); }
-        } else offset = 0;
-        const total = (Number(response.headers.get('content-length')) || 0) + offset;
-        let received = offset, lastReport = 0;
-        const meter = new Transform({ transform(chunk, encoding, callback) {
-          received += chunk.length;
-          if (onProgress && Date.now() - lastReport > 150) { lastReport = Date.now(); onProgress(received, total); }
-          callback(null, chunk);
-        } });
-        await pipeline(Readable.fromWeb(response.body), meter, createWriteStream(partial, { flags: offset ? 'a' : 'w' }));
-        if (expected && await hashFile(partial, algorithm) !== expected.toLowerCase()) { await fs.rm(partial, { force: true }); throw new Error('O download não passou na verificação.'); }
-        await fs.rename(partial, destination);
-        if (onProgress) onProgress(received, total);
-        return;
-      } catch (error) {
-        if (!expected) await fs.rm(partial, { force: true });
-        if (attempt === 2) throw error;
-        await new Promise(resolve => setTimeout(resolve, (attempt + 1) * 1000));
-      }
-    }
-  }
+  async jsonFrom(url) { return jsonFrom(this, url); }
+  async download(url, destination, expected, algorithm = 'sha1', onProgress) { return download(this, url, destination, expected, algorithm, onProgress); }
   progress(text, done, total) {
     const now = Date.now();
     if (total > 0 && done < total && now - (this.lastProgress || 0) < 100) return;
     this.lastProgress = now;
     this.report({ text, percent: total > 0 ? Math.round(done / total * 100) : null });
   }
-  async installJava() {
-    if (await exists(this.java)) return;
-    this.progress('Baixando Java 21…');
-    const metadata = await this.jsonFrom('https://api.adoptium.net/v3/assets/latest/21/hotspot?architecture=x64&image_type=jre&os=windows&vendor=eclipse');
-    const archive = metadata[0]?.binary?.package;
-    if (!archive?.link || !archive.checksum) throw new Error('Não encontrei o Java 21 para Windows.');
-    const zip = path.join(this.root, 'downloads', 'java21.zip');
-    await this.download(archive.link, zip, archive.checksum, 'sha256', (done, total) => this.progress('Baixando Java 21…', done, total));
-    this.progress('Preparando Java 21…');
-    const staging = path.join(this.root, 'runtime-extract');
-    await extract(zip, staging);
-    for (const entry of await fs.readdir(staging, { withFileTypes: true })) {
-      const source = under(staging, entry.name);
-      if (entry.isDirectory() && await exists(path.join(source, 'bin', 'java.exe'))) { await copyTree(source, path.join(this.root, 'runtime')); return; }
-    }
-    throw new Error('O Java baixado está incompleto.');
-  }
-  async libraries(version) {
-    await workers((version.libraries || []).filter(library => allowed(library)), 6, async library => {
-      const downloads = library.downloads || {};
-      const artifact = downloads.artifact;
-      if (artifact?.url) await this.download(artifact.url, under(path.join(this.game, 'libraries'), artifact.path), artifact.sha1);
-      const classifier = library.natives?.windows?.replace('${arch}', '64');
-      const native = downloads.classifiers?.[classifier];
-      if (native?.url) await this.download(native.url, under(path.join(this.game, 'libraries'), native.path), native.sha1);
-    });
-  }
-  async installer(jar) {
-    const log = path.join(this.root, 'neoforge-install.log');
-    await fs.writeFile(log, 'Hollow Launcher Electron\n');
-    const output = createWriteStream(log, { flags: 'a' });
-    try {
-      await new Promise((resolve, reject) => {
-        const child = spawn(this.java, ['-jar', jar, '--installClient', this.game], { cwd: this.root, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
-        child.stdout.pipe(output, { end: false }); child.stderr.pipe(output, { end: false });
-        child.once('error', reject);
-        child.once('close', code => code === 0 ? resolve() : reject(new Error('O NeoForge não terminou a instalação. Consulte neoforge-install.log.')));
-      });
-    } finally { await new Promise(resolve => output.end(resolve)); }
-    if (!await exists(this.versionFile(VERSION))) throw new Error('A instalação do NeoForge está incompleta.');
-  }
-  async install() {
-    if (this.platform !== 'win32' || process.arch !== 'x64') throw new Error('Este launcher exige Windows de 64 bits.');
-    await fs.mkdir(this.game, { recursive: true });
-    await this.installJava();
-    this.progress('Preparando Minecraft 1.21.1…');
-    const manifest = await this.jsonFrom('https://piston-meta.mojang.com/mc/game/version_manifest_v2.json');
-    const version = manifest.versions.find(item => item.id === MC);
-    if (!version) throw new Error('Não encontrei a versão do Minecraft.');
-    await this.download(version.url, this.versionFile(MC), version.sha1);
-    const vanilla = await readJson(this.versionFile(MC));
-    const client = vanilla.downloads.client;
-    await this.download(client.url, path.join(this.game, 'versions', MC, `${MC}.jar`), client.sha1, 'sha1', (done, total) => this.progress('Baixando Minecraft 1.21.1…', done, total));
-    this.progress('Preparando bibliotecas…'); await this.libraries(vanilla);
-    if (!await exists(this.versionFile(VERSION))) {
-      this.progress('Instalando NeoForge… Isso pode levar alguns minutos.');
-      const jar = path.join(this.root, 'downloads', 'neoforge-installer.jar');
-      await this.download(`https://maven.neoforged.net/releases/net/neoforged/neoforge/${NF}/neoforge-${NF}-installer.jar`, jar, INSTALLER_HASH, 'sha256');
-      const profiles = path.join(this.game, 'launcher_profiles.json');
-      if (!await exists(profiles)) await writeJson(profiles, { profiles: {} });
-      await this.installer(jar);
-    }
-    await this.libraries(await readJson(this.versionFile(VERSION)));
-    this.progress('Conferindo recursos do jogo…');
-    const indexPath = under(path.join(this.game, 'assets', 'indexes'), `${vanilla.assetIndex.id}.json`);
-    await this.download(vanilla.assetIndex.url, indexPath, vanilla.assetIndex.sha1);
-    const objects = [...new Map(Object.values((await readJson(indexPath)).objects).map(item => [item.hash, item])).values()];
-    let done = 0;
-    await workers(objects, 12, async item => {
-      const hash = item.hash;
-      if (!/^[0-9a-f]{40}$/.test(hash)) throw new Error('Recurso inválido no manifesto.');
-      await this.download(`https://resources.download.minecraft.net/${hash.slice(0, 2)}/${hash}`, under(path.join(this.game, 'assets', 'objects'), `${hash.slice(0, 2)}/${hash}`), hash);
-      this.progress(`Recursos: ${++done} / ${objects.length}`, done, objects.length);
-    });
-    this.progress('Preparando AVERON SMP…');
-    const mods = path.join(this.game, 'mods'); await fs.mkdir(mods, { recursive: true });
-    if (!(await fs.readdir(mods)).some(name => /^automodpack-.*\.jar$/.test(name))) {
-      const original = path.join(this.assets, 'automodpack-5.0.0-rc.2.jar');
-      if (await hashFile(original, 'sha256') !== MOD_HASH) throw new Error('AutoModpack inválido.');
-      await fs.copyFile(original, path.join(mods, path.basename(original)));
-    }
-    const servers = path.join(this.game, 'servers.dat');
-    if (!await exists(servers)) await fs.writeFile(servers, nbtServerList());
-    await writeJson(path.join(this.root, 'ready.json'), { minecraft: MC, neoforge: NF, launcher: 'electron', created: new Date().toISOString() });
-    this.progress('Instalação concluída.', 1, 1);
-  }
-  async buildArguments(nickname, ram, account) {
-    validateOptions({ mode: 'nickname', nickname, ram });
-    if (account && (account.name !== nickname || !/^[a-f0-9]{32}$/i.test(account.id) || typeof account.accessToken !== 'string' || !account.accessToken || !Number.isFinite(account.expires) || account.expires <= Date.now())) throw new Error('Sessão Microsoft inválida ou expirada. Faça login novamente.');
-    const vanilla = await readJson(this.versionFile(MC)), neo = await readJson(this.versionFile(VERSION));
-    const merged = new Map();
-    for (const library of [...vanilla.libraries, ...neo.libraries]) {
-      if (!allowed(library)) continue;
-      const parts = library.name.split(':');
-      merged.set(`${parts[0]}:${parts[1]}:${parts[3] || ''}`, library);
-    }
-    const libraries = path.join(this.game, 'libraries'), natives = path.join(this.game, 'natives');
-    await fs.mkdir(natives, { recursive: true });
-    const classpath = [];
-    for (const library of merged.values()) {
-      const artifact = library.downloads?.artifact;
-      if (artifact) {
-        const jar = under(libraries, artifact.path);
-        if (!await exists(jar)) throw new Error(`Biblioteca ausente: ${path.basename(jar)}. Use Resetar para reparar.`);
-        classpath.push(jar);
-        if (library.name.includes(':natives-windows')) await extract(jar, natives, true);
-      }
-      const classifier = library.natives?.windows?.replace('${arch}', '64');
-      const native = library.downloads?.classifiers?.[classifier];
-      if (native) await extract(under(libraries, native.path), natives, true);
-    }
-    classpath.push(path.join(this.game, 'versions', MC, `${MC}.jar`));
-    const replacements = {
-      auth_player_name: nickname, version_name: VERSION, game_directory: this.game,
-      assets_root: path.join(this.game, 'assets'), assets_index_name: vanilla.assetIndex.id,
-      auth_uuid: account?.id || offlineUuid(nickname), auth_access_token: account?.accessToken || '0', clientid: account?.clientId || '', auth_xuid: account?.xuid || '',
-      user_type: account ? 'msa' : 'legacy', version_type: 'release', natives_directory: natives,
-      launcher_name: 'HollowSMP', launcher_version: require('../package.json').version, classpath: classpath.join(';'),
-      library_directory: libraries, classpath_separator: ';', user_properties: '{}',
-    };
-    const expand = argument => String(argument).replace(/\$\{([^}]+)\}/g, (_, name) => {
-      if (!(name in replacements)) throw new Error(`Argumento desconhecido: ${name}`);
-      return replacements[name];
-    });
-    return [`-Xms1G`, `-Xmx${ram}G`, '-Dfile.encoding=UTF-8', ...[vanilla, neo].flatMap(version => argumentsOf(version, 'jvm').map(expand)),
-      `-DignoreList=client-extra,${VERSION}.jar,${MC}.jar`, neo.mainClass,
-      ...[vanilla, neo].flatMap(version => argumentsOf(version, 'game').map(expand))];
-  }
-  async launch(nickname, ram, account) {
-    if (alive(this.gameProcess)) throw new Error('O Minecraft já está aberto.');
-    const { prepareModpack } = require('./modpack-preflight.cjs');
-    await prepareModpack(this, { run: runFile });
-    const { prepareMenu } = require('./menu-bootstrap.cjs');
-    await prepareMenu(this);
-    const argumentsList = await this.buildArguments(nickname, ram, account);
-    const { javaInvocation, startupFailure } = require('./java-invocation.cjs');
-    const invocation = javaInvocation(this.java, argumentsList, this.game, { account: Boolean(account) });
-    const argumentFile = path.join(this.root, 'game-args.txt');
-    if (invocation.method === 'argument-file') {
-      await fs.writeFile(argumentFile, '', { mode: 0o600 });
-      if (account && this.platform === 'win32') {
-        // Java needs an argument file for Windows command length limits. Protect it before writing credentials.
-        const script = "$ErrorActionPreference='Stop'; $file=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('" + Buffer.from(argumentFile).toString('base64') + "')); $acl=New-Object Security.AccessControl.FileSecurity; $acl.SetAccessRuleProtection($true,$false); $sid=[Security.Principal.WindowsIdentity]::GetCurrent().User; $acl.SetOwner($sid); $acl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule($sid,'FullControl','Allow'))); $acl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule((New-Object Security.Principal.SecurityIdentifier('S-1-5-18')),'FullControl','Allow'))); [IO.File]::SetAccessControl($file,$acl)";
-        try { await runFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-EncodedCommand', Buffer.from(script, 'utf16le').toString('base64')], { windowsHide: true, timeout: 15000 }); }
-        catch { await fs.rm(argumentFile, { force: true }); throw new Error('Não consegui proteger a sessão no Windows. Verifique o acesso à pasta HollowSMP e tente novamente.'); }
-      }
-      await fs.writeFile(argumentFile, invocation.args.map(value => `"${value.replaceAll('\\', '\\\\').replaceAll('"', '\\"')}"`).join('\n'), 'utf8');
-    } else await fs.rm(argumentFile, { force: true });
-    const output = createWriteStream(path.join(this.root, 'game-launch.log'), { flags: 'w' });
-    output.write(`Averon Launcher ${require('../package.json').version} — ${new Date().toISOString()}\nInicialização: ${invocation.method}; memória: ${ram} GB\n`);
-    const started = Date.now();
-    const child = spawn(this.java, invocation.method === 'direct' ? invocation.args : [`@${argumentFile}`], { cwd: this.game, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
-    let launchFailure = null;
-    let argumentCleanup;
-    const cleanupArgs = () => argumentCleanup ||= fs.rm(argumentFile, { force: true }).catch(() => {});
-    const { redactedLog } = require('./redacted-log.cjs');
-    const stdout = child.stdout.pipe(redactedLog(account?.accessToken));
-    const stderr = child.stderr.pipe(redactedLog(account?.accessToken));
-    stdout.pipe(output, { end: false }); stderr.pipe(output, { end: false });
-    // First Java output means the VM has parsed the argument file.
-    child.stdout.once('data', cleanupArgs); child.stderr.once('data', cleanupArgs);
-    const finish = trackGameProcess(this, child, { cleanup: cleanupArgs, finishLog: async code => {
-      stdout.unpipe(output); stderr.unpipe(output);
-      stdout.resume(); stderr.resume(); // Drain inherited helper output without keeping the game active.
-      await new Promise(resolve => output.end(`\nExit code: ${code}\n`, resolve));
-      const elapsed = Date.now() - started;
-      if (code === 0 && elapsed >= 15000) return;
-      const log = await fs.open(path.join(this.root, 'game-launch.log'), 'r').then(async file => {
-        try {
-          const { size } = await file.stat();
-          const buffer = Buffer.alloc(Math.min(size, 16384));
-          const { bytesRead } = await file.read(buffer, 0, buffer.length, Math.max(0, size - buffer.length));
-          return buffer.subarray(0, bytesRead).toString('utf8');
-        } finally { await file.close(); }
-      }).catch(() => '');
-      const message = startupFailure(code, elapsed, log);
-      if (message) launchFailure = { id: `${child.pid || 'spawn'}-${started}`, title: elapsed < 15000 ? 'Não foi possível iniciar o Minecraft' : 'O Minecraft encerrou', message };
-    }, exitReport: () => ({ launchFailure }) });
-    try { await new Promise((resolve, reject) => { child.once('spawn', resolve); child.once('error', reject); }); }
-    catch (error) { await finish(null); throw error; }
-    return child.pid;
-  }
+  async installJava() { return installJava(this); }
+  async libraries(version) { return libraries(this, version); }
+  async installer(jar) { return installer(this, jar); }
+  async install() { return install(this); }
+  async buildArguments(nickname, ram, account) { return buildArguments(this, nickname, ram, account); }
+  async launch(nickname, ram, account) { return launch(this, nickname, ram, account); }
   async javaRunning() {
     if (alive(this.gameProcess)) return true;
     return (await this.hollowGamePids()).length > 0;
@@ -418,7 +102,7 @@ class Engine {
     await this.assertNoLinks(this.root);
     // Keep player data in place, including DH databases and their installation receipt.
     const preserved = new Set([
-      'launcher-settings.json', 'landscape-installed.json', 'menu-defaults-installed.json',
+      'launcher-settings.json', 'landscape-installed.json', 'menu-defaults-installed.json', 'sync-backups',
       'game/options.txt', 'game/optionsof.txt', 'game/optionsshaders.txt',
       'game/servers.dat', 'game/config',
       'game/Distant_Horizons_server_data', 'game/schematics',

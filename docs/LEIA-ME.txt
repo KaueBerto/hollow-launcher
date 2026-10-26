@@ -4,7 +4,7 @@ AVERON SMP LAUNCHER — 2.4.0 — Electron
 2. Escolha Nickname ou Microsoft e ajuste a memória na barra.
 3. Clique em Instalar e jogar e aguarde a preparação inicial.
 4. Abra Multijogador e entre no servidor já configurado.
-5. Confirme os avisos do AutoModpack. Se ele pedir reinício, feche
+5. Confirme os avisos do AveronSync. Se ele pedir reinício, feche
    o jogo, abra novamente pelo launcher e volte ao servidor.
 
 IDENTIDADE AVERON

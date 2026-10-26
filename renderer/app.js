@@ -2,12 +2,9 @@
 const $ = selector => document.querySelector(selector);
 let current = { ready: false, busy: false, gameRunning: false };
 let saveTimer;
-const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-const motion = new Map();
 let completionTimer, completed = false;
 let portalTimer;
 let wasStartup = true;
-let landscapeDirectoryPreference, pendingLandscapeOperation;
 const music = new window.LauncherMusic(new Audio('../assets/launcher-music.mp3'), $('#music-toggle'), localStorage);
 function syncMusic() {
   music.setAllowed(!document.hidden && !current.gameRunning && current.startup?.visible === false);
@@ -23,41 +20,14 @@ for (let i = 0; i < 18; i++) {
   particle.style.setProperty('--drift', `${i % 2 ? -24 : 28}px`);
   $('.particles').append(particle);
 }
-function serverStatus(value = {}) {
-  const panel = $('.server-status'); panel.dataset.state = value.kind || 'checking';
-  $('#server-label').textContent = value.kind === 'online' ? 'Servidor online' : value.kind === 'unknown' ? 'Sem resposta do servidor' : 'Consultando servidor…';
-  const count = Number.isInteger(value.players) && Number.isInteger(value.maxPlayers) ? `${value.players}/${value.maxPlayers} jogadores` : 'AVERON SMP';
-  $('#server-details').textContent = value.kind === 'online' ? `${count}${Number.isInteger(value.ping) ? ` · ${value.ping} ms` : ''}` : value.kind === 'unknown' ? 'Você pode tentar entrar normalmente.' : 'AVERON SMP';
-  $('#refresh-server').disabled = Boolean(value.checking);
-}
-
-function animate(element, frames, duration = 240) {
-  motion.get(element)?.cancel();
-  motion.delete(element);
-  if (reducedMotion.matches || document.hidden) return;
-  const animation = element.animate(frames, { duration, easing: 'cubic-bezier(.22, 1, .36, 1)' });
-  motion.set(element, animation);
-  animation.finished.then(() => { if (motion.get(element) === animation) motion.delete(element); }).catch(() => {});
-}
-function showDialog(dialog) {
-  if (!dialog.open) dialog.showModal();
-}
-function closeDialog(dialog) {
-  if (!dialog.open || dialog.dataset.closing) return;
-  if (reducedMotion.matches || document.hidden) { dialog.close(); return; }
-  dialog.dataset.closing = 'true';
-  dialog.inert = true;
-  animate(dialog, [{ opacity: 1, transform: 'translateY(0) scale(1)' }, { opacity: 0, transform: 'translateY(6px) scale(.99)' }], 150);
-  const animation = motion.get(dialog);
-  const finish = () => { delete dialog.dataset.closing; dialog.inert = false; dialog.close(); };
-  animation ? animation.finished.then(finish, finish) : finish();
-}
+const serverStatus = window.LauncherServerStatus($);
+const { reducedMotion, motion, animate, showDialog, closeDialog } = window.LauncherMotion();
 function clearCompletion() {
   clearTimeout(completionTimer); completed = false;
 }
 
 function options() {
-  return { mode: $('[name=mode]:checked').value, nickname: $('#nickname').value.trim(), ram: Number($('#ram').value), remember: $('#remember').checked, landscape: $('#landscape').checked, landscapeDirectory: landscapeDirectoryPreference };
+  return { mode: $('[name=mode]:checked').value, nickname: $('#nickname').value.trim(), ram: Number($('#ram').value), remember: $('#remember').checked, landscape: $('#landscape').checked, landscapeDirectory: dialogs.directory };
 }
 function settings(value) {
   $(`[name=mode][value="${value.mode === 'microsoft' ? 'microsoft' : 'nickname'}"]`).checked = true;
@@ -108,31 +78,9 @@ function render() {
   else if (Number.isFinite(current.percent)) $('#progress').value = current.percent;
   else $('#progress').removeAttribute('value');
 }
-function message(text, title = 'AVERON SMP', logs = false) {
-  $('#message-open-logs').hidden = !logs;
-  $('#message-title').textContent = title;
-  $('#message-text').textContent = text;
-  showDialog($('#message'));
-}
-async function execute(operation) {
-  clearTimeout(saveTimer);
-  try {
-    const result = await operation();
-    if (!result.ok && result.code === 'LANDSCAPE_SELECTION_REQUIRED') {
-      const select = $('#landscape-server');
-      select.replaceChildren();
-      for (const choice of result.choices) {
-        const option = document.createElement('option');
-        option.value = choice.directory;
-        option.textContent = `${choice.name} · ${choice.address}`;
-        select.append(option);
-      }
-      pendingLandscapeOperation = operation;
-      showDialog($('#landscape-select'));
-    } else if (!result.ok) message(result.error);
-    else { if (result.settings) settings(result.settings); if (result.message) message(result.message); }
-  } catch { message('Não foi possível concluir. Feche e abra o launcher para tentar novamente.'); }
-}
+const dialogs = window.LauncherDialogs({ $, showDialog, closeDialog, settings, beforeOperation: () => clearTimeout(saveTimer), openLogs: () => window.hollow.openLogs() });
+function message(text, title, logs) { dialogs.message(text, title, logs); }
+function execute(operation) { return dialogs.execute(operation); }
 function save() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => { if (!current.busy) window.hollow.save(options()).catch(() => {}); }, 300);
@@ -167,18 +115,6 @@ for (const mode of document.querySelectorAll('[name=mode]')) mode.addEventListen
 $('#reset').addEventListener('click', () => { if (!current.busy) { clearTimeout(saveTimer); showDialog($('#confirm-reset')); } });
 $('#cancel-reset').addEventListener('click', () => closeDialog($('#confirm-reset')));
 $('#do-reset').addEventListener('click', () => { const selected = options(); closeDialog($('#confirm-reset')); execute(() => window.hollow.reset(selected)); });
-$('#message-ok').addEventListener('click', () => closeDialog($('#message')));
-$('#message-open-logs').addEventListener('click', () => execute(() => window.hollow.openLogs()));
-$('#landscape-cancel').addEventListener('click', () => { pendingLandscapeOperation = null; closeDialog($('#landscape-select')); });
-$('#landscape-confirm').addEventListener('click', () => {
-  if (!pendingLandscapeOperation || !$('#landscape-server').value) return;
-  landscapeDirectoryPreference = $('#landscape-server').value;
-  const operation = pendingLandscapeOperation;
-  pendingLandscapeOperation = null;
-  $('#landscape-select').close();
-  execute(operation);
-});
-for (const dialog of document.querySelectorAll('dialog')) dialog.addEventListener('cancel', event => { event.preventDefault(); if (dialog.id === 'landscape-select') pendingLandscapeOperation = null; closeDialog(dialog); });
 document.addEventListener('visibilitychange', () => {
   syncMusic();
   document.body.classList.toggle('paused', document.hidden);
