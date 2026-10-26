@@ -76,3 +76,23 @@ test('legacy receipt upgrades in place and does not trust a truncated database',
   assert.deepEqual(await fs.readFile(target),raw);
  }finally{global.fetch=oldFetch;await fs.rm(root,{recursive:true,force:true});}
 });
+test('duplicate aliases do not download before a choice; selected folder is installed and reused on later openings',async()=>{
+ const {registrations}=require('./helpers/server-registrations.cjs');
+ const root=await fs.mkdtemp(path.join(os.tmpdir(),'averon-dh-choice-'));
+ const raw=Buffer.concat([Buffer.from('SQLite format 3\0'),Buffer.alloc(100)]),packed=require('node:zlib').gzipSync(raw),m=manifest(packed);
+ m.databaseBytes=raw.length;m.databaseSha256=crypto.createHash('sha256').update(raw).digest('hex');
+ const engine={root,game:path.join(root,'game'),gameProcess:null,javaRunning:async()=>false,jsonFrom:async()=>m,progress:()=>{}};
+ const original=registrations([{name:'Hollow SMP',ip:'hollowsmp.com.br'},{name:'Averon SMP',ip:'hollowsmp.com.br:25565'}]);
+ const oldFetch=global.fetch;let requests=0;
+ try {
+  await fs.mkdir(engine.game);await fs.writeFile(path.join(engine.game,'servers.dat'),original);
+  global.fetch=async(url,options)=>{requests++;const [,start,end]=/bytes=(\d+)-(\d+)/.exec(options.headers.Range);return new Response(packed.subarray(+start,+end+1),{status:206,headers:{'content-range':`bytes ${start}-${end}/${packed.length}`}})};
+  await assert.rejects(installLandscape(engine),error=>error.code==='LANDSCAPE_SELECTION_REQUIRED');assert.equal(requests,0);
+  const directory=path.join('Averon+SMP',DIRECTORY.split('/')[1]);
+  assert.equal((await installLandscape(engine,{directory})).alreadyInstalled,false);
+  assert.deepEqual(await fs.readFile(path.join(engine.game,'Distant_Horizons_server_data',directory,'DistantHorizons.sqlite')),raw);
+  assert.equal((await installLandscape(engine)).alreadyInstalled,true);assert.equal(requests,1);
+  assert.deepEqual(await fs.readFile(path.join(engine.game,'servers.dat')),original);
+  await assert.rejects(fs.access(path.join(engine.game,'Distant_Horizons_server_data','Hollow+SMP')));
+ } finally {global.fetch=oldFetch;await fs.rm(root,{recursive:true,force:true});}
+});

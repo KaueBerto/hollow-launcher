@@ -7,6 +7,7 @@ const motion = new Map();
 let completionTimer, completed = false;
 let portalTimer;
 let wasStartup = true;
+let landscapeDirectoryPreference, pendingLandscapeOperation;
 const music = new window.LauncherMusic(new Audio('../assets/launcher-music.mp3'), $('#music-toggle'), localStorage);
 function syncMusic() {
   music.setAllowed(!document.hidden && !current.gameRunning && current.startup?.visible === false);
@@ -56,7 +57,7 @@ function clearCompletion() {
 }
 
 function options() {
-  return { mode: $('[name=mode]:checked').value, nickname: $('#nickname').value.trim(), ram: Number($('#ram').value), remember: $('#remember').checked, landscape: $('#landscape').checked };
+  return { mode: $('[name=mode]:checked').value, nickname: $('#nickname').value.trim(), ram: Number($('#ram').value), remember: $('#remember').checked, landscape: $('#landscape').checked, landscapeDirectory: landscapeDirectoryPreference };
 }
 function settings(value) {
   $(`[name=mode][value="${value.mode === 'microsoft' ? 'microsoft' : 'nickname'}"]`).checked = true;
@@ -117,7 +118,18 @@ async function execute(operation) {
   clearTimeout(saveTimer);
   try {
     const result = await operation();
-    if (!result.ok) message(result.error);
+    if (!result.ok && result.code === 'LANDSCAPE_SELECTION_REQUIRED') {
+      const select = $('#landscape-server');
+      select.replaceChildren();
+      for (const choice of result.choices) {
+        const option = document.createElement('option');
+        option.value = choice.directory;
+        option.textContent = `${choice.name} · ${choice.address}`;
+        select.append(option);
+      }
+      pendingLandscapeOperation = operation;
+      showDialog($('#landscape-select'));
+    } else if (!result.ok) message(result.error);
     else { if (result.settings) settings(result.settings); if (result.message) message(result.message); }
   } catch { message('Não foi possível concluir. Feche e abra o launcher para tentar novamente.'); }
 }
@@ -157,7 +169,16 @@ $('#cancel-reset').addEventListener('click', () => closeDialog($('#confirm-reset
 $('#do-reset').addEventListener('click', () => { const selected = options(); closeDialog($('#confirm-reset')); execute(() => window.hollow.reset(selected)); });
 $('#message-ok').addEventListener('click', () => closeDialog($('#message')));
 $('#message-open-logs').addEventListener('click', () => execute(() => window.hollow.openLogs()));
-for (const dialog of document.querySelectorAll('dialog')) dialog.addEventListener('cancel', event => { event.preventDefault(); closeDialog(dialog); });
+$('#landscape-cancel').addEventListener('click', () => { pendingLandscapeOperation = null; closeDialog($('#landscape-select')); });
+$('#landscape-confirm').addEventListener('click', () => {
+  if (!pendingLandscapeOperation || !$('#landscape-server').value) return;
+  landscapeDirectoryPreference = $('#landscape-server').value;
+  const operation = pendingLandscapeOperation;
+  pendingLandscapeOperation = null;
+  $('#landscape-select').close();
+  execute(operation);
+});
+for (const dialog of document.querySelectorAll('dialog')) dialog.addEventListener('cancel', event => { event.preventDefault(); if (dialog.id === 'landscape-select') pendingLandscapeOperation = null; closeDialog(dialog); });
 document.addEventListener('visibilitychange', () => {
   syncMusic();
   document.body.classList.toggle('paused', document.hidden);

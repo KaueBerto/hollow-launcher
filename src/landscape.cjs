@@ -74,14 +74,14 @@ async function downloadParts(m, folder, progress, request = fetch, partSize = 8 
   for(let i=0;i<count;i++) await fs.rm(path.join(folder,`${i}.part`),{force:true});
   return archive;
 }
-async function installLandscape(engine) {
+async function installLandscape(engine, { directory: selectedDirectory } = {}) {
   if(engine.gameProcess || await engine.javaRunning()) throw new Error('Feche o Minecraft antes de baixar a paisagem.');
   const m=validate(await engine.jsonFrom(MANIFEST));
   const marker=path.join(engine.root,'landscape-installed.json');
-  const directory=await landscapeDirectory(engine.game,DIRECTORY.split('/')[1]);
-  const target=path.join(engine.game,'Distant_Horizons_server_data',directory,'DistantHorizons.sqlite');
   let installed;
   try { installed=JSON.parse(await fs.readFile(marker,'utf8')); } catch(error) { if(error.code!=='ENOENT' && !(error instanceof SyntaxError)) throw error; }
+  const directory=await landscapeDirectory(engine.game,DIRECTORY.split('/')[1], { preferredDirectory: installed?.directory, selectedDirectory });
+  const target=path.join(engine.game,'Distant_Horizons_server_data',directory,'DistantHorizons.sqlite');
   if(installed?.sha256===m.databaseSha256) {
     // DH edits its SQLite database during play; its checksum cannot stay equal to the original archive.
     if(installed.directory===directory && await validDatabase(target)) return {alreadyInstalled:true};

@@ -37,7 +37,7 @@ function folderName(server, mode = 'NAME_ONLY') {
   if (!folder || ['.', '..'].includes(folder)) throw Error('Nome de servidor inválido.');
   return folder;
 }
-async function landscapeDirectory(game, level) {
+async function landscapeDirectory(game, level, { preferredDirectory, selectedDirectory } = {}) {
   const normalize = ip => ip.toLowerCase().replace(/:25565$/, '');
   let servers;
   try { servers = serverList(await fs.readFile(path.join(game, 'servers.dat'))); }
@@ -47,8 +47,17 @@ async function landscapeDirectory(game, level) {
   let config = '';
   try { config = await fs.readFile(path.join(game, 'config', 'DistantHorizons.toml'), 'utf8'); } catch (e) { if (e.code !== 'ENOENT') throw e; }
   const mode = /^\s*serverFolderNameMode\s*=\s*"([A-Z_]+)"/m.exec(config)?.[1] || 'NAME_ONLY';
-  const folders = [...new Set(matching.map(s => folderName(s, mode)))];
-  if (folders.length !== 1) throw Error('Há mais de um cadastro do Hollow SMP com nomes diferentes. Mantenha um cadastro para instalar a paisagem.');
-  return path.join(folders[0], level);
+  const choices = [...new Map(matching.map(s => {
+    const directory = path.join(folderName(s, mode), level);
+    return [directory, { name: s.name, address: s.ip, directory }];
+  })).values()];
+  const selectionRequired = message => Object.assign(Error(message), { code: 'LANDSCAPE_SELECTION_REQUIRED', choices });
+  if (selectedDirectory !== undefined) {
+    if (!choices.some(choice => choice.directory === selectedDirectory)) throw selectionRequired('O cadastro escolhido mudou. Abra a seleção da paisagem novamente.');
+    return selectedDirectory;
+  }
+  if (choices.some(choice => choice.directory === preferredDirectory)) return preferredDirectory;
+  if (choices.length === 1) return choices[0].directory;
+  throw selectionRequired('Escolha o cadastro do AVERON que você usa para entrar no servidor.');
 }
 module.exports = { serverList, folderName, landscapeDirectory };

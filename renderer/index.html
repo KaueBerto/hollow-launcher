@@ -69,6 +69,14 @@
     <p>Feche o Minecraft antes de continuar. O modpack será recebido ao entrar no servidor.</p>
     <div class="dialog-actions"><button class="block-button secondary" id="cancel-reset" autofocus>CANCELAR</button><button class="block-button primary" id="do-reset">RESETAR</button></div>
   </dialog>
+  <dialog id="landscape-select" aria-labelledby="landscape-select-title">
+    <h2 id="landscape-select-title">Paisagem do AVERON</h2>
+    <p>O servidor está salvo com mais de um nome. Escolha o cadastro que você usa para entrar no Minecraft.</p>
+    <label for="landscape-server">Cadastro do servidor</label>
+    <select id="landscape-server"></select>
+    <p>A paisagem será instalada na pasta desse cadastro. Seus servidores e dados existentes serão mantidos.</p>
+    <div class="dialog-actions"><button class="block-button secondary" id="landscape-cancel">CANCELAR</button><button class="block-button primary" id="landscape-confirm">CONTINUAR</button></div>
+  </dialog>
   <dialog id="message" aria-labelledby="message-title"><h2 id="message-title">AVERON SMP</h2><p id="message-text"></p><div class="dialog-actions"><button class="block-button secondary" id="message-open-logs" hidden>ABRIR LOGS</button><button class="block-button primary" id="message-ok">OK</button></div></dialog>
 </body>
 </html>

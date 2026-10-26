@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/averon-smp.png" alt="AVERON SMP" width="260"></p>
 <h1 align="center">Averon Launcher</h1>
 <p align="center">Launcher Electron do AVERON SMP para Windows.<br>Instalação automática, visual pixelado e modpack pelo AutoModpack.</p>
-<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-f6c844"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-c9362a"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.5.2-f6c844"></p>
+<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-f6c844"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-c9362a"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.5.3-f6c844"></p>
 
 ![Interface do Averon Launcher](docs/launcher.png)
 
@@ -13,7 +13,7 @@ O Minecraft já abre com o menu AVERON personalizado desde a primeira execução
 
 ## Baixar e jogar
 
-Baixe e execute `AveronSMP-Launcher-Setup-2.5.2.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
+Baixe e execute `AveronSMP-Launcher-Setup-2.5.3.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
 
 1. Escolha **Nickname** ou **Microsoft** e ajuste a memória.
 2. Clique em **Instalar e jogar** e aguarde a preparação inicial.
@@ -23,6 +23,8 @@ Baixe e execute `AveronSMP-Launcher-Setup-2.5.2.exe` na página de [Releases](ht
 A primeira preparação baixa Java 21, Minecraft 1.21.1, NeoForge 21.1.253 e recursos do jogo. Pode levar vários minutos. Nas próximas aberturas, o launcher reutiliza a instalação. O modpack é recebido **dentro do Minecraft**, ao entrar no servidor; a barra do launcher mostra a preparação da base.
 
 O repositório e os downloads são públicos. Ao abrir, uma tela compacta com a logo verifica as atualizações, baixa e instala versões novas automaticamente, e reabre o Averon. Sem atualização, abre o launcher normalmente. Falha de conexão libera o jogo; Minecraft aberto impede a aplicação. A pasta do jogo é preservada. Versões 2.2.0 e 2.2.1 precisam aplicar esta atualização pelo botão antigo uma vez; versões portáteis precisam do instalador. Veja [como publicar atualizações](docs/LAUNCHER-UPDATES.md).
+
+A paisagem opcional do Distant Horizons aceita vários cadastros do mesmo servidor: o launcher reutiliza a pasta já registrada ou pergunta qual cadastro usar, sem excluir os demais. Veja [paisagem e escolha de cadastro](docs/PAISAGEM.md).
 
 ## Versão Electron
 
@@ -89,7 +91,7 @@ npm run build
 npm run package
 ```
 
-`build` gera `dist/AveronSMP-Launcher-Setup-2.5.2.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/AveronSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
+`build` gera `dist/AveronSMP-Launcher-Setup-2.5.3.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/AveronSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
 
 O executável não possui certificado de assinatura de código do Averon. Para uma distribuição assinada, configure seu certificado no electron-builder.
 

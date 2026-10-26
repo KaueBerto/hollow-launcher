@@ -49,6 +49,7 @@ function trusted(event) {
 async function result(operation) {
   try { return { ok: true, ...await operation() }; }
   catch (error) {
+    if (error.code === 'LANDSCAPE_SELECTION_REQUIRED') return { ok: false, code: error.code, choices: error.choices };
     try { await fs.mkdir(engine.root, { recursive: true }); await fs.writeFile(path.join(engine.root, 'launcher-error.log'), error.stack || String(error)); } catch {}
     return { ok: false, error: error.message || 'Não foi possível concluir. Tente novamente.' };
   }
@@ -66,7 +67,7 @@ function registerHandlers() {
     return result(() => prepare(async () => {
       if (state.gameRunning || engine.gameProcess) throw new Error('Feche o Minecraft antes de baixar a paisagem.');
       await engine.saveSettings(options, { requireNickname: false });
-      const installed = await installLandscape(engine);
+      const installed = await installLandscape(engine, { directory: options?.landscapeDirectory });
       return { message: installed.alreadyInstalled ? 'Essa paisagem já está instalada.' : 'Paisagem instalada. O Distant Horizons continua com a opção de ativação que você escolheu.' };
     }));
   });
@@ -87,7 +88,7 @@ function registerHandlers() {
       const account = selected.mode === 'microsoft' ? await microsoft.authenticate() : undefined;
       publish({ account: await microsoft.publicAccount() });
       if (!await engine.ready()) await engine.install();
-      if (selected.landscape) await installLandscape(engine);
+      if (selected.landscape) await installLandscape(engine, { directory: options?.landscapeDirectory });
       // A first installation can outlast a short session. Refresh before launching.
       const identity = account ? await microsoft.authenticate() : undefined;
       const pid = await engine.launch(identity?.name || selected.nickname, selected.ram, identity);
@@ -127,7 +128,14 @@ async function smokeUi() {
   window.webContents.on('console-message', event => { if (event.level === 'error') { errors.push(event.message); console.error(event.message); } });
   await window.webContents.executeJavaScript(`window.hollowTestReady`);
   window.show();
-  const entranceError = await window.webContents.executeJavaScript(`!document.body.classList.contains('entered') || getComputedStyle(document.querySelector('.controls')).animationName!=='panel-enter' ? 'Entrada suave ausente' : ''`);
+  const entranceError = await window.webContents.executeJavaScript(`(() => {
+    if (!document.body.classList.contains('entered')) return 'Interface não carregou';
+    if (reducedMotion.matches) return '';
+    // Replay in one renderer turn; a loaded machine may have finished the original animation already.
+    document.body.classList.remove('entering'); void document.querySelector('.controls').offsetWidth;
+    document.body.classList.add('entering');
+    return getComputedStyle(document.querySelector('.controls')).animationName === 'panel-enter' ? '' : 'Entrada suave ausente';
+  })()`);
   if (entranceError) throw new Error(entranceError);
   publish({ gameRunning: true });
   if (window.isVisible()) throw new Error('Launcher não se escondeu ao abrir o jogo.');
@@ -186,6 +194,31 @@ async function smokeUi() {
   await window.webContents.executeJavaScript(`if (document.querySelector('#message').open) throw Error('Diagnóstico repetido');`);
   publish({ launchFailure: null });
   report.push('Falha ao abrir Minecraft mostra aviso e Abrir logs, sem repetir a cada atualização de estado: OK');
+  await window.webContents.executeJavaScript(`(async () => {
+    window.landscapeChoiceTestCalls = 0;
+    window.landscapeChoiceOperation = async () => {
+      window.landscapeChoiceTestCalls++;
+      if (window.landscapeChoiceTestCalls === 1) return { ok:false, code:'LANDSCAPE_SELECTION_REQUIRED', choices:[{name:'Hollow SMP',address:'hollowsmp.com.br',directory:'Hollow+SMP/level'},{name:'Averon SMP',address:'hollowsmp.com.br:25565',directory:'Averon+SMP/level'}] };
+      window.landscapeChosenForTest = options().landscapeDirectory;
+      return {ok:true};
+    };
+    await execute(window.landscapeChoiceOperation);
+    if (!document.querySelector('#landscape-select').open || document.querySelector('#landscape-server').options.length !== 2) throw Error('Seleção de cadastro da paisagem não abriu');
+  })()`);
+  await window.webContents.executeJavaScript(`Promise.allSettled(document.querySelector('#landscape-select').getAnimations().map(animation => animation.finished))`);
+  await fs.writeFile(path.join(output, 'landscape-selection.png'), (await window.webContents.capturePage()).toPNG());
+  await window.webContents.executeJavaScript(`(async () => {
+    document.querySelector('#landscape-server').value='Averon+SMP/level';
+    document.querySelector('#landscape-confirm').click();
+    await new Promise(resolve=>setTimeout(resolve,50));
+    if (window.landscapeChoiceTestCalls !== 2 || window.landscapeChosenForTest !== 'Averon+SMP/level' || document.querySelector('#landscape-select').open) throw Error('Escolha da paisagem não retomou a operação');
+    window.landscapeChoiceTestCalls=0;
+    await execute(window.landscapeChoiceOperation);
+    document.querySelector('#landscape-cancel').click();
+    await new Promise(resolve=>setTimeout(resolve,250));
+    if (window.landscapeChoiceTestCalls !== 1 || document.querySelector('#landscape-select').open) throw Error('Cancelar paisagem iniciou download');
+  })()`);
+  report.push('Cadastros duplicados: escolha explícita retoma a operação na pasta selecionada; Cancelar não baixa: OK');
   report.push('Fechamento nativo e X escondem durante o jogo; janela preservada e restaurada ao encerrar: OK');
   if (!safeStorage.isEncryptionAvailable()) throw new Error('Criptografia Windows indisponível no teste.');
   const protectedToken = safeStorage.encryptString('hollow-test-token');

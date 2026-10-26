@@ -21,6 +21,8 @@ const metadata = require('../package.json');
   zip.addLocalFile(path.join(root, 'docs', 'AMBIENTE.md'));
   zip.addLocalFile(path.join(root, 'docs', 'MENU.md'));
   zip.addLocalFile(path.join(root, 'docs', 'minecraft-menu.png'));
+  zip.addLocalFile(path.join(root, 'docs', 'PAISAGEM.md'));
+  zip.addLocalFile(path.join(root, 'docs', 'landscape-selection.png'));
   zip.addLocalFile(path.join(root, 'THIRD-PARTY.txt'));
   zip.addLocalFolder(path.join(root, 'licenses'), 'licenses');
   zip.addLocalFolder(path.join(root, 'java', 'preflight'), 'preflight-source');
