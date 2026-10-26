@@ -55,11 +55,12 @@ async function result(operation) {
 }
 async function prepare(operation) {
   if (state.busy || state.updating || state.startup?.visible) throw new Error('Aguarde a preparação ou atualização terminar.');
-  publish({ busy: true, text: 'Preparando…', percent: null });
+  publish({ busy: true, text: 'Preparando…', percent: null, launchFailure: null });
   try { return await operation(); }
   finally { publish({ busy: false, ready: await engine.ready(), text: '', percent: null }); }
 }
 function registerHandlers() {
+  ipcMain.handle('launcher:open-logs', event => { trusted(event); shell.showItemInFolder(path.join(engine.root, 'game-launch.log')); return { ok: true }; });
   ipcMain.handle('launcher:landscape', async (event, options) => {
     trusted(event);
     return result(() => prepare(async () => {
@@ -178,6 +179,13 @@ async function smokeUi() {
     if (!audio.paused) throw new Error('Música tocando enquanto pausada');
   })()`);
   report.push('MP3 incorporado decodifica; volume 25%, loop e botão de mudo persistente: OK');
+  publish({ launchFailure: { id: 'smoke-launch-failure', title: 'O Minecraft encerrou', message: 'Erro de inicialização de teste' } });
+  await window.webContents.executeJavaScript(`if (!document.querySelector('#message').open || document.querySelector('#message-open-logs').hidden || typeof window.hollow.openLogs !== 'function') throw Error('Diagnóstico de abertura não apareceu'); document.querySelector('#message-ok').click();`);
+  await new Promise(resolve => setTimeout(resolve, 250));
+  publish({ launchFailure: { id: 'smoke-launch-failure', message: 'Erro de inicialização de teste' } });
+  await window.webContents.executeJavaScript(`if (document.querySelector('#message').open) throw Error('Diagnóstico repetido');`);
+  publish({ launchFailure: null });
+  report.push('Falha ao abrir Minecraft mostra aviso e Abrir logs, sem repetir a cada atualização de estado: OK');
   report.push('Fechamento nativo e X escondem durante o jogo; janela preservada e restaurada ao encerrar: OK');
   if (!safeStorage.isEncryptionAvailable()) throw new Error('Criptografia Windows indisponível no teste.');
   const protectedToken = safeStorage.encryptString('hollow-test-token');

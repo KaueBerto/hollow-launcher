@@ -328,18 +328,24 @@ class Engine {
     const { prepareMenu } = require('./menu-bootstrap.cjs');
     await prepareMenu(this);
     const argumentsList = await this.buildArguments(nickname, ram, account);
+    const { javaInvocation, startupFailure } = require('./java-invocation.cjs');
+    const invocation = javaInvocation(this.java, argumentsList, this.game, { account: Boolean(account) });
     const argumentFile = path.join(this.root, 'game-args.txt');
-    await fs.writeFile(argumentFile, '', { mode: 0o600 });
-    if (account && this.platform === 'win32') {
-      // Java needs an argument file for Windows command length limits. Protect it before writing credentials.
-      const script = "$ErrorActionPreference='Stop'; $file=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('" + Buffer.from(argumentFile).toString('base64') + "')); $acl=New-Object Security.AccessControl.FileSecurity; $acl.SetAccessRuleProtection($true,$false); $sid=[Security.Principal.WindowsIdentity]::GetCurrent().User; $acl.SetOwner($sid); $acl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule($sid,'FullControl','Allow'))); $acl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule((New-Object Security.Principal.SecurityIdentifier('S-1-5-18')),'FullControl','Allow'))); [IO.File]::SetAccessControl($file,$acl)";
-      try { await runFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-EncodedCommand', Buffer.from(script, 'utf16le').toString('base64')], { windowsHide: true, timeout: 15000 }); }
-      catch { await fs.rm(argumentFile, { force: true }); throw new Error('Não consegui proteger a sessão no Windows. Verifique o acesso à pasta HollowSMP e tente novamente.'); }
-    }
-    await fs.writeFile(argumentFile, argumentsList.map(value => `"${value.replaceAll('\\', '\\\\').replaceAll('"', '\\"')}"`).join('\n'), 'utf8');
+    if (invocation.method === 'argument-file') {
+      await fs.writeFile(argumentFile, '', { mode: 0o600 });
+      if (account && this.platform === 'win32') {
+        // Java needs an argument file for Windows command length limits. Protect it before writing credentials.
+        const script = "$ErrorActionPreference='Stop'; $file=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('" + Buffer.from(argumentFile).toString('base64') + "')); $acl=New-Object Security.AccessControl.FileSecurity; $acl.SetAccessRuleProtection($true,$false); $sid=[Security.Principal.WindowsIdentity]::GetCurrent().User; $acl.SetOwner($sid); $acl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule($sid,'FullControl','Allow'))); $acl.AddAccessRule((New-Object Security.AccessControl.FileSystemAccessRule((New-Object Security.Principal.SecurityIdentifier('S-1-5-18')),'FullControl','Allow'))); [IO.File]::SetAccessControl($file,$acl)";
+        try { await runFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-EncodedCommand', Buffer.from(script, 'utf16le').toString('base64')], { windowsHide: true, timeout: 15000 }); }
+        catch { await fs.rm(argumentFile, { force: true }); throw new Error('Não consegui proteger a sessão no Windows. Verifique o acesso à pasta HollowSMP e tente novamente.'); }
+      }
+      await fs.writeFile(argumentFile, invocation.args.map(value => `"${value.replaceAll('\\', '\\\\').replaceAll('"', '\\"')}"`).join('\n'), 'utf8');
+    } else await fs.rm(argumentFile, { force: true });
     const output = createWriteStream(path.join(this.root, 'game-launch.log'), { flags: 'w' });
-    output.write(`Hollow Launcher Electron — ${new Date().toISOString()}\n`);
-    const child = spawn(this.java, [`@${argumentFile}`], { cwd: this.game, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+    output.write(`Averon Launcher ${require('../package.json').version} — ${new Date().toISOString()}\nInicialização: ${invocation.method}; memória: ${ram} GB\n`);
+    const started = Date.now();
+    const child = spawn(this.java, invocation.method === 'direct' ? invocation.args : [`@${argumentFile}`], { cwd: this.game, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+    let launchFailure = null;
     let argumentCleanup;
     const cleanupArgs = () => argumentCleanup ||= fs.rm(argumentFile, { force: true }).catch(() => {});
     const { redactedLog } = require('./redacted-log.cjs');
@@ -348,11 +354,23 @@ class Engine {
     stdout.pipe(output, { end: false }); stderr.pipe(output, { end: false });
     // First Java output means the VM has parsed the argument file.
     child.stdout.once('data', cleanupArgs); child.stderr.once('data', cleanupArgs);
-    const finish = trackGameProcess(this, child, { cleanup: cleanupArgs, finishLog: code => {
+    const finish = trackGameProcess(this, child, { cleanup: cleanupArgs, finishLog: async code => {
       stdout.unpipe(output); stderr.unpipe(output);
       stdout.resume(); stderr.resume(); // Drain inherited helper output without keeping the game active.
-      return new Promise(resolve => output.end(`\nExit code: ${code}\n`, resolve));
-    } });
+      await new Promise(resolve => output.end(`\nExit code: ${code}\n`, resolve));
+      const elapsed = Date.now() - started;
+      if (code === 0 && elapsed >= 15000) return;
+      const log = await fs.open(path.join(this.root, 'game-launch.log'), 'r').then(async file => {
+        try {
+          const { size } = await file.stat();
+          const buffer = Buffer.alloc(Math.min(size, 16384));
+          const { bytesRead } = await file.read(buffer, 0, buffer.length, Math.max(0, size - buffer.length));
+          return buffer.subarray(0, bytesRead).toString('utf8');
+        } finally { await file.close(); }
+      }).catch(() => '');
+      const message = startupFailure(code, elapsed, log);
+      if (message) launchFailure = { id: `${child.pid || 'spawn'}-${started}`, title: elapsed < 15000 ? 'Não foi possível iniciar o Minecraft' : 'O Minecraft encerrou', message };
+    }, exitReport: () => ({ launchFailure }) });
     try { await new Promise((resolve, reject) => { child.once('spawn', resolve); child.once('error', reject); }); }
     catch (error) { await finish(null); throw error; }
     return child.pid;

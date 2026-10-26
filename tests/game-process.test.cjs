@@ -46,6 +46,14 @@ test('signals and spawn failure release state once', async () => {
   child.emit('close', null); await finish(null);
   assert.equal(engine.gameProcess, null); assert.equal(reports.length, 1);
 });
+test('failed launch diagnosis reaches the interface after cleanup and log completion', async () => {
+  const reports = [], engine = { report: value => reports.push(value) };
+  const child = new EventEmitter(); child.exitCode = null;
+  let diagnostic;
+  const finish = trackGameProcess(engine, child, { finishLog: async () => { diagnostic = { id:'test',message:'Java failed' }; }, exitReport: () => ({ launchFailure: diagnostic }) });
+  child.exitCode = 1; child.emit('exit',1); await finish(1);
+  assert.equal(reports[0].gameRunning,false); assert.equal(reports[0].launchFailure.message,'Java failed');
+});
 
 test('only Hollow game and pack helpers block; Crash Assistant and unrelated Java do not', () => {
   const java = 'C:\\HollowSMP\\runtime\\bin\\java.exe', game = 'C:\\HollowSMP\\game';

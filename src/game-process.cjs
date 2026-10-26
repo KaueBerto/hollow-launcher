@@ -6,7 +6,7 @@ function alive(child) {
 
 // A helper can inherit Java's stdout/stderr and delay `close` after the game exits.
 // Finish local cleanup before releasing the installation for another launch.
-function trackGameProcess(engine, child, { cleanup = async () => {}, finishLog = async () => {} } = {}) {
+function trackGameProcess(engine, child, { cleanup = async () => {}, finishLog = async () => {}, exitReport = () => ({}) } = {}) {
   engine.gameProcess = child;
   let finished;
   const finish = code => {
@@ -16,7 +16,7 @@ function trackGameProcess(engine, child, { cleanup = async () => {}, finishLog =
       finally {
         if (engine.gameProcess === child) {
           engine.gameProcess = null;
-          engine.report({ text: code === 0 ? 'Minecraft fechado.' : 'O Minecraft encerrou. Confira game-launch.log.', gameRunning: false });
+          engine.report({ text: code === 0 ? 'Minecraft fechado.' : 'O Minecraft encerrou. Confira game-launch.log.', gameRunning: false, ...exitReport() });
         }
       }
     })();

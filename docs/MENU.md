@@ -23,3 +23,9 @@ Uma segunda preparação completa foi testada com downloads desativados e não f
 ## Atualizar o preset
 
 Publique os novos arquivos com nomes derivados do SHA256 e atualize o manifesto no código, mantendo os endereços anteriores disponíveis para launchers antigos. Em seguida, gere e publique uma nova versão do launcher. Esta primeira integração instala padrões quando ausentes; não força a substituição de layouts ou preferências que os jogadores já tenham editado.
+
+## Diagnóstico de abertura
+
+Na versão 2.5.2, o modo Nickname usa uma chamada direta do Java quando o comando cabe com segurança no limite do Windows. Os caminhos absolutos de bibliotecas e módulos são preservados para o NeoForge reconhecer as mesmas localizações. Comandos muito longos e contas Microsoft usam o arquivo protegido de argumentos; os tokens Microsoft não são passados na linha de comando do processo.
+
+Um encerramento com erro ou nos primeiros 15 segundos mostra um aviso com o código de saída e o motivo disponível no log. O botão **Abrir logs** seleciona `game-launch.log` no Explorer. A restauração da janela do launcher após o Minecraft fechar continua funcionando. Essa mudança fornece uma alternativa para testar e melhora o diagnóstico; sem o log do computador afetado, não confirma a causa de uma falha específica.

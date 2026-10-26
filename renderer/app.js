@@ -107,7 +107,8 @@ function render() {
   else if (Number.isFinite(current.percent)) $('#progress').value = current.percent;
   else $('#progress').removeAttribute('value');
 }
-function message(text, title = 'AVERON SMP') {
+function message(text, title = 'AVERON SMP', logs = false) {
+  $('#message-open-logs').hidden = !logs;
   $('#message-title').textContent = title;
   $('#message-text').textContent = text;
   showDialog($('#message'));
@@ -155,6 +156,7 @@ $('#reset').addEventListener('click', () => { if (!current.busy) { clearTimeout(
 $('#cancel-reset').addEventListener('click', () => closeDialog($('#confirm-reset')));
 $('#do-reset').addEventListener('click', () => { const selected = options(); closeDialog($('#confirm-reset')); execute(() => window.hollow.reset(selected)); });
 $('#message-ok').addEventListener('click', () => closeDialog($('#message')));
+$('#message-open-logs').addEventListener('click', () => execute(() => window.hollow.openLogs()));
 for (const dialog of document.querySelectorAll('dialog')) dialog.addEventListener('cancel', event => { event.preventDefault(); closeDialog(dialog); });
 document.addEventListener('visibilitychange', () => {
   syncMusic();
@@ -169,6 +171,7 @@ $('.brand').addEventListener('animationend', event => { if (event.animationName 
 reducedMotion.addEventListener('change', () => {
   if (reducedMotion.matches) { document.body.classList.remove('entering'); for (const animation of motion.values()) animation.finish(); }
 });
+let lastLaunchFailure;
 window.hollow.onState(value => {
   if (value.gameRunning && !current.gameRunning && $('#message').open) $('#message').close();
   const wasBusy = current.busy, wasReady = current.ready;
@@ -181,6 +184,10 @@ window.hollow.onState(value => {
     completionTimer = setTimeout(() => { completed = false; render(); }, 1800);
   }
   render();
+  if (value.launchFailure?.id && value.launchFailure.id !== lastLaunchFailure) {
+    lastLaunchFailure = value.launchFailure.id;
+    message(value.launchFailure.message, value.launchFailure.title || 'O Minecraft encerrou', true);
+  }
 });
 window.hollowTestReady = window.hollow.state().then(async value => {
   current = value; settings(value.settings); await document.fonts.ready;
