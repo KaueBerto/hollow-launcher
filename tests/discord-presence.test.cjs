@@ -3,6 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const net = require('node:net');
 const { DiscordPresence, frame } = require('../src/discord-presence.cjs');
+const discordConfig = require('../src/discord-config.cjs');
 const applicationId = '123456789012345678';
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function until(predicate) {
@@ -32,7 +33,7 @@ async function fixture(accept, action) {
 function ready(socket) { socket.write(frame(1, { cmd: 'DISPATCH', evt: 'READY', data: { user: { id: 'not-exposed' } } })); }
 function acknowledge(socket, message) { socket.write(frame(1, { cmd: 'SET_ACTIVITY', nonce: message.nonce, data: {} })); }
 
-test('presença fixa aguarda READY fragmentado, não envia detalhes e limpa ao fechar', async () => {
+test('presença AveronSMP com logo aguarda READY fragmentado, não envia detalhes e limpa ao fechar', async () => {
   const messages = [];
   await fixture((socket, opcode, bytes) => {
     const message = JSON.parse(bytes); messages.push({ opcode, message });
@@ -43,7 +44,10 @@ test('presença fixa aguarda READY fragmentado, não envia detalhes e limpa ao f
     } else acknowledge(socket, message);
   }, async presence => {
     presence.start(); await until(() => presence.status === 'active');
-    assert.deepEqual(messages[1].message.args, { pid: 42, activity: { type: 0 } });
+    assert.deepEqual(messages[1].message.args, { pid: 42, activity: {
+      type: 0, name: 'AveronSMP',
+      assets: { large_image: discordConfig.largeImage, large_text: 'AveronSMP' },
+    } });
     await wait(70); assert.equal(messages.length, 2);
     await presence.stop(); await until(() => messages.length === 3);
     assert.equal(messages[2].message.args.activity, null);
@@ -56,7 +60,12 @@ test('heartbeat devolve bytes sem JSON e reconecta depois do Discord fechar', as
     if (opcode === 0) { connections++; ready(socket); }
     else if (opcode === 4) { assert.deepEqual(bytes, Buffer.from([0, 255, 31])); pong = true; socket.destroy(); }
     else {
-      const message = JSON.parse(bytes); acknowledge(socket, message);
+      const message = JSON.parse(bytes);
+      if (message.args.activity) {
+        assert.equal(message.args.activity.name, 'AveronSMP');
+        assert.equal(message.args.activity.assets.large_image, discordConfig.largeImage);
+      }
+      acknowledge(socket, message);
       if (message.args.activity && connections === 1) socket.write(frame(3, Buffer.from([0, 255, 31])));
     }
   }, async presence => {

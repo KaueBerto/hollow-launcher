@@ -1,6 +1,7 @@
 'use strict';
 const net = require('node:net');
 const { randomUUID } = require('node:crypto');
+const discordConfig = require('./discord-config.cjs');
 
 const MAX_FRAME = 64 * 1024;
 function frame(opcode, payload) {
@@ -11,10 +12,12 @@ function frame(opcode, payload) {
 }
 
 class DiscordPresence {
-  constructor({ applicationId, pid = process.pid, connect = name => net.createConnection(name),
+  constructor({ applicationId, activityName = discordConfig.activityName, largeImage = discordConfig.largeImage,
+    pid = process.pid, connect = name => net.createConnection(name),
     pipes = Array.from({ length: 10 }, (_, i) => `\\\\?\\pipe\\discord-ipc-${i}`),
     timeout = 4000, retryDelay = 15000 } = {}) {
     this.applicationId = String(applicationId || '');
+    this.activity = { type: 0, name: activityName, assets: { large_image: largeImage, large_text: activityName } };
     this.pid = pid; this.connect = connect; this.pipes = pipes;
     this.timeout = timeout; this.retryDelay = retryDelay;
     this.running = false; this.socket = null; this.retry = null; this.deadline = null;
@@ -74,8 +77,8 @@ class DiscordPresence {
         if (!message || typeof message !== 'object' || message.evt === 'ERROR') { close(); return; }
         if (!ready && message.cmd === 'DISPATCH' && message.evt === 'READY') {
           ready = true; nonce = randomUUID(); arm();
-          // Discord uses the application's name for the Playing label. No changing details, timer, or images.
-          write(1, { cmd: 'SET_ACTIVITY', args: { pid: this.pid, activity: { type: 0 } }, nonce });
+          // Override the legacy application branding, without nickname, changing details, timer, or buttons.
+          write(1, { cmd: 'SET_ACTIVITY', args: { pid: this.pid, activity: this.activity }, nonce });
         } else if (ready && message.cmd === 'SET_ACTIVITY' && message.nonce === nonce) {
           clearTimeout(this.deadline); this.deadline = null; this.status = 'active';
         }

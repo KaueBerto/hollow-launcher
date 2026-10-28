@@ -107,7 +107,7 @@ app.whenReady().then(async () => {
   if (smoke) await new Promise(resolve => setTimeout(resolve, 300));
   if (smoke) await require('./diagnostics/ui-smoke.cjs').smokeUi({ window, engine, publish, gameWindow, safeStorage, app, verifyOutputIndex, resizeWindow }); else {
     window.show(); serverMonitor.start();
-    discordPresence = new DiscordPresence({ applicationId: discordConfig.applicationId });
+    discordPresence = new DiscordPresence(discordConfig);
     discordPresence.start();
     launcherUpdate = new LauncherUpdate({
       updater: require('electron-updater').autoUpdater,

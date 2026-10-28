@@ -1,21 +1,23 @@
 # Atividade no Discord
 
-Enquanto o launcher estiver aberto, a atividade é sempre **Jogando HollowSMP**. Não há detalhes de instalação, nickname, tempo, imagens ou botões. Minimizar ou esconder durante o Minecraft mantém a atividade; sair do launcher remove a presença enviada por ele.
+Enquanto o launcher estiver aberto, a atividade é **Jogando AveronSMP**, com a logo dourada atual do servidor. Não há nickname, detalhes de instalação, tempo ou botões. Minimizar ou esconder durante o Minecraft mantém a atividade; sair do launcher remove a presença enviada por ele.
 
-## Ativação pelo responsável
+## Identidade visual
 
-1. Abra o [Discord Developer Portal](https://discord.com/developers/applications) na sua conta e crie uma aplicação chamada **HollowSMP**. Esse nome é usado pelo Discord na atividade do tipo Jogando.
-2. Em **General Information**, copie o **Application ID** público.
-3. Preencha `applicationId` em `src/discord-config.cjs` e gere novamente o executável. O mesmo ID funciona para os jogadores que usam essa distribuição.
+O launcher envia `name: AveronSMP` explicitamente no `SET_ACTIVITY`, além de `assets.large_image` com a logo atual e `large_text: AveronSMP`. Assim, a presença não depende do antigo nome cadastrado para a aplicação. O Application ID público existente é preservado: `1557116892945055754`.
 
-Não é necessário bot, token de usuário, bot token, client secret ou senha. O Application ID público do HollowSMP está configurado: `1557116892945055754`.
+A logo usa a cópia original em `assets/averon-smp.png`, publicada por HTTPS em uma revisão fixa do repositório. O Discord suporta imagens externas e as entrega por seu proxy de mídia. Atualizar a marca no futuro exige ajustar `activityName` e `largeImage` em `src/discord-config.cjs` e publicar uma nova versão.
 
-O jogador precisa do aplicativo Discord aberto no computador e da exibição de atividade habilitada nas configurações do Discord. Se o Discord abrir depois, o launcher tenta conectar novamente. Falhas não impedem instalar ou abrir o Minecraft.
+## Configuração e uso
+
+Não é necessário criar bot, fornecer token de usuário, bot token, client secret ou senha. Os jogadores também não precisam criar uma aplicação. Para usar outra aplicação própria, copie seu Application ID público no [Discord Developer Portal](https://discord.com/developers/applications), atualize a configuração e gere o launcher novamente.
+
+O jogador precisa do aplicativo Discord aberto e atualizado no computador, com a exibição de atividade habilitada. Se o Discord abrir depois, o launcher tenta conectar novamente. Falhas não impedem instalar ou abrir o Minecraft.
 
 ## Implementação e verificação
 
-A conexão usa somente os pipes locais `discord-ipc-0` a `discord-ipc-9`, handshake v1 e `SET_ACTIVITY` com tipo Playing. Sem dependência adicional, autenticação ou acesso a mensagens. Respostas READY não são expostas ao renderer nem registradas. Frames limitados, timeout de conexão, reconexão e encerramento limitado a 250 ms.
+A conexão usa somente os pipes locais `discord-ipc-0` a `discord-ipc-9`, handshake v1 e `SET_ACTIVITY` do tipo Playing. Não acessa mensagens. Dados do evento READY não são expostos ao renderer nem registrados. Há limite de frames, timeout, reconexão e encerramento limitado a 250 ms.
 
-Testes usam um servidor IPC simulado: READY fragmentado, atividade fixa/limpeza, heartbeat, reconexão, Discord iniciado depois, ID ausente, cancelamento e frames inválidos. Isso verifica o protocolo e o ciclo de vida. A aceitação pelo Discord desktop é verificada separadamente quando ele está aberto; a exibição depende das preferências de atividade do jogador.
+Testes simulados verificam o payload exato de nome e logo, READY fragmentado, limpeza, heartbeat, reconexão, Discord iniciado depois, ID ausente, cancelamento e frames inválidos. Na validação local da versão 2.6.2, o Discord desktop confirmou o nome `AveronSMP` e converteu a URL da logo em um endereço de seu proxy de mídia. A visibilidade no perfil continua sujeita às preferências do jogador.
 
-Referências oficiais: [RPC via IPC](https://discord.com/developers/docs/topics/rpc#rpc-over-ipc) e [Rich Presence](https://discord.com/developers/docs/rich-presence/overview).
+Referências oficiais: [RPC via IPC](https://discord.com/developers/docs/topics/rpc#rpc-over-ipc), [nome da atividade](https://discord.com/developers/docs/discord-social-sdk/development-guides/setting-rich-presence#setting-the-application-name) e [imagens da presença](https://discord.com/developers/docs/social-sdk/classdiscordpp_1_1ActivityAssets.html).
