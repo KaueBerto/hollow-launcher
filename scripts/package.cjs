@@ -30,7 +30,7 @@ const metadata = require('../package.json');
   zip.addLocalFile(path.join(root, 'docs', 'landscape-selection.png'));
   zip.addLocalFile(path.join(root, 'THIRD-PARTY.txt'));
   zip.addLocalFolder(path.join(root, 'licenses'), 'licenses');
-  zip.addLocalFile(path.join(root, 'vendor/averonsync/AveronSync-0.4-source.zip'), 'licenses');
+  zip.addLocalFile(path.join(root, 'vendor/averonsync/AveronSync-0.5-source.zip'), 'licenses');
   zip.addLocalFolder(path.join(root, 'java', 'preflight'), 'preflight-source');
   // Chromium notices are distributed by Electron alongside its runtime.
   zip.addLocalFile(path.join(root, 'node_modules', 'electron', 'dist', 'LICENSE'), 'licenses', 'Electron-LICENSE.txt');

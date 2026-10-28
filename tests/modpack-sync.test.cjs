@@ -44,6 +44,36 @@ test('fresh installation uses the exact fork and later launches leave it untouch
   assert.deepEqual(await fs.readdir(path.join(engine.game, 'mods')), [SYNC_FILE]);
 }));
 
+test('0.4 upgrades to 0.5 once, retaining installed modpack, consent and client preferences', () => fixture(async engine => {
+  const oldName = 'averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.4.jar';
+  const old = path.join(engine.game, 'mods', oldName);
+  const zip = new AdmZip();
+  zip.addFile('META-INF/neoforge.mods.toml', Buffer.from('[[mods]]\nmodId="automodpack"\nversion="4.0.6-averonsync.0.4"\n'));
+  zip.writeZip(old);
+  const oldHash = await hashFile(old, 'sha256');
+  const preserved = {
+    'automodpack/automodpack-client.json': '{"selectedModpack":"Averon"}',
+    'automodpack/averonsync-consent.json': '{"accepted":true}',
+    'automodpack/modpacks/Averon/mods/example.jar': 'installed mod',
+    'config/player.toml': 'distance = 24',
+    'options.txt': 'mouseSensitivity:0.75',
+  };
+  for (const [name, content] of Object.entries(preserved)) {
+    const file = path.join(engine.game, name);
+    await fs.mkdir(path.dirname(file), { recursive: true });
+    await fs.writeFile(file, content);
+  }
+  await ensureSync(engine);
+  assert.equal(await exists(old), false);
+  assert.equal(await hashFile(path.join(engine.root, 'sync-backups', `${oldHash}-${oldName}`), 'sha256'), oldHash);
+  assert.deepEqual(await fs.readdir(path.join(engine.game, 'mods')), [SYNC_FILE]);
+  assert.match(SYNC_FILE, /averonsync\.0\.5\.jar$/);
+  for (const [name, content] of Object.entries(preserved)) assert.equal(await fs.readFile(path.join(engine.game, name), 'utf8'), content);
+  const before = (await fs.stat(path.join(engine.game, 'mods', SYNC_FILE))).mtimeMs;
+  await ensureSync(engine);
+  assert.equal((await fs.stat(path.join(engine.game, 'mods', SYNC_FILE))).mtimeMs, before);
+}));
+
 test('migration backs up renamed loader and 5.x projection, preserving player and 4.x data', () => fixture(async engine => {
   const old = await oldInstallation(engine);
   const oldHash = await hashFile(old, 'sha256');
