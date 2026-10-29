@@ -1,8 +1,8 @@
 # AveronSync no launcher
 
-O launcher 2.6.3 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.6.jar`, sem alterações.
+O launcher 2.6.4 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.7.jar`, sem alterações.
 
-SHA-256: `784e84358eb17f041d7291d8c8b1dd8f312d602967df28ab3abf3c3e69d208e7`.
+SHA-256: `19bd47a8810280f0db65292faa75618e931cc563dc5debc3e4e143f65d6df349`.
 
 O fork mantém os IDs `automodpack` e `automodpack_mod`. Por isso, não pode coexistir com o AutoModpack original. A integração identifica o ID nos metadados NeoForge, inclusive se alguém renomear o JAR, e preserva uma cópia antes de retirá-lo de `mods`.
 
@@ -22,4 +22,4 @@ O servidor precisa usar o protocolo compatível com esse fork. A integração no
 
 ## Código correspondente
 
-O arquivo `vendor/averonsync/AveronSync-0.6-source.zip` contém os fontes fornecidos com esta versão, incluindo Gradle, instruções de compilação, licenças e alterações do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
+O arquivo `vendor/averonsync/AveronSync-0.7-source.zip` contém os fontes fornecidos com esta versão, incluindo Gradle, instruções de compilação, licenças e alterações do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
