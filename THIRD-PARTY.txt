@@ -1,11 +1,11 @@
 Este launcher é um projeto independente do AVERON SMP.
 
-AveronSync 4.0.6-averonsync.0.5
+AveronSync 4.0.6-averonsync.0.6
 Fork do AutoModpack 4.0.6, por Skidam; modificações por AveronSync contributors.
 Licença LGPL-3.0; avisos originais preservados no JAR fornecido.
 Fontes correspondentes completos, instruções e avisos do fork:
-licenses/AveronSync-0.5-source.zip no instalador e no ZIP de distribuição;
-vendor/averonsync/AveronSync-0.5-source.zip no repositório do launcher.
+licenses/AveronSync-0.6-source.zip no instalador e no ZIP de distribuição;
+vendor/averonsync/AveronSync-0.6-source.zip no repositório do launcher.
 Upstream: https://github.com/Skidamek/AutoModpack/tree/v4.0.6
 O JAR é copiado separadamente para mods. Não foi modificado pelo launcher.
 

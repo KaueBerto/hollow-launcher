@@ -44,11 +44,11 @@ test('fresh installation uses the exact fork and later launches leave it untouch
   assert.deepEqual(await fs.readdir(path.join(engine.game, 'mods')), [SYNC_FILE]);
 }));
 
-test('0.4 upgrades to 0.5 once, retaining installed modpack, consent and client preferences', () => fixture(async engine => {
-  const oldName = 'averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.4.jar';
+for (const previousVersion of ['0.4', '0.5']) test(`${previousVersion} upgrades to 0.6 once, retaining installed modpack, consent and client preferences`, () => fixture(async engine => {
+  const oldName = `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.${previousVersion}.jar`;
   const old = path.join(engine.game, 'mods', oldName);
   const zip = new AdmZip();
-  zip.addFile('META-INF/neoforge.mods.toml', Buffer.from('[[mods]]\nmodId="automodpack"\nversion="4.0.6-averonsync.0.4"\n'));
+  zip.addFile('META-INF/neoforge.mods.toml', Buffer.from(`[[mods]]\nmodId="automodpack"\nversion="4.0.6-averonsync.${previousVersion}"\n`));
   zip.writeZip(old);
   const oldHash = await hashFile(old, 'sha256');
   const preserved = {
@@ -67,7 +67,7 @@ test('0.4 upgrades to 0.5 once, retaining installed modpack, consent and client 
   assert.equal(await exists(old), false);
   assert.equal(await hashFile(path.join(engine.root, 'sync-backups', `${oldHash}-${oldName}`), 'sha256'), oldHash);
   assert.deepEqual(await fs.readdir(path.join(engine.game, 'mods')), [SYNC_FILE]);
-  assert.match(SYNC_FILE, /averonsync\.0\.5\.jar$/);
+  assert.match(SYNC_FILE, /averonsync\.0\.6\.jar$/);
   for (const [name, content] of Object.entries(preserved)) assert.equal(await fs.readFile(path.join(engine.game, name), 'utf8'), content);
   const before = (await fs.stat(path.join(engine.game, 'mods', SYNC_FILE))).mtimeMs;
   await ensureSync(engine);

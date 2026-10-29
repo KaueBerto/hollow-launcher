@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/averon-smp.png" alt="AVERON SMP" width="260"></p>
 <h1 align="center">Averon Launcher</h1>
 <p align="center">Launcher Electron do AVERON SMP para Windows.<br>Instalação automática, visual pixelado e modpack pelo AveronSync.</p>
-<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-f6c844"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-c9362a"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.6.2-f6c844"></p>
+<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-f6c844"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-c9362a"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.6.3-f6c844"></p>
 
 ![Interface do Averon Launcher](docs/launcher.png)
 
@@ -13,7 +13,7 @@ O Minecraft já abre com o menu AVERON personalizado desde a primeira execução
 
 ## Baixar e jogar
 
-Baixe e execute `AveronSMP-Launcher-Setup-2.6.2.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
+Baixe e execute `AveronSMP-Launcher-Setup-2.6.3.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
 
 1. Escolha **Nickname** ou **Microsoft** e ajuste a memória.
 2. Clique em **Instalar e jogar** e aguarde a preparação inicial.
@@ -91,7 +91,7 @@ npm run build
 npm run package
 ```
 
-`build` gera `dist/AveronSMP-Launcher-Setup-2.6.2.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/AveronSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
+`build` gera `dist/AveronSMP-Launcher-Setup-2.6.3.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/AveronSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
 
 O executável não possui certificado de assinatura de código do Averon. Para uma distribuição assinada, configure seu certificado no electron-builder.
 
@@ -119,7 +119,7 @@ Versões do jogo e servidor ficam em `src/engine.cjs`. O layout está em `render
 
 ## Verificações e problemas
 
-O sincronizador atual é o **AveronSync 4.0.6-averonsync.0.5**, fornecido pelo responsável pelo servidor. A migração da base AutoModpack 5 conclui transações pendentes antes da troca e guarda os JARs e o estado antigo em `sync-backups`, fora da pasta do jogo. O verificador Java antigo continua no instalador apenas para essa transição; não é usado com o armazenamento 4.x do AveronSync. Veja [AVERONSYNC.md](docs/AVERONSYNC.md) e a [arquitetura](docs/ARCHITECTURE.md).
+O sincronizador atual é o **AveronSync 4.0.6-averonsync.0.6**, fornecido pelo responsável pelo servidor. A migração da base AutoModpack 5 conclui transações pendentes antes da troca e guarda os JARs e o estado antigo em `sync-backups`, fora da pasta do jogo. O verificador Java antigo continua no instalador apenas para essa transição; não é usado com o armazenamento 4.x do AveronSync. Veja [AVERONSYNC.md](docs/AVERONSYNC.md) e a [arquitetura](docs/ARCHITECTURE.md).
 
 `npm test` verifica UUID, manifestos, caminhos, preferências, reset, arquivos ocupados, junctions, ZIPs, downloads e autenticação Microsoft simulada. `npm run test:ui` abre a interface em renderização isolada, testa os controles e a criptografia Windows, e gera screenshots. Todos os dados de teste ficam em `dist/`.
 
