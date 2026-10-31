@@ -11,7 +11,7 @@ const { registerHandlers } = require('../src/ipc.cjs');
 
 async function fixture(totalGB, operation) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'averon-memory-'));
-  const engine = new Engine({ root: path.join(root, 'HollowSMP'), totalMemory: totalGB * GIB });
+  const engine = new Engine({ root: path.join(root, 'HollowSMP'), totalMemory: totalGB * GIB, assets: path.resolve(__dirname, '../assets') });
   try { await operation(engine); }
   finally { await fs.rm(root, { recursive: true, force: true }); }
 }

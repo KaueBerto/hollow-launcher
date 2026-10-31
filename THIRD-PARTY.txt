@@ -66,3 +66,9 @@ WaterMedia 3.0.0.23: WaterMediaTeam/SrRapero720, PolyForm Strict 1.0.0.
 https://github.com/WaterMediaTeam/watermedia
 WaterMedia Binaries 3.0.0.6: avisos e licenças preservados no JAR original.
 Os JARs originais são baixados com SHA256 fixado; imagens, logo e vídeo do menu foram fornecidos pelo responsável pelo servidor.
+
+Paisagem do Voxy: cache de terreno fornecido pelo responsável do servidor, distribuído separadamente por HTTPS. O launcher não incorpora nem altera o JAR do Voxy.
+
+yauzl 3.4.0 — licença MIT. Extração ZIP/ZIP64 com leitura limitada em memória.
+https://github.com/thejoshwolfe/yauzl
+Licenças preservadas em licenses/yauzl-LICENSE.txt e licenses/pend-LICENSE.txt, além dos pacotes npm originais.

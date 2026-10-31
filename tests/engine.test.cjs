@@ -64,6 +64,12 @@ test('reset preserves preferences, nested configs, DH databases and schematics b
     'game/servers.dat': Buffer.from([10, 0, 0, 9]),
     'game/config/client.json': '{"custom":true}', 'game/config/nested/keys.toml': 'key="R"\n',
     'landscape-installed.json': '{"sha256":"installed-landscape","directory":"Hollow+SMP/dimension"}',
+    'voxy-landscape-installed.json': '{"kind":"voxy","sha256":"installed-voxy","directory":"hollowsmp.com.br"}',
+    'game/.voxy/saves/hollowsmp.com.br/config.json': '{"version":1}',
+    'game/.voxy/saves/hollowsmp.com.br/world/storage/CURRENT': 'MANIFEST-000001',
+    'game/.voxy/saves/hollowsmp.com.br/world/storage/000001.sst': 'voxy terrain',
+    'landscape-backups/voxy/previous/hollowsmp.com.br/sentinel': 'previous voxy cache',
+
     'menu-defaults-installed.json': '{"activatedResourcePacks":["file/AveronSMP.zip"],"fmlConfigured":true}',
     'game/Distant_Horizons_server_data/Hollow+SMP/dimension/DistantHorizons.sqlite': Buffer.from([0, 1, 2, 255]),
     'game/Distant_Horizons_server_data/Hollow+SMP/dimension/DistantHorizons.sqlite-wal': Buffer.from([7, 8, 9]),

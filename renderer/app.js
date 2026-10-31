@@ -42,6 +42,11 @@ function settings(value) {
 function render() {
   syncMusic();
   const memoryReady = renderMemory(current.memory);
+  if (current.landscapeInfo) {
+    const format = bytes => (bytes / 1e9).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    $('#landscape-size').textContent = `${format(current.landscapeInfo.bytes)} GB para baixar · ${format(current.landscapeInfo.unpackedBytes)} GB no disco`;
+    $('#landscape-size').title = `Mantenha cerca de ${format(current.landscapeInfo.temporaryBytes)} GB livres durante o download e a instalação.`;
+  }
   const startup = current.startup || { visible: true, kind: 'checking' };
   if (wasStartup && !startup.visible && document.body.classList.contains('entered') && !reducedMotion.matches) document.body.classList.add('entering');
   wasStartup = Boolean(startup.visible);

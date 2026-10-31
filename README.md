@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/averon-smp.png" alt="AVERON SMP" width="260"></p>
 <h1 align="center">Averon Launcher</h1>
 <p align="center">Launcher Electron do AVERON SMP para Windows.<br>Instalação automática, visual pixelado e modpack pelo AveronSync.</p>
-<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-f6c844"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-c9362a"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.6.6-f6c844"></p>
+<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-f6c844"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-c9362a"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.7.0-f6c844"></p>
 
 ![Interface do Averon Launcher](docs/launcher.png)
 
@@ -13,7 +13,7 @@ O Minecraft já abre com o menu AVERON personalizado desde a primeira execução
 
 ## Baixar e jogar
 
-Baixe e execute `AveronSMP-Launcher-Setup-2.6.6.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
+Baixe e execute `AveronSMP-Launcher-Setup-2.7.0.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
 
 1. Escolha **Nickname** ou **Microsoft** e ajuste a memória.
 2. Clique em **Instalar e jogar** e aguarde a preparação inicial.
@@ -24,7 +24,7 @@ A primeira preparação baixa Java 21, Minecraft 1.21.1, NeoForge 21.1.253 e rec
 
 O repositório e os downloads são públicos. Ao abrir, uma tela compacta com a logo verifica as atualizações, baixa e instala versões novas automaticamente, e reabre o Averon. Sem atualização, abre o launcher normalmente. Falha de conexão libera o jogo; Minecraft aberto impede a aplicação. A pasta do jogo é preservada. Versões 2.2.0 e 2.2.1 precisam aplicar esta atualização pelo botão antigo uma vez; versões portáteis precisam do instalador. Veja [como publicar atualizações](docs/LAUNCHER-UPDATES.md).
 
-A paisagem opcional do Distant Horizons aceita vários cadastros do mesmo servidor: o launcher reutiliza a pasta já registrada ou pergunta qual cadastro usar, sem excluir os demais. Veja [paisagem e escolha de cadastro](docs/PAISAGEM.md).
+O download opcional de paisagem agora instala o LOD do **Voxy** em `.voxy/saves/<endereço>`. São 4,36 GB de download e 4,58 GB instalados; a extração é feita em fluxo, sem carregar o ZIP na RAM. Veja [paisagem do Voxy e escolha de endereço](docs/PAISAGEM.md).
 
 ## Versão Electron
 
@@ -62,7 +62,7 @@ A autenticação do servidor é responsabilidade da configuração da VPS. Este 
 
 ## Resetar
 
-O botão **Resetar** pede confirmação e reinstala a base do jogo. Preserva o nickname atual, modo de conta, memória e opção de lembrar nickname, além de teclas, distância de renderização, sensibilidade, áudio, vídeo, servidores favoritos e configurações dos mods. Mantém também toda a pasta `Distant_Horizons_server_data`, seus bancos e arquivos auxiliares, a pasta `schematics` e o registro da paisagem instalada, evitando baixá-la novamente após o reset. Os arquivos de preferências ficam no lugar durante a limpeza, inclusive se houver falha.
+O botão **Resetar** pede confirmação e reinstala a base do jogo. Preserva o nickname atual, modo de conta, memória e opção de lembrar nickname, além de teclas, distância de renderização, sensibilidade, áudio, vídeo, servidores favoritos e configurações dos mods. Mantém também o cache `.voxy`, o registro da paisagem do Voxy e seus backups, além da pasta `schematics` e dos dados legados do Distant Horizons, evitando baixar o LOD novamente após o reset. Os arquivos de preferências ficam no lugar durante a limpeza, inclusive se houver falha.
 
 Mods, Java, bibliotecas, recursos, mundos locais, screenshots, logs e sessão Microsoft são removidos. **A exclusão desses arquivos não pode ser desfeita.** Faça backup dos mundos e screenshots que deseja guardar.
 
@@ -91,7 +91,7 @@ npm run build
 npm run package
 ```
 
-`build` gera `dist/AveronSMP-Launcher-Setup-2.6.6.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/AveronSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
+`build` gera `dist/AveronSMP-Launcher-Setup-2.7.0.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/AveronSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
 
 O executável não possui certificado de assinatura de código do Averon. Para uma distribuição assinada, configure seu certificado no electron-builder.
 

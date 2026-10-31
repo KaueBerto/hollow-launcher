@@ -51,8 +51,8 @@
         <label class="remember"><input id="remember" type="checkbox" checked><span class="checkbox" aria-hidden="true"></span><span>Lembrar nickname</span></label>
         <div class="memory-heading"><label for="ram">MEMÓRIA</label><span id="ram-hardware">Detectando RAM…</span><output for="ram" id="ram-value">—</output></div>
         <input id="ram" type="range" min="2" max="2" step="1" value="2" disabled aria-label="Memória do Minecraft em GB" aria-describedby="ram-hardware">
-        <label class="remember landscape-choice"><input id="landscape" type="checkbox"><span class="checkbox" aria-hidden="true"></span><span>baixar paisagem do distant horizons do servidor</span></label>
-        <div class="landscape-note"><span id="landscape-size">1,86 GB para baixar · 1,93 GB no disco</span><button type="button" class="text-action" id="download-landscape">Baixar agora</button></div>
+        <label class="remember landscape-choice"><input id="landscape" type="checkbox"><span class="checkbox" aria-hidden="true"></span><span>baixar paisagem do voxy do servidor</span></label>
+        <div class="landscape-note"><span id="landscape-size">Consultando tamanho da paisagem…</span><button type="button" class="text-action" id="download-landscape">Baixar agora</button></div>
         <button type="button" class="text-action official" id="logout" hidden>Sair da conta</button>
         <button type="button" class="text-action official" id="cancel-login" hidden>Cancelar login</button>
       </form>
@@ -68,17 +68,17 @@
     <h2 id="reset-title">Resetar AVERON</h2>
     <p>Apagar a instalação local e baixar novamente?</p>
     <p>Seu nickname, memória, teclas, vídeo, sensibilidade e configurações dos mods serão mantidos.</p>
-    <p>A paisagem do Distant Horizons e seus schematics também serão mantidos.</p>
+    <p>A paisagem do Voxy e seus schematics também serão mantidos.</p>
     <p>Isso remove os arquivos do jogo, mods, mundos salvos e screenshots. <strong>Não há como desfazer.</strong></p>
     <p>Feche o Minecraft antes de continuar. O modpack será recebido ao entrar no servidor.</p>
     <div class="dialog-actions"><button class="block-button secondary" id="cancel-reset" autofocus>CANCELAR</button><button class="block-button primary" id="do-reset">RESETAR</button></div>
   </dialog>
   <dialog id="landscape-select" aria-labelledby="landscape-select-title">
     <h2 id="landscape-select-title">Paisagem do AVERON</h2>
-    <p>O servidor está salvo com mais de um nome. Escolha o cadastro que você usa para entrar no Minecraft.</p>
-    <label for="landscape-server">Cadastro do servidor</label>
+    <p>O Voxy guarda os dados por endereço. Escolha o mesmo endereço que você usa para entrar no servidor.</p>
+    <label for="landscape-server">Endereço do servidor</label>
     <select id="landscape-server"></select>
-    <p>A paisagem será instalada na pasta desse cadastro. Seus servidores e dados existentes serão mantidos.</p>
+    <p>A paisagem será instalada na pasta desse endereço. Seus servidores e dados existentes serão mantidos.</p>
     <div class="dialog-actions"><button class="block-button secondary" id="landscape-cancel">CANCELAR</button><button class="block-button primary" id="landscape-confirm">CONTINUAR</button></div>
   </dialog>
   <dialog id="message" aria-labelledby="message-title"><h2 id="message-title">AVERON SMP</h2><p id="message-text"></p><div class="dialog-actions"><button class="block-button secondary" id="message-open-logs" hidden>ABRIR LOGS</button><button class="block-button primary" id="message-ok">OK</button></div></dialog>

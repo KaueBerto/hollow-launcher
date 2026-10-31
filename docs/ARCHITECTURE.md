@@ -17,11 +17,14 @@ O projeto usa CommonJS no processo principal do Electron e scripts locais no ren
 | `src/modpack-sync.cjs` | Instalação verificada do AveronSync, substituição e backup do legado |
 | `src/modpack-preflight.cjs` | Conclusão de transações antigas 5.x antes da migração |
 | `src/menu-bootstrap.cjs` | Dependências e padrões do menu antes do jogo |
-| `src/landscape*.cjs` | Download e instalação opcional dos dados do Distant Horizons |
+| `src/landscape-download.cjs` | Downloads grandes por intervalos, retomada, concorrência e checksum |
+| `src/voxy-folder.cjs` | Endereço do servidor e pasta `.voxy/saves` correspondente |
+| `src/voxy-archive.cjs` | Manifesto, ZIP64 em fluxo, hashes por arquivo e validação do cache RocksDB |
+| `src/voxy-landscape.cjs` | Instalação opcional, recibo, troca com backup e recuperação após interrupção |
 | `src/diagnostics/ui-smoke.cjs` | Verificação da interface em perfil explicitamente isolado |
 | `renderer/app.js` | Estado, formulário e composição dos componentes da interface |
 | `renderer/components/motion.js` | Animações e abertura/fechamento dos diálogos |
-| `renderer/components/dialogs.js` | Avisos, erros e escolha do cadastro para a paisagem |
+| `renderer/components/dialogs.js` | Avisos, erros e escolha do endereço para a paisagem |
 | `renderer/components/memory.js` | Limites de RAM recebidos do processo principal e indicação da capacidade detectada |
 | `renderer/components/server-status.js` | Apresentação do status do servidor |
 | `renderer/music.js` | Reprodução, volume e preferência de mudo |
@@ -31,3 +34,5 @@ Os módulos de baixo nível não importam `Engine`. A fachada reexporta alguns h
 ## Validação
 
 Execute `npm test`, `npm run test:ui`, `npm run build` e `npm run package`. O smoke usa `--test-root` e não aponta para a instalação real. Testes de migração cobrem substituição de JAR renomeado, backup, repetição sem recópia, transação pendente, jogo aberto, fonte corrompida, conflito de backup e junction.
+
+Os antigos módulos `landscape.cjs` e `landscape-folder.cjs` permanecem para diagnóstico dos dados legados do Distant Horizons. Os canais IPC do launcher usam exclusivamente `voxy-landscape.cjs`.

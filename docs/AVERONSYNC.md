@@ -1,6 +1,6 @@
 # AveronSync no launcher
 
-O launcher 2.6.6 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.8.jar`, sem alterações.
+O launcher 2.7.0 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.8.jar`, sem alterações.
 
 SHA-256: `865513111bc79caeef7c1b364342886fb2468c3d3bea95711cd4c02e93c01f9c`.
 
