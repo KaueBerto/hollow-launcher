@@ -4,14 +4,14 @@ const path = require('node:path');
 const { spawn, execFile } = require('node:child_process');
 const { promisify } = require('node:util');
 const { createWriteStream } = require('node:fs');
-const { MC, VERSION, offlineUuid, validateOptions, allowed, argumentsOf } = require('./core/minecraft.cjs');
+const { MC, VERSION, offlineUuid, allowed, argumentsOf } = require('./core/minecraft.cjs');
 const { readJson, under, exists, extract } = require('./core/files.cjs');
 const { alive, trackGameProcess } = require('./game-process.cjs');
 const { ensureSync } = require('./modpack-sync.cjs');
 const runFile = promisify(execFile);
 
 async function buildArguments(engine, nickname, ram, account) {
-  validateOptions({ mode: 'nickname', nickname, ram });
+  engine.validateOptions({ mode: 'nickname', nickname, ram });
   if (account && (account.name !== nickname || !/^[a-f0-9]{32}$/i.test(account.id) || typeof account.accessToken !== 'string' || !account.accessToken || !Number.isFinite(account.expires) || account.expires <= Date.now())) throw new Error('Sessão Microsoft inválida ou expirada. Faça login novamente.');
   const vanilla = await readJson(engine.versionFile(MC)), neo = await readJson(engine.versionFile(VERSION));
   const merged = new Map();

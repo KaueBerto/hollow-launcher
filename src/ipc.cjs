@@ -1,6 +1,5 @@
 'use strict';
 const path = require('node:path');
-const { validateOptions } = require('./core/minecraft.cjs');
 const { installLandscape } = require('./landscape.cjs');
 
 function registerHandlers({ ipcMain, shell, app, engine, microsoft, state, publish, trusted, result, prepare, getWindow, getUpdater, getMonitor, smoke }) {
@@ -17,7 +16,7 @@ function registerHandlers({ ipcMain, shell, app, engine, microsoft, state, publi
   ipcMain.handle('launcher:update-check', async event => { trusted(event); return result(async () => { await getUpdater()?.boot(); return {}; }); });
   ipcMain.handle('launcher:update-install', async event => { trusted(event); return result(async () => { await getUpdater()?.install(); return {}; }); });
   ipcMain.handle('launcher:server-refresh', async event => { trusted(event); if (!smoke) await getMonitor().refresh(true); return { ok: true }; });
-  ipcMain.handle('launcher:state', async event => { trusted(event); return { ...state, account: await microsoft.publicAccount(), ready: await engine.ready(), settings: await engine.loadSettings(), version: app.getVersion() }; });
+  ipcMain.handle('launcher:state', async event => { trusted(event); return { ...state, memory: engine.memory, account: await microsoft.publicAccount(), ready: await engine.ready(), settings: await engine.loadSettings(), version: app.getVersion() }; });
   ipcMain.handle('launcher:save', async (event, options) => {
     trusted(event);
     return result(async () => { if (state.busy || state.updating || state.startup?.visible) return {}; await engine.saveSettings(options); return {}; });
@@ -25,7 +24,7 @@ function registerHandlers({ ipcMain, shell, app, engine, microsoft, state, publi
   ipcMain.handle('launcher:play', async (event, options) => {
     trusted(event);
     return result(() => prepare(async () => {
-      const selected = validateOptions(options);
+      const selected = engine.validateOptions(options);
       if (state.gameRunning || engine.gameProcess) throw new Error('O Minecraft já está aberto.');
       await engine.saveSettings(selected);
       const account = selected.mode === 'microsoft' ? await microsoft.authenticate() : undefined;
@@ -43,7 +42,7 @@ function registerHandlers({ ipcMain, shell, app, engine, microsoft, state, publi
     trusted(event);
     return result(() => prepare(async () => {
       if (state.gameRunning) throw new Error('Feche o Minecraft antes de resetar.');
-      const selected = validateOptions(options, { requireNickname: false });
+      const selected = engine.validateOptions(options, { requireNickname: false });
       publish({ text: 'Limpando a instalação…' });
       await engine.reset();
       await engine.saveSettings(selected, { requireNickname: false });

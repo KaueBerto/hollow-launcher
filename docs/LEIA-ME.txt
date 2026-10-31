@@ -28,7 +28,7 @@ conforme a configuração do servidor. Não coletamos senhas de conta.
 REQUISITOS
 Windows 10/11 de 64 bits, internet e espaço para o modpack.
 Java 21 é baixado automaticamente. A primeira instalação pode levar
-vários minutos. Não escolha mais RAM que seu PC possui.
+vários minutos. A barra detecta a RAM do PC e reserva parte dela para o Windows.
 
 RESETAR
 Pede confirmação e reinstala a base do jogo. Preserva nickname,

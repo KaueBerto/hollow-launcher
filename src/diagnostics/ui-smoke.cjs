@@ -38,7 +38,7 @@ async function smokeUi({ window, engine, publish, gameWindow, safeStorage, app, 
     check(typeof window.hollow.landscape === 'function', 'Download opcional indisponível');
     for (let i=0;i<16;i++) { modes[i%2].click(); check(modes.filter(item=>item.checked).length===1,'Seletores de conta'); }
     modes[0].click();
-    const slider=document.querySelector('#ram');slider.value='13';slider.dispatchEvent(new Event('input',{bubbles:true}));check(document.querySelector('#ram-value').textContent==='13 GB','Memória');slider.value='6';slider.dispatchEvent(new Event('input',{bubbles:true}));
+    const slider=document.querySelector('#ram');const expectedRam=Math.min(13,Number(slider.max));slider.value=String(expectedRam);slider.dispatchEvent(new Event('input',{bubbles:true}));check(document.querySelector('#ram-value').textContent===expectedRam+' GB','Memória');slider.value='6';slider.dispatchEvent(new Event('input',{bubbles:true}));
     const logo=document.querySelector('.logo');const animation=logo.getAnimations()[0];check(animation,'Animação ausente');animation.pause();animation.currentTime=0;const first=new DOMMatrixReadOnly(getComputedStyle(logo).transform);animation.currentTime=4000;const middle=new DOMMatrixReadOnly(getComputedStyle(logo).transform);check(Math.abs(middle.m42-first.m42)>=13,'Flutuação vertical muito pequena');check(Math.abs(middle.m41-first.m41)>=5,'Movimento lateral muito pequeno');check(first.m12<0 && middle.m12>0,'Inclinação da logo ausente');animation.currentTime=8000;const last=new DOMMatrixReadOnly(getComputedStyle(logo).transform);check(Math.abs(last.m42-first.m42)<.01,'Salto no reinício da animação');animation.play();
     check(await document.fonts.load('700 16px Monocraft').then(fonts=>fonts.length>0),'Fonte não carregada');
     check(typeof require==='undefined' && typeof process==='undefined','Node exposto à interface');
@@ -52,6 +52,32 @@ async function smokeUi({ window, engine, publish, gameWindow, safeStorage, app, 
     return ['16 trocas de conta: OK','Memória sincronizada: OK','Animação CSS ativa: OK','Fonte incorporada: OK','Interface sem Node: OK','Confirmação e cancelamento de reset: OK','Motion: entrada, trocas rápidas sem deslocamento e Escape nos avisos: OK'];
   })().catch(error => ({ smokeError: error.stack || String(error) }))`);
   if (report.smokeError) throw new Error(report.smokeError);
+  const { memoryLimits, GIB } = require('../core/memory.cjs');
+  const actualMemory = engine.memory;
+  try {
+    engine.memory = memoryLimits(8 * GIB);
+    publish({ memory: engine.memory });
+    await window.webContents.executeJavaScript(`(async () => {
+      const slider=document.querySelector('#ram');
+      slider.value='24';slider.dispatchEvent(new Event('input',{bubbles:true}));
+      if(slider.max!=='6' || slider.value!=='6' || document.querySelector('#ram-value').textContent!=='6 GB' || document.querySelector('#ram-hardware').textContent!=='PC: 8 GB') throw Error('Limite real de RAM não foi aplicado');
+      clearTimeout(saveTimer);
+      const response=await window.hollow.save({...options(),ram:24});
+      if(response.ok || !response.error.includes('2 a 6 GB')) throw Error('IPC aceitou memória maior que o limite real');
+    })()`);
+    await fs.writeFile(path.join(output, 'memory-8gb.png'), (await window.webContents.capturePage()).toPNG());
+    engine.memory = memoryLimits(64 * GIB);
+    publish({ memory: engine.memory });
+    await window.webContents.executeJavaScript(`(() => {
+      const slider=document.querySelector('#ram');slider.value='40';slider.dispatchEvent(new Event('input',{bubbles:true}));clearTimeout(saveTimer);
+      if(slider.max!=='48' || slider.value!=='40' || document.querySelector('#ram-value').textContent!=='40 GB') throw Error('RAM ainda limitada a 24 GB no PC de 64 GB');
+    })()`);
+  } finally {
+    engine.memory = actualMemory;
+    publish({ memory: actualMemory });
+    await window.webContents.executeJavaScript(`document.querySelector('#ram').value='6';clearTimeout(saveTimer);render();`);
+  }
+  report.push('RAM real: PC de 8 GB limitado a 6 GB; PC de 64 GB aceita 40 GB; IPC recusa limite adulterado: OK');
   await window.webContents.executeJavaScript(`(async () => {
     const audio = music.audio;
     await Promise.race([new Promise((resolve, reject) => {
@@ -166,22 +192,23 @@ async function smokeUi({ window, engine, publish, gameWindow, safeStorage, app, 
   const originalInstall = engine.install, originalJavaRunning = engine.javaRunning;
   engine.install = async () => {};
   engine.javaRunning = async () => false;
+  const resetRam = Math.min(9, engine.memory.maximumGB);
   const playerOptions = 'renderDistance:14\nmouseSensitivity:0.65\nkey_key.forward:key.keyboard.up\n';
   await fs.mkdir(path.join(engine.game, 'config'), { recursive: true });
   await fs.writeFile(path.join(engine.game, 'options.txt'), playerOptions);
   await fs.writeFile(path.join(engine.game, 'config', 'client.json'), '{"sentinel":true}');
   try {
     for (const remember of [true, false]) {
-      await window.webContents.executeJavaScript(`document.querySelector('[value="nickname"]').click(); document.querySelector('#nickname').value='TypedAveron'; document.querySelector('#nickname').dispatchEvent(new Event('input')); document.querySelector('#ram').value='9'; document.querySelector('#remember').checked=${remember}; document.querySelector('#reset').click(); document.querySelector('#do-reset').click();`);
+      await window.webContents.executeJavaScript(`document.querySelector('[value="nickname"]').click(); document.querySelector('#nickname').value='TypedAveron'; document.querySelector('#nickname').dispatchEvent(new Event('input')); document.querySelector('#ram').value='${resetRam}'; document.querySelector('#remember').checked=${remember}; document.querySelector('#reset').click(); document.querySelector('#do-reset').click();`);
       let finished = false;
       for (let i = 0; i < 100; i++) {
         await new Promise(resolve => setTimeout(resolve, 100));
         if (await window.webContents.executeJavaScript(`document.querySelector('#message').open`)) { finished = true; break; }
       }
       if (!finished) throw new Error('Reset não terminou no smoke');
-      await window.webContents.executeJavaScript(`if(document.querySelector('#nickname').value!=='TypedAveron' || document.querySelector('#ram').value!=='9' || document.querySelector('#remember').checked!==${remember} || !document.querySelector('#message-text').textContent.includes('preservados')) throw new Error('Reset perdeu preferências ou falhou'); document.querySelector('#message').close();`);
+      await window.webContents.executeJavaScript(`if(document.querySelector('#nickname').value!=='TypedAveron' || document.querySelector('#ram').value!=='${resetRam}' || document.querySelector('#remember').checked!==${remember} || !document.querySelector('#message-text').textContent.includes('preservados')) throw new Error('Reset perdeu preferências ou falhou'); document.querySelector('#message').close();`);
       const saved = await engine.loadSettings();
-      if (saved.nickname !== (remember ? 'TypedAveron' : '') || saved.ram !== 9 || saved.remember !== remember) throw new Error('Preferências salvas após reset incorretas');
+      if (saved.nickname !== (remember ? 'TypedAveron' : '') || saved.ram !== resetRam || saved.remember !== remember) throw new Error('Preferências salvas após reset incorretas');
       if (await fs.readFile(path.join(engine.game, 'options.txt'), 'utf8') !== playerOptions) throw new Error('Reset perdeu opções do jogo');
       if (await fs.readFile(path.join(engine.game, 'config', 'client.json'), 'utf8') !== '{"sentinel":true}') throw new Error('Reset perdeu configuração do mod');
     }

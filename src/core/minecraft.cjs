@@ -1,6 +1,7 @@
 'use strict';
 const os = require('node:os');
 const crypto = require('node:crypto');
+const { memoryLimits } = require('./memory.cjs');
 
 const MC = '1.21.1';
 const NF = '21.1.253';
@@ -12,9 +13,12 @@ function offlineUuid(nickname) {
   bytes[8] = (bytes[8] & 63) | 128;
   return bytes.toString('hex');
 }
-function validateOptions(options, { requireNickname = true } = {}) {
+function validateOptions(options, { requireNickname = true, memory = memoryLimits() } = {}) {
   if (!options || !['nickname', 'microsoft'].includes(options.mode)) throw new Error('Escolha uma conta válida.');
-  if (!Number.isInteger(options.ram) || options.ram < 2 || options.ram > 24) throw new Error('Escolha de 2 a 24 GB de memória.');
+  if (!memory.supported) throw new Error('O computador precisa ter pelo menos 4 GB de RAM para reservar memória para o Minecraft e o Windows.');
+  if (!Number.isInteger(options.ram) || options.ram < memory.minimumGB || options.ram > memory.maximumGB) {
+    throw new Error(`Escolha de ${memory.minimumGB} a ${memory.maximumGB} GB de memória para este computador (${memory.totalGB} GB de RAM).`);
+  }
   if (requireNickname && options.mode === 'nickname' && !/^[A-Za-z0-9_]{3,16}$/.test(options.nickname || '')) {
     throw new Error('Use um nickname de 3 a 16 letras, números ou _.');
   }

@@ -9,6 +9,7 @@
   <script defer src="music.js"></script>
   <script defer src="components/motion.js"></script>
   <script defer src="components/server-status.js"></script>
+  <script defer src="components/memory.js"></script>
   <script defer src="components/dialogs.js"></script>
   <script defer src="app.js"></script>
 </head>
@@ -48,8 +49,8 @@
         </div>
         <button class="block-button primary" id="play" type="submit">INSTALAR E JOGAR</button>
         <label class="remember"><input id="remember" type="checkbox" checked><span class="checkbox" aria-hidden="true"></span><span>Lembrar nickname</span></label>
-        <div class="memory-heading"><label for="ram">MEMÓRIA</label><output for="ram" id="ram-value">6 GB</output></div>
-        <input id="ram" type="range" min="2" max="24" step="1" value="6" aria-label="Memória do Minecraft em GB">
+        <div class="memory-heading"><label for="ram">MEMÓRIA</label><span id="ram-hardware">Detectando RAM…</span><output for="ram" id="ram-value">—</output></div>
+        <input id="ram" type="range" min="2" max="2" step="1" value="2" disabled aria-label="Memória do Minecraft em GB" aria-describedby="ram-hardware">
         <label class="remember landscape-choice"><input id="landscape" type="checkbox"><span class="checkbox" aria-hidden="true"></span><span>baixar paisagem do distant horizons do servidor</span></label>
         <div class="landscape-note"><span id="landscape-size">1,86 GB para baixar · 1,93 GB no disco</span><button type="button" class="text-action" id="download-landscape">Baixar agora</button></div>
         <button type="button" class="text-action official" id="logout" hidden>Sair da conta</button>

@@ -7,12 +7,13 @@ const crypto = require('node:crypto');
 const { spawn } = require('node:child_process');
 const AdmZip = require('adm-zip');
 const { Engine, under, offlineUuid, allowed, validateOptions, readJson, writeJson, extract, MOD_HASH, hashFile, workers } = require('../src/engine.cjs');
+const { memoryLimits, GIB } = require('../src/core/memory.cjs');
 const directory = path.resolve(__dirname, '..', 'dist', 'tests');
 
 async function fixture(operation) {
   await fs.mkdir(directory, { recursive: true });
   const folder = await fs.mkdtemp(path.join(directory, 'case-'));
-  const engine = new Engine({ root: path.join(folder, 'HollowSMP'), assets: path.resolve(__dirname, '..', 'assets') });
+  const engine = new Engine({ root: path.join(folder, 'HollowSMP'), assets: path.resolve(__dirname, '..', 'assets'), totalMemory: 32 * GIB });
   engine.javaRunning = async () => false;
   try { await operation(engine, folder); }
   finally {
@@ -26,7 +27,7 @@ test('UUID offline e regras de plataforma', () => {
   assert.equal(allowed({ rules: [{ action: 'allow', features: { is_demo_user: true } }] }), false);
   assert.equal(allowed({ rules: [{ action: 'allow', os: { name: 'windows' } }] }), true);
   assert.throws(() => validateOptions({ mode: 'nickname', nickname: 'a;evil', ram: 6 }));
-  assert.throws(() => validateOptions({ mode: 'nickname', nickname: 'Hollow', ram: 25 }));
+  assert.throws(() => validateOptions({ mode: 'nickname', nickname: 'Hollow', ram: 25 }, { memory: memoryLimits(32 * GIB) }));
 });
 test('caminhos recusam travessia, raiz e caminhos absolutos', () => {
   for (const name of ['../outside', '..\\outside', '.', 'C:\\outside', '/outside']) assert.throws(() => under(directory, name));

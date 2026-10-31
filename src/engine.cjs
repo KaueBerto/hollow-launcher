@@ -15,9 +15,10 @@ const { buildArguments, launch } = require('./game-launch.cjs');
 const { jsonFrom, download } = require('./downloads.cjs');
 const { installJava, libraries, installer, install } = require('./game-installation.cjs');
 const { syncReady, SYNC_HASH: MOD_HASH } = require('./modpack-sync.cjs');
+const { memoryLimits, clampRam } = require('./core/memory.cjs');
 
 class Engine {
-  constructor({ root, assets, report = () => {}, platform = process.platform } = {}) {
+  constructor({ root, assets, report = () => {}, platform = process.platform, totalMemory } = {}) {
     this.root = path.resolve(root || path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local'), 'HollowSMP'));
     this.game = path.join(this.root, 'game');
     this.java = path.join(this.root, 'runtime', 'bin', 'java.exe');
@@ -25,6 +26,7 @@ class Engine {
     this.report = report;
     this.platform = platform;
     this.gameProcess = null;
+    this.memory = memoryLimits(totalMemory);
   }
   versionFile(version) { return path.join(this.game, 'versions', version, `${version}.json`); }
   async ready() {
@@ -32,19 +34,20 @@ class Engine {
     return syncReady(this);
   }
   async loadSettings() {
-    const defaults = { mode: 'nickname', nickname: 'Aventureiro', ram: 6, remember: true, landscape: false };
+    const defaults = { mode: 'nickname', nickname: 'Aventureiro', ram: this.memory.recommendedGB, remember: true, landscape: false };
     try {
       const value = await readJson(path.join(this.root, 'launcher-settings.json'));
       // Understand preferences saved by the previous Windows Forms launcher.
       const mode = value.mode === 1 || value.mode === 'microsoft' ? 'microsoft' : 'nickname';
-      const ram = Math.max(2, Math.min(24, Math.round(Number(value.ram) || 6)));
+      const ram = clampRam(value.ram, this.memory);
       return { mode, ram, nickname: String(value.nickname || '').slice(0, 16), remember: value.remember !== false, landscape: value.landscape === true };
     } catch { return defaults; }
   }
   async saveSettings(options, validation) {
-    const value = validateOptions(options, validation);
+    const value = this.validateOptions(options, validation);
     await writeJson(path.join(this.root, 'launcher-settings.json'), { ...value, nickname: value.remember ? value.nickname : '' });
   }
+  validateOptions(options, validation) { return validateOptions(options, { ...validation, memory: this.memory }); }
   async jsonFrom(url) { return jsonFrom(this, url); }
   async download(url, destination, expected, algorithm = 'sha1', onProgress) { return download(this, url, destination, expected, algorithm, onProgress); }
   progress(text, done, total) {
@@ -120,7 +123,7 @@ class Engine {
     await remove(this.root);
   }
   async registerOfficial(ram, testHome) {
-    validateOptions({ mode: 'microsoft', ram });
+    this.validateOptions({ mode: 'microsoft', ram });
     if (!testHome) {
       const { stdout } = await runFile('tasklist.exe', ['/FO', 'CSV', '/NH'], { windowsHide: true });
       if (/^"MinecraftLauncher\.exe"/im.test(stdout)) throw new Error('Feche o Minecraft Launcher antes de preparar o perfil Hollow.');

@@ -21,6 +21,7 @@ for (let i = 0; i < 18; i++) {
   $('.particles').append(particle);
 }
 const serverStatus = window.LauncherServerStatus($);
+const renderMemory = window.LauncherMemory($);
 const { reducedMotion, motion, animate, showDialog, closeDialog } = window.LauncherMotion();
 function clearCompletion() {
   clearTimeout(completionTimer); completed = false;
@@ -30,6 +31,7 @@ function options() {
   return { mode: $('[name=mode]:checked').value, nickname: $('#nickname').value.trim(), ram: Number($('#ram').value), remember: $('#remember').checked, landscape: $('#landscape').checked, landscapeDirectory: dialogs.directory };
 }
 function settings(value) {
+  renderMemory(current.memory);
   $(`[name=mode][value="${value.mode === 'microsoft' ? 'microsoft' : 'nickname'}"]`).checked = true;
   $('#nickname').value = value.nickname || '';
   $('#ram').value = value.ram;
@@ -39,6 +41,7 @@ function settings(value) {
 }
 function render() {
   syncMusic();
+  const memoryReady = renderMemory(current.memory);
   const startup = current.startup || { visible: true, kind: 'checking' };
   if (wasStartup && !startup.visible && document.body.classList.contains('entered') && !reducedMotion.matches) document.body.classList.add('entering');
   wasStartup = Boolean(startup.visible);
@@ -67,10 +70,11 @@ function render() {
   $('#cancel-login').hidden = !current.authPending;
   $('#play').textContent = current.authPending ? 'AGUARDANDO LOGIN…' : current.busy ? 'PREPARANDO…' : current.gameRunning ? 'JOGO ABERTO' : microsoft && !current.account ? 'ENTRAR E JOGAR' : !current.ready ? 'INSTALAR E JOGAR' : 'JOGAR';
   for (const element of document.querySelectorAll('#reset, #play, #nickname, #ram, [name=mode]')) element.disabled = updating || current.busy || element.id === 'play' && current.gameRunning;
+  $('#ram').disabled ||= !memoryReady;
+  $('#play').disabled ||= !memoryReady;
   $('#close').disabled = current.busy || updating;
   $('#landscape').disabled = current.busy || updating || current.gameRunning;
   $('#download-landscape').disabled = current.busy || updating || current.gameRunning;
-  $('#ram-value').textContent = `${$('#ram').value} GB`;
   $('.progress-area').hidden = !current.busy && !completed;
   $('.progress-area').classList.toggle('finishing', completed);
   $('#status').textContent = completed ? 'Instalação concluída.' : current.text || '';

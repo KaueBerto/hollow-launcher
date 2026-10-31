@@ -9,6 +9,7 @@ O projeto usa CommonJS no processo principal do Electron e scripts locais no ren
 | `src/engine.cjs` | Fachada do jogo, preferências, processos e reset |
 | `src/core/files.cjs` | Caminhos confinados, JSON, hashes, ZIP e cópias |
 | `src/core/minecraft.cjs` | Versões, opções, UUID offline, regras de bibliotecas e cadastro do servidor |
+| `src/core/memory.cjs` | Capacidade física, limite de RAM por PC e ajuste das preferências antigas |
 | `src/core/workers.cjs` | Fila de tarefas com concorrência limitada |
 | `src/downloads.cjs` | Downloads HTTPS, retomada, integridade e progresso |
 | `src/game-installation.cjs` | Java, NeoForge, bibliotecas e recursos do Minecraft |
@@ -21,6 +22,7 @@ O projeto usa CommonJS no processo principal do Electron e scripts locais no ren
 | `renderer/app.js` | Estado, formulário e composição dos componentes da interface |
 | `renderer/components/motion.js` | Animações e abertura/fechamento dos diálogos |
 | `renderer/components/dialogs.js` | Avisos, erros e escolha do cadastro para a paisagem |
+| `renderer/components/memory.js` | Limites de RAM recebidos do processo principal e indicação da capacidade detectada |
 | `renderer/components/server-status.js` | Apresentação do status do servidor |
 | `renderer/music.js` | Reprodução, volume e preferência de mudo |
 

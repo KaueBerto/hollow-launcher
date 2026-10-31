@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/averon-smp.png" alt="AVERON SMP" width="260"></p>
 <h1 align="center">Averon Launcher</h1>
 <p align="center">Launcher Electron do AVERON SMP para Windows.<br>Instalação automática, visual pixelado e modpack pelo AveronSync.</p>
-<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-f6c844"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-c9362a"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.6.5-f6c844"></p>
+<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-f6c844"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-c9362a"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.6.6-f6c844"></p>
 
 ![Interface do Averon Launcher](docs/launcher.png)
 
@@ -13,7 +13,7 @@ O Minecraft já abre com o menu AVERON personalizado desde a primeira execução
 
 ## Baixar e jogar
 
-Baixe e execute `AveronSMP-Launcher-Setup-2.6.5.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
+Baixe e execute `AveronSMP-Launcher-Setup-2.6.6.exe` na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest). Instale e abra pelo atalho. O ZIP também inclui o instalador.
 
 1. Escolha **Nickname** ou **Microsoft** e ajuste a memória.
 2. Clique em **Instalar e jogar** e aguarde a preparação inicial.
@@ -36,7 +36,7 @@ A versão 2.0 substitui a interface Windows Forms por HTML, CSS e JavaScript, co
 - Paisagem Minecraft, névoa e 18 partículas quadradas, com movimento reduzido e pausa ao ocultar.
 - Brilho dourado da logo ao clicar em Jogar e durante a preparação.
 - Status Java direto, jogadores e ping por pong, atualização a cada 45 segundos enquanto visível e botão para atualizar. Falha de consulta mostra **Sem resposta**, permite jogar e não inventa estado offline.
-- Memória de 2 a 24 GB por arraste ou teclado.
+- Memória por arraste ou teclado, limitada à RAM real do PC e com reserva para o Windows.
 - Reset com confirmação e preparação automática da nova instalação.
 - Launcher escondido enquanto o Minecraft está aberto, retornando ao fechar o jogo.
 - Atividade fixa **Jogando AveronSMP**, com a logo atual, no Discord enquanto o launcher estiver aberto, inclusive escondido. Reconecta se o Discord abrir depois e limpa ao sair: [configuração](docs/DISCORD.md).
@@ -76,7 +76,7 @@ Feche o Minecraft e aguarde atualizações do modpack antes. O reset recusa proc
 - Internet, espaço para o jogo/modpack e memória suficiente para o pack.
 - Conta com Minecraft Java para Microsoft, e aplicativo Averon registrado/aprovado.
 
-O jogador não precisa instalar Node.js, Electron, Java ou um SDK. A barra de RAM não verifica a capacidade física: deixe memória livre para Windows e outros programas.
+O jogador não precisa instalar Node.js, Electron, Java ou um SDK. A barra de RAM lê a capacidade física pelo sistema operacional e mostra a memória detectada. Reserva pelo menos 2 GB ou 25% da RAM para o Windows e processos nativos: um PC de 8 GB permite até 6 GB; um de 16 GB, até 12 GB. Preferências antigas acima do limite são ajustadas ao carregar. A validação também ocorre antes de salvar e abrir o Java, mesmo se a interface for adulterada. Em PCs com menos de 4 GB, a abertura fica bloqueada.
 
 ## Desenvolver e compilar
 
@@ -91,7 +91,7 @@ npm run build
 npm run package
 ```
 
-`build` gera `dist/AveronSMP-Launcher-Setup-2.6.5.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/AveronSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
+`build` gera `dist/AveronSMP-Launcher-Setup-2.6.6.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/AveronSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
 
 O executável não possui certificado de assinatura de código do Averon. Para uma distribuição assinada, configure seu certificado no electron-builder.
 
