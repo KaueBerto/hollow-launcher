@@ -17,6 +17,7 @@ O projeto usa CommonJS no processo principal do Electron e scripts locais no ren
 | `src/modpack-sync.cjs` | Instalação verificada do AveronSync, substituição e backup do legado |
 | `src/modpack-preflight.cjs` | Conclusão de transações antigas 5.x antes da migração |
 | `src/menu-bootstrap.cjs` | Dependências e padrões do menu antes do jogo |
+| `src/profile-defaults.cjs` | Perfil inicial de teclas, vídeo e configurações dos mods sem sobrescrever escolhas existentes |
 | `src/landscape-download.cjs` | Downloads grandes por intervalos, retomada, concorrência e checksum |
 | `src/voxy-folder.cjs` | Endereço do servidor e pasta `.voxy/saves` correspondente |
 | `src/voxy-archive.cjs` | Manifesto, ZIP64 em fluxo, hashes por arquivo e validação do cache RocksDB |

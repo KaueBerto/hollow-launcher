@@ -55,6 +55,8 @@ async function buildArguments(engine, nickname, ram, account) {
 async function launch(engine, nickname, ram, account) {
   if (alive(engine.gameProcess)) throw new Error('O Minecraft já está aberto.');
   await ensureSync(engine);
+  const { prepareProfileDefaults } = require('./profile-defaults.cjs');
+  await prepareProfileDefaults(engine);
   const { prepareMenu } = require('./menu-bootstrap.cjs');
   await prepareMenu(engine);
   const argumentsList = await engine.buildArguments(nickname, ram, account);

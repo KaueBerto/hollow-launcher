@@ -107,7 +107,7 @@ class Engine {
     await require('./voxy-landscape.cjs').recoverInstall(this);
     // Keep player data, including both current Voxy and legacy DH caches.
     const preserved = new Set([
-      'launcher-settings.json', 'landscape-installed.json', 'voxy-landscape-installed.json', 'landscape-backups/voxy', 'menu-defaults-installed.json', 'sync-backups',
+      'launcher-settings.json', 'landscape-installed.json', 'voxy-landscape-installed.json', 'landscape-backups/voxy', 'menu-defaults-installed.json', 'profile-defaults-installed.json', 'sync-backups',
       'game/options.txt', 'game/optionsof.txt', 'game/optionsshaders.txt',
       'game/servers.dat', 'game/config',
       'game/Distant_Horizons_server_data', 'game/.voxy', 'game/voxy', 'game/schematics',

@@ -99,3 +99,7 @@ Após publicação, verificações Electron com provedor GitHub real confirmaram
 Teste isolado verificou dois resets consecutivos: launcher-settings.json, options.txt (teclas, sensibilidade e renderização), optionsof.txt, optionsshaders.txt, servers.dat e configurações aninhadas dos mods permanecem idênticos byte a byte. Arquivos de instalação, mods, mundos, screenshots e sessão são removidos. Preflight de processos, arquivos ocupados e links continua sendo aplicado antes da exclusão. Nickname inválido ainda é recusado ao jogar; reset permite preservar preferências sem exigir preenchimento do nickname.
 
 O smoke Electron também executou dois resets reais pela interface em pasta isolada, usando nickname recém-digitado antes do debounce de salvamento, 9 GB de RAM e lembrar nickname ativado/desativado. O nickname permaneceu visível nos dois casos; o disco respeitou a opção de não lembrar. options.txt e a configuração de mod permaneceram intactos. A instalação/download foi substituída por operação vazia apenas neste teste; o reset e a gravação de preferências usaram o código real.
+
+## Perfil padrão 2.8.0
+
+O preset real foi aplicado em uma instalação vazia: 1.116 arquivos instalados e `options.txt` idêntico ao perfil de origem. Em seguida, `options.txt` foi alterado manualmente; uma nova aplicação preservou o conteúdo do jogador e não instalou novamente nenhum arquivo. O arquivo incorporado e seu manifesto foram comparados byte a byte no pacote `win-unpacked`. A suíte completa passou com 117 testes, além do smoke Electron.

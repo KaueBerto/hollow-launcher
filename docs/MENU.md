@@ -10,7 +10,7 @@ A partir da versão 2.5.1, o pack ativo no perfil Dev, `AveronSMP-93fd4b63e142.z
 
 A ativação é registrada no recibo do menu. Depois disso, uma escolha manual de desativar o pack é respeitada, inclusive após Resetar. O reset mantém esse recibo e as opções do jogo; o arquivo ZIP é recuperado novamente quando necessário. Não é preciso entrar no servidor para a textura estar aplicada.
 
-Configurações e layouts existentes não são sobrescritos. Novos arquivos são instalados apenas quando ausentes, e configurações de teclado, vídeo, nickname e mundos não são importadas do perfil Dev. Dados pessoais do FancyMenu, histórico, mundos, bancos de variáveis e estado do editor não são distribuídos. Os caminhos dos recursos são relativos à pasta do jogo. A tela de boas-vindas do FancyMenu já está desativada no preset de origem.
+Configurações e layouts existentes não são sobrescritos. Novos arquivos são instalados apenas quando ausentes. A partir da versão 2.8.0, teclas, vídeo e configurações seguras dos mods vêm de um perfil padrão separado, descrito em [PERFIL-PADRAO.md](PERFIL-PADRAO.md). Dados pessoais do FancyMenu, histórico, mundos, bancos de variáveis e estado do editor não são distribuídos. Os caminhos dos recursos são relativos à pasta do jogo. A tela de boas-vindas do FancyMenu já está desativada no preset de origem.
 
 Os arquivos de menu ficam em `game/config/fancymenu`, e o preset da tela de carregamento em `game/config/drippyloadingscreen`. O provider de carregamento é ajustado somente na primeira preparação, mantendo as outras opções de `fml.toml` e um provider diferente que o jogador já tenha escolhido. Recursos de exemplo inexistentes do preset Drippy foram substituídos pela logo e fundo reais.
 
