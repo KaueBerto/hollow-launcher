@@ -16,14 +16,12 @@ async function fixture(totalGB, operation) {
   finally { await fs.rm(root, { recursive: true, force: true }); }
 }
 
-test('RAM limits follow physical capacity, reserving at least 2 GB or one quarter for Windows and native processes', () => {
-  for (const [total, maximum] of [[4, 2], [8, 6], [12, 9], [16, 12], [24, 18], [32, 24], [64, 48], [96, 72]]) {
+test('RAM maximum follows the full physical capacity while the automatic default stays conservative', () => {
+  for (const [total, recommended] of [[4, 2], [8, 6], [12, 6], [16, 6], [24, 6], [32, 6], [64, 6], [96, 6]]) {
     const memory = memoryLimits(total * GIB);
     assert.equal(memory.totalGB, total);
-    assert.equal(memory.maximumGB, maximum);
-    assert.equal(memory.recommendedGB, Math.min(6, maximum));
-    assert(memory.reservedGB >= 2);
-    assert.equal(memory.maximumGB + memory.reservedGB, total);
+    assert.equal(memory.maximumGB, total);
+    assert.equal(memory.recommendedGB, recommended);
     assert.equal(memory.supported, true);
   }
   assert.equal(memoryLimits(7.9 * GIB).totalGB, 8);
@@ -36,13 +34,13 @@ test('invalid RAM readings fail explicitly and machines under 4 GB cannot launch
 
 test('memory validation follows this machine rather than a fixed maximum of 24 GB', () => {
   const options = { mode: 'nickname', nickname: 'Player', ram: 24 };
-  assert.throws(() => validateOptions(options, { memory: memoryLimits(8 * GIB) }), /2 a 6 GB/);
+  assert.throws(() => validateOptions(options, { memory: memoryLimits(8 * GIB) }), /2 a 8 GB/);
   const memory = memoryLimits(64 * GIB);
   assert.equal(validateOptions({ ...options, ram: 40 }, { memory }).ram, 40);
-  for (const ram of [49, 1, 6.5, NaN, '6']) assert.throws(() => validateOptions({ ...options, ram }, { memory }));
+  for (const ram of [65, 1, 6.5, NaN, '6']) assert.throws(() => validateOptions({ ...options, ram }, { memory }));
   assert.equal(clampRam(Infinity, memory), 6);
   assert.equal(clampRam(-1, memory), 6);
-  assert.equal(clampRam(500, memory), 48);
+  assert.equal(clampRam(500, memory), 64);
 });
 
 test('saved RAM above the new machine limit is clamped while all player preferences are retained', () => fixture(8, async engine => {
@@ -50,16 +48,16 @@ test('saved RAM above the new machine limit is clamped while all player preferen
   const file = path.join(engine.root, 'launcher-settings.json');
   await fs.mkdir(engine.root);
   await fs.writeFile(file, JSON.stringify(preferences));
-  assert.deepEqual(await engine.loadSettings(), { ...preferences, ram: 6 });
+  assert.deepEqual(await engine.loadSettings(), { ...preferences, ram: 8 });
   await engine.saveSettings(await engine.loadSettings());
-  assert.deepEqual(JSON.parse(await fs.readFile(file, 'utf8')), { ...preferences, ram: 6 });
-  await assert.rejects(engine.saveSettings({ ...preferences, memory: memoryLimits(128 * GIB) }), /2 a 6 GB/);
-  assert.equal(JSON.parse(await fs.readFile(file, 'utf8')).ram, 6);
+  assert.deepEqual(JSON.parse(await fs.readFile(file, 'utf8')), { ...preferences, ram: 8 });
+  await assert.rejects(engine.saveSettings({ ...preferences, memory: memoryLimits(128 * GIB) }), /2 a 8 GB/);
+  assert.equal(JSON.parse(await fs.readFile(file, 'utf8')).ram, 8);
 }));
 
 test('first installation on a 4 GB PC defaults to 2 GB; Java rejects an excessive heap before reading installation files', () => fixture(4, async engine => {
   assert.equal((await engine.loadSettings()).ram, 2);
-  await assert.rejects(engine.buildArguments('Player', 6), /2 a 2 GB/);
+  await assert.rejects(engine.buildArguments('Player', 6), /2 a 4 GB/);
 }));
 
 test('IPC exposes actual hardware limits and rejects forged memory selections before login or launching', () => fixture(8, async engine => {
@@ -72,8 +70,8 @@ test('IPC exposes actual hardware limits and rejects forged memory selections be
   });
   const state = await handlers.get('launcher:state')({});
   assert.equal(state.memory.totalGB, 8);
-  assert.equal(state.memory.maximumGB, 6);
+  assert.equal(state.memory.maximumGB, 8);
   const options = { mode: 'microsoft', ram: 24, remember: true, memory: memoryLimits(128 * GIB) };
-  await assert.rejects(handlers.get('launcher:play')({}, options), /2 a 6 GB/);
-  await assert.rejects(handlers.get('launcher:save')({}, options), /2 a 6 GB/);
+  await assert.rejects(handlers.get('launcher:play')({}, options), /2 a 8 GB/);
+  await assert.rejects(handlers.get('launcher:save')({}, options), /2 a 8 GB/);
 }));

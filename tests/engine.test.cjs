@@ -27,7 +27,7 @@ test('UUID offline e regras de plataforma', () => {
   assert.equal(allowed({ rules: [{ action: 'allow', features: { is_demo_user: true } }] }), false);
   assert.equal(allowed({ rules: [{ action: 'allow', os: { name: 'windows' } }] }), true);
   assert.throws(() => validateOptions({ mode: 'nickname', nickname: 'a;evil', ram: 6 }));
-  assert.throws(() => validateOptions({ mode: 'nickname', nickname: 'Hollow', ram: 25 }, { memory: memoryLimits(32 * GIB) }));
+  assert.throws(() => validateOptions({ mode: 'nickname', nickname: 'Hollow', ram: 33 }, { memory: memoryLimits(32 * GIB) }));
 });
 test('caminhos recusam travessia, raiz e caminhos absolutos', () => {
   for (const name of ['../outside', '..\\outside', '.', 'C:\\outside', '/outside']) assert.throws(() => under(directory, name));

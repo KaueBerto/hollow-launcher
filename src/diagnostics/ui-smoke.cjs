@@ -61,24 +61,24 @@ async function smokeUi({ window, engine, publish, gameWindow, safeStorage, app, 
     await window.webContents.executeJavaScript(`(async () => {
       const slider=document.querySelector('#ram');
       slider.value='24';slider.dispatchEvent(new Event('input',{bubbles:true}));
-      if(slider.max!=='6' || slider.value!=='6' || document.querySelector('#ram-value').textContent!=='6 GB' || document.querySelector('#ram-hardware').textContent!=='PC: 8 GB') throw Error('Limite real de RAM não foi aplicado');
+      if(slider.max!=='8' || slider.value!=='8' || document.querySelector('#ram-value').textContent!=='8 GB' || document.querySelector('#ram-hardware').textContent!=='PC: 8 GB') throw Error('Limite real de RAM não foi aplicado');
       clearTimeout(saveTimer);
       const response=await window.hollow.save({...options(),ram:24});
-      if(response.ok || !response.error.includes('2 a 6 GB')) throw Error('IPC aceitou memória maior que o limite real');
+      if(response.ok || !response.error.includes('2 a 8 GB')) throw Error('IPC aceitou memória maior que o limite real');
     })()`);
     await fs.writeFile(path.join(output, 'memory-8gb.png'), (await window.webContents.capturePage()).toPNG());
     engine.memory = memoryLimits(64 * GIB);
     publish({ memory: engine.memory });
     await window.webContents.executeJavaScript(`(() => {
       const slider=document.querySelector('#ram');slider.value='40';slider.dispatchEvent(new Event('input',{bubbles:true}));clearTimeout(saveTimer);
-      if(slider.max!=='48' || slider.value!=='40' || document.querySelector('#ram-value').textContent!=='40 GB') throw Error('RAM ainda limitada a 24 GB no PC de 64 GB');
+      if(slider.max!=='64' || slider.value!=='40' || document.querySelector('#ram-value').textContent!=='40 GB') throw Error('RAM ainda limitada abaixo da capacidade física no PC de 64 GB');
     })()`);
   } finally {
     engine.memory = actualMemory;
     publish({ memory: actualMemory });
     await window.webContents.executeJavaScript(`document.querySelector('#ram').value='6';clearTimeout(saveTimer);render();`);
   }
-  report.push('RAM real: PC de 8 GB limitado a 6 GB; PC de 64 GB aceita 40 GB; IPC recusa limite adulterado: OK');
+  report.push('RAM real: PC de 8 GB permite 8 GB; PC de 64 GB permite 64 GB; padrão conservador e IPC protegido: OK');
   await window.webContents.executeJavaScript(`(async () => {
     const audio = music.audio;
     await Promise.race([new Promise((resolve, reject) => {
