@@ -23,6 +23,7 @@ function validateManifest(manifest) {
     names.add(key); total += item.size;
   }
   if (total > 100 * 1024 * 1024) throw Error('Perfil padrão excede o limite.');
+  if (!Array.isArray(manifest.enforcedFiles) || manifest.enforcedFiles.length > 16 || new Set(manifest.enforcedFiles).size !== manifest.enforcedFiles.length || manifest.enforcedFiles.some(file => !names.has(file.toLowerCase()) || !/^config\/(?:emf_compat|entity_model_features|entity_texture_features|etf_warnings)\.json$/.test(file))) throw Error('Política do perfil padrão inválida.');
   return new Map(manifest.files.map(item => [item.path, item]));
 }
 async function noLinks(root, destination) {
@@ -39,6 +40,7 @@ async function prepareProfileDefaults(engine, options = {}) {
   const manifestPath = options.manifestPath || path.join(engine.assets, 'profile-defaults-manifest.json');
   const manifest = options.manifest || JSON.parse(await fs.readFile(manifestPath, 'utf8'));
   const expected = validateManifest(manifest);
+  const enforced = new Set(manifest.enforcedFiles);
   const archive = options.archivePath || path.join(engine.assets, manifest.archive.file);
   const stat = await fs.stat(archive);
   if (stat.size !== manifest.archive.size || await hashFile(archive, 'sha256') !== manifest.archive.sha256) throw Error('O preset de configurações do launcher está corrompido.');
@@ -47,10 +49,10 @@ async function prepareProfileDefaults(engine, options = {}) {
   await noLinks(engine.root, receipt);
   try {
     const current = JSON.parse(await fs.readFile(receipt, 'utf8'));
-    if (current.id === manifest.id && current.archive === manifest.archive.sha256) return { installed: 0, preserved: manifest.files.length };
+    if (current.id === manifest.id && current.archive === manifest.archive.sha256) return { installed: 0, preserved: manifest.files.length, enforced: 0 };
   } catch (error) { if (error.code !== 'ENOENT' && !(error instanceof SyntaxError)) throw error; }
 
-  let installed = 0, preserved = 0;
+  let installed = 0, preserved = 0, enforcedCount = 0;
   const found = new Set();
   const zip = await yauzl.openPromise(archive, { autoClose: false, strictFileNames: true, validateEntrySizes: true });
   let zipFailure;
@@ -70,7 +72,7 @@ async function prepareProfileDefaults(engine, options = {}) {
       let bytes = 0;
       const verify = new Transform({ transform(chunk, encoding, callback) { bytes += chunk.length; digest.update(chunk); callback(null, chunk); } });
       const input = await zip.openReadStreamPromise(entry);
-      if (exists) {
+      if (exists && !enforced.has(entry.fileName)) {
         verify.on('data', () => {});
         await pipeline(input, verify);
         if (zipFailure) throw zipFailure;
@@ -86,9 +88,25 @@ async function prepareProfileDefaults(engine, options = {}) {
         await handle.close().catch(() => {});
         if (zipFailure) { await fs.unlink(temporary).catch(() => {}); throw zipFailure; }
         if (bytes !== item.size || digest.digest('hex') !== item.sha256) { await fs.unlink(temporary).catch(() => {}); throw Error(`Configuração padrão inválida: ${entry.fileName}`); }
-        try { await fs.copyFile(temporary, destination, constants.COPYFILE_EXCL); installed++; }
-        catch (error) { if (error.code !== 'EEXIST') throw error; preserved++; }
-        finally { await fs.unlink(temporary).catch(() => {}); }
+        try {
+          if (exists) {
+            if (await hashFile(destination, 'sha256') === item.sha256) preserved++;
+            else {
+              const backup = path.join(engine.root, 'profile-defaults-backups', manifest.id, ...entry.fileName.split('/'));
+              await noLinks(engine.root, backup);
+              await fs.mkdir(path.dirname(backup), { recursive: true });
+              try { await fs.copyFile(destination, backup, constants.COPYFILE_EXCL); }
+              catch (error) {
+                if (error.code !== 'EEXIST' || await hashFile(backup, 'sha256') !== await hashFile(destination, 'sha256')) throw Error(`Backup de configuração já existe e difere do arquivo atual: ${entry.fileName}`);
+              }
+              await fs.rename(temporary, destination);
+              enforcedCount++;
+            }
+          } else {
+            try { await fs.copyFile(temporary, destination, constants.COPYFILE_EXCL); installed++; }
+            catch (error) { if (error.code !== 'EEXIST') throw error; preserved++; }
+          }
+        } finally { await fs.unlink(temporary).catch(() => {}); }
       }
     }
   } finally { zip.close(); }
@@ -97,6 +115,6 @@ async function prepareProfileDefaults(engine, options = {}) {
   await fs.mkdir(engine.root, { recursive: true });
   await fs.writeFile(temporaryReceipt, JSON.stringify({ schema: 1, id: manifest.id, archive: manifest.archive.sha256, installedAt: new Date().toISOString() }, null, 2));
   await fs.rename(temporaryReceipt, receipt);
-  return { installed, preserved };
+  return { installed, preserved, enforced: enforcedCount };
 }
 module.exports = { prepareProfileDefaults, validateManifest };

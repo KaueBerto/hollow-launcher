@@ -45,11 +45,12 @@ async function smokeUi({ window, engine, publish, gameWindow, safeStorage, app, 
     check(typeof require==='undefined' && typeof process==='undefined','Node exposto à interface');
     check(document.querySelector('#reset').offsetWidth>0,'Botão reset');
     const wait = ms=>new Promise(resolve=>setTimeout(resolve,ms));
-    document.querySelector('#reset').click();check(document.querySelector('#confirm-reset').open,'Confirmação reset');document.querySelector('#cancel-reset').click();await wait(200);check(!document.querySelector('#confirm-reset').open,'Cancelar reset');
+    const until = async (condition, message) => { const limit=performance.now()+3000; while(!condition()){ if(performance.now()>limit) throw new Error(message); await wait(25); } };
+    document.querySelector('#reset').click();check(document.querySelector('#confirm-reset').open,'Confirmação reset');document.querySelector('#cancel-reset').click();await until(()=>!document.querySelector('#confirm-reset').open,'Cancelar reset');
     await wait(850);const box=document.querySelector('.account-input').getBoundingClientRect();
     for(let i=0;i<12;i++) modes[i%2].click();await wait(280);const nextBox=document.querySelector('.account-input').getBoundingClientRect();check(Math.abs(box.x-nextBox.x)<.1 && Math.abs(box.y-nextBox.y)<.1 && Math.abs(box.width-nextBox.width)<.1,'Troca de conta deslocou o layout');
     check(getComputedStyle(document.querySelector('.controls')).opacity==='1' && !document.body.classList.contains('entering'),'Entrada não terminou');
-    document.querySelector('#reset').click();await wait(250);document.querySelector('#confirm-reset').dispatchEvent(new Event('cancel',{cancelable:true}));await wait(200);check(!document.querySelector('#confirm-reset').open,'Escape durante animação');
+    document.querySelector('#reset').click();await wait(250);document.querySelector('#confirm-reset').dispatchEvent(new Event('cancel',{cancelable:true}));await until(()=>!document.querySelector('#confirm-reset').open,'Escape durante animação');
     return ['16 trocas de conta: OK','Memória sincronizada: OK','Animação CSS ativa: OK','Fonte incorporada: OK','Interface sem Node: OK','Confirmação e cancelamento de reset: OK','Motion: entrada, trocas rápidas sem deslocamento e Escape nos avisos: OK'];
   })().catch(error => ({ smokeError: error.stack || String(error) }))`);
   if (report.smokeError) throw new Error(report.smokeError);

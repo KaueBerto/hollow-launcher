@@ -1,12 +1,18 @@
 {
   "schema": 1,
-  "id": "averon-profile-25b0282b906e",
+  "id": "averon-profile-945880fc5d3f",
   "minecraft": "1.21.1",
   "archive": {
     "file": "profile-defaults.zip",
-    "size": 821040,
-    "sha256": "25b0282b906e8645ffdaef98353d3804d3d47dd45b41ac54cfe4fea094258aa1"
+    "size": 824473,
+    "sha256": "fad2d3331297239aa4a20c8294bcf18ac39b09e4911ff7d241265fb3e1c75faa"
   },
+  "enforcedFiles": [
+    "config/emf_compat.json",
+    "config/entity_model_features.json",
+    "config/entity_texture_features.json",
+    "config/etf_warnings.json"
+  ],
   "files": [
     {
       "path": "config/aaa_particles-client.toml",
@@ -695,8 +701,8 @@
     },
     {
       "path": "config/axiom/axiom.json",
-      "size": 9653,
-      "sha256": "9e161d8f81e7ecb72627efa284fd70ab71a8b5d3e8b22415d8e504d19e287a4b"
+      "size": 9655,
+      "sha256": "ae213382bb35b60ac33a04b4799ac7215051e4e4963d1cb8a99c3e47ac960c16"
     },
     {
       "path": "config/axiom/imgui.ini",
@@ -1441,7 +1447,7 @@
     {
       "path": "config/fabric/indigo-renderer.properties",
       "size": 290,
-      "sha256": "cd58ba04e0212c7d0f9296c40bc1d87f59ba77c880502dbe6e588ddb6c499165"
+      "sha256": "880b8f2ab9c4410fb19290e2379268c7b972d22248861f23e49a8eb80d23afe0"
     },
     {
       "path": "config/fallinglogs-server.toml",
@@ -1640,8 +1646,8 @@
     },
     {
       "path": "config/icys-better-horses.json",
-      "size": 2099,
-      "sha256": "d9360303c5382bb5644bafc621e4f7ce76460cbbcea68dd9f9e52161f341ce6d"
+      "size": 2100,
+      "sha256": "ac312a827e9deeafd5eb415d6621cc3594023aa3671b9621a95f3e8a8a833405"
     },
     {
       "path": "config/immediatelyfast.json",
@@ -1755,8 +1761,8 @@
     },
     {
       "path": "config/iris.properties",
-      "size": 296,
-      "sha256": "f354a80ec4d6cfc968beb2f7602ad2bcad4dd751b00018fd6c90c7f1a2cc5668"
+      "size": 300,
+      "sha256": "711cde232440aa2fc6a6344a932dc2e72abeed7e657ffbbab69e2893aada4e57"
     },
     {
       "path": "config/irons_spellbooks_spell_config/global_config.json",
@@ -1965,8 +1971,8 @@
     },
     {
       "path": "config/lambdynlights.toml",
-      "size": 1448,
-      "sha256": "fdd6958ff17541c8d1c891bd1602088bb6888f41229e966387a07311f32ec6d9"
+      "size": 16702,
+      "sha256": "6df7da044fbc3257fa43932fba6c0b33e40593b2a6a18831997a3492c9b93e93"
     },
     {
       "path": "config/legendarysurvivaloverhaul-client.toml",
@@ -2111,7 +2117,7 @@
     {
       "path": "config/medievalcourier/medievalcourier.properties",
       "size": 432,
-      "sha256": "058af075540885ef82f942464f02d8b57ac8f025170e3a0ec4e365af4803459b"
+      "sha256": "f3393765354978d32d738bb6b38b3fb7e380e0e9d7b325efc754be29739b19e2"
     },
     {
       "path": "config/mezz_config/client/default/settings.ini",
@@ -4261,7 +4267,7 @@
     {
       "path": "config/packetfixer.properties",
       "size": 488,
-      "sha256": "a7f18bc9ae2ce8df71c9130a93c8d4a6c0d97312854a725872a6727f5f250c24"
+      "sha256": "6087e9f3e9316353a045a68d0c3c64aecfdc9846b1cf8712e3aada4cebe11790"
     },
     {
       "path": "config/paladins/effects.json",
@@ -4850,8 +4856,8 @@
     },
     {
       "path": "config/sounds/chat.json",
-      "size": 590,
-      "sha256": "8bcca2d482cfdcda78b96923e6895075eecacead3784021fe53f48c409f16ffb"
+      "size": 638,
+      "sha256": "694671dd084d36371783ea97e16b3530073cff9c796fe7a0441a957183b723cf"
     },
     {
       "path": "config/sounds/event.json",
@@ -5415,8 +5421,8 @@
     },
     {
       "path": "config/voxy-config.json",
-      "size": 488,
-      "sha256": "8f75ac5823e3609ed2bc5699dea008b0cc5d7ae31cc0511a31dade65814e2d07"
+      "size": 487,
+      "sha256": "567aa432d21e3f98e2dfd21fc69535fb92702e8b2705406b45f4014c29061568"
     },
     {
       "path": "config/walljump.json5",
@@ -5585,8 +5591,8 @@
     },
     {
       "path": "options.txt",
-      "size": 12981,
-      "sha256": "e1b09770b17bef97c9bb622800bb2c649a50a1a1a522bbae818503709e7a29bd"
+      "size": 12905,
+      "sha256": "1ddab4be8a2aa98bf68f509f8451c010aa5b3043d969ae287b3b49828b1d4a0a"
     }
   ]
 }

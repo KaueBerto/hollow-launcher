@@ -26,6 +26,12 @@ const excluded = [
   /^config\/DistantHorizons\.toml$/i,
 ];
 const rootFiles = ['options.txt', 'optionsof.txt', 'optionsshaders.txt'];
+const enforcedFiles = [
+  'config/emf_compat.json',
+  'config/entity_model_features.json',
+  'config/entity_texture_features.json',
+  'config/etf_warnings.json',
+];
 const normalize = value => value.split(path.sep).join('/');
 const sha256 = value => crypto.createHash('sha256').update(value).digest('hex');
 const selected = [];
@@ -79,12 +85,14 @@ if (archive.length > 100 * 1024 * 1024) throw Error('Preset excede 100 MiB.');
 fs.mkdirSync(assets, { recursive: true });
 const archivePath = path.join(assets, 'profile-defaults.zip');
 const manifestPath = path.join(assets, 'profile-defaults-manifest.json');
+const policyHash = sha256(Buffer.concat([archive, Buffer.from(JSON.stringify(enforcedFiles))]));
 fs.writeFileSync(archivePath, archive);
 fs.writeFileSync(manifestPath, JSON.stringify({
   schema: 1,
-  id: `averon-profile-${sha256(archive).slice(0, 12)}`,
+  id: `averon-profile-${policyHash.slice(0, 12)}`,
   minecraft: '1.21.1',
   archive: { file: 'profile-defaults.zip', size: archive.length, sha256: sha256(archive) },
+  enforcedFiles,
   files,
 }, null, 2) + '\n');
 console.log(JSON.stringify({ archivePath, manifestPath, files: files.length, bytes: archive.length, sha256: sha256(archive) }, null, 2));

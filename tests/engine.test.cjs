@@ -72,6 +72,7 @@ test('reset preserves preferences, nested configs, DH databases and schematics b
 
     'menu-defaults-installed.json': '{"activatedResourcePacks":["file/AveronSMP.zip"],"fmlConfigured":true}',
     'profile-defaults-installed.json': '{"schema":1,"id":"averon-profile-test","archive":"test"}',
+    'profile-defaults-backups/averon-profile-test/config/entity_model_features.json': '{"old":true}',
     'game/Distant_Horizons_server_data/Hollow+SMP/dimension/DistantHorizons.sqlite': Buffer.from([0, 1, 2, 255]),
     'game/Distant_Horizons_server_data/Hollow+SMP/dimension/DistantHorizons.sqlite-wal': Buffer.from([7, 8, 9]),
     'game/Distant_Horizons_server_data/Hollow+SMP/dimension/DistantHorizons.sqlite-shm': Buffer.from([4, 5, 6]),
