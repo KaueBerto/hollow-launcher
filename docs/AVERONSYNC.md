@@ -1,8 +1,8 @@
 # AveronSync no launcher
 
-O launcher 2.8.3 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.10.jar`, sem alterações.
+O launcher 2.8.4 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.11.jar`, sem alterações.
 
-SHA-256: `865513111bc79caeef7c1b364342886fb2468c3d3bea95711cd4c02e93c01f9c`.
+SHA-256: `25b2f06f6a57c2dfcbba0a7990a2e4940be710a2a35d0544cd207fac73229764`.
 
 O fork mantém os IDs `automodpack` e `automodpack_mod`. Por isso, não pode coexistir com o AutoModpack original. A integração identifica o ID nos metadados NeoForge, inclusive se alguém renomear o JAR, e preserva uma cópia antes de retirá-lo de `mods`.
 
@@ -22,4 +22,8 @@ O servidor precisa usar o protocolo compatível com esse fork. A integração no
 
 ## Código correspondente
 
-O arquivo `vendor/averonsync/AveronSync-0.10-source.zip` contém os fontes correspondentes desta versão, incluindo Gradle, instruções de compilação, licenças, fila VIP e starter kits do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
+O arquivo `vendor/averonsync/AveronSync-0.11-source.zip` contém os fontes correspondentes desta versão, incluindo Gradle, instruções de compilação, licenças, fila VIP e starter kits do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
+
+## AveronSync 0.11 / launcher 2.8.4
+
+Inclui a cor VIP azul clara no TAB no servidor, preservando o nome de personagem do AveronOrigins. A integração visual ainda requer teste dentro do jogo. A versão do servidor precisa ser atualizada separadamente para ativar esse recurso.
