@@ -103,3 +103,9 @@ O smoke Electron também executou dois resets reais pela interface em pasta isol
 ## Perfil padrão 2.8.0
 
 O preset real foi aplicado em uma instalação vazia: 1.116 arquivos instalados e `options.txt` idêntico ao perfil de origem. Em seguida, `options.txt` foi alterado manualmente; uma nova aplicação preservou o conteúdo do jogador e não instalou novamente nenhum arquivo. O arquivo incorporado e seu manifesto foram comparados byte a byte no pacote `win-unpacked`. A suíte completa passou com 117 testes, além do smoke Electron.
+
+## AveronSync 0.10 — launcher 2.8.3
+
+O JAR fornecido passou pela leitura integral do ZIP: 2.838 entradas externas e 130 entradas no AutoModpack interno, sem erro de CRC. Os dois metadados NeoForge declaram `4.0.6-averonsync.0.10`. O SHA-256 incorporado é `87b22ab867579dd0bb1f279c7af119e7ec2bd126a4b4f794fd3c3a36f42a3e56`.
+
+O pacote final foi inspecionado: contém somente o JAR 0.10, o código do launcher aponta para seu nome e hash, e `resources/licenses/AveronSync-0.10-source.zip` declara a mesma versão e inclui licenças, Gradle, fila VIP e starter kits. A suíte completa passou com 120 testes, incluindo instalação nova e migrações 0.4 a 0.9 sem perda do modpack, aceite ou preferências.

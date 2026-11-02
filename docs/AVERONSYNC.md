@@ -1,6 +1,6 @@
 # AveronSync no launcher
 
-O launcher 2.8.2 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.8.jar`, sem alterações.
+O launcher 2.8.3 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.10.jar`, sem alterações.
 
 SHA-256: `865513111bc79caeef7c1b364342886fb2468c3d3bea95711cd4c02e93c01f9c`.
 
@@ -22,4 +22,4 @@ O servidor precisa usar o protocolo compatível com esse fork. A integração no
 
 ## Código correspondente
 
-O arquivo `vendor/averonsync/AveronSync-0.8-source.zip` contém os fontes fornecidos com esta versão, incluindo Gradle, instruções de compilação, licenças e alterações do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
+O arquivo `vendor/averonsync/AveronSync-0.10-source.zip` contém os fontes correspondentes desta versão, incluindo Gradle, instruções de compilação, licenças, fila VIP e starter kits do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
