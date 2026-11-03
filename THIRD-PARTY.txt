@@ -1,11 +1,11 @@
 Este launcher é um projeto independente do AVERON SMP.
 
-AveronSync 4.0.6-averonsync.0.11
+AveronSync 4.0.6-averonsync.0.14
 Fork do AutoModpack 4.0.6, por Skidam; modificações por AveronSync contributors.
 Licença LGPL-3.0; avisos originais preservados no JAR fornecido.
 Fontes correspondentes completos, instruções e avisos do fork:
-licenses/AveronSync-0.11-source.zip no instalador e no ZIP de distribuição;
-vendor/averonsync/AveronSync-0.11-source.zip no repositório do launcher.
+licenses/AveronSync-0.14-source.zip no instalador e no ZIP de distribuição;
+vendor/averonsync/AveronSync-0.14-source.zip no repositório do launcher.
 Upstream: https://github.com/Skidamek/AutoModpack/tree/v4.0.6
 O JAR é copiado separadamente para mods. Não foi modificado pelo launcher.
 
@@ -24,7 +24,7 @@ Downloads realizados quando o jogador prepara o jogo:
   https://www.minecraft.net/
 
 O launcher não incorpora os JARs do Minecraft, o Java, o NeoForge nem
-os mods e texturas comerciais do servidor. Os downloads mantêm as
+os demais mods e texturas comerciais do servidor. Os downloads mantêm as
 licenças e termos dos respectivos autores.
 
 Monocraft: fonte pixelada inspirada na tipografia do Minecraft.
@@ -72,3 +72,7 @@ Paisagem do Voxy: cache de terreno fornecido pelo responsável do servidor, dist
 yauzl 3.4.0 — licença MIT. Extração ZIP/ZIP64 com leitura limitada em memória.
 https://github.com/thejoshwolfe/yauzl
 Licenças preservadas em licenses/yauzl-LICENSE.txt e licenses/pend-LICENSE.txt, além dos pacotes npm originais.
+
+Cubees: os recursos cosméticos de pets estão no JAR AveronSync.
+Créditos e direitos originais preservados em licenses/Cubees-NOTICE.txt.
+Essas artes não estão sob LGPL e não integram o arquivo de fontes do programa.

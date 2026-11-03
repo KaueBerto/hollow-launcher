@@ -1,0 +1,11 @@
+Cubees third-party artwork
+
+The server owner supplied the Cubees v6 Nether Biomes Pack and Cubees v16 Biomes II.
+Artwork, original Blockbench models, textures and animations are by Cubees;
+the pack metadata credits configurator @metemmi.
+Original vendor reference: https://mcmodels.net/vendors/177/cubees
+
+The LGPL license for AveronSync's program code does not grant a license to this
+third-party artwork. Original rights and purchase terms remain with their holders.
+Imported artwork is kept out of the public source tree. The importer and native
+cosmetic implementation are provided separately as AveronSync program code.
