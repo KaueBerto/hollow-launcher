@@ -2,7 +2,10 @@
   "name": "hollow-launcher",
   "version": "2.9.0",
   "description": "Launcher Electron do AVERON SMP para Windows e Linux",
-  "author": "AVERON SMP",
+  "author": {
+    "name": "AVERON SMP",
+    "email": "kaueberto@users.noreply.github.com"
+  },
   "license": "UNLICENSED",
   "private": true,
   "desktopName": "averon-launcher.desktop",
