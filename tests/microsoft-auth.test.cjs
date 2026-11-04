@@ -6,6 +6,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { MicrosoftAuth } = require('../src/microsoft-auth.cjs');
 const { Engine, MC, VERSION, writeJson } = require('../src/engine.cjs');
+const { GIB } = require('../src/core/memory.cjs');
 const { redactedLog } = require('../src/redacted-log.cjs');
 const ID = '12345678-1234-1234-1234-123456789abc';
 const PROFILE = { name: 'HollowTeste', id: '123456789abcdef0123456789abcdef0' };
@@ -103,7 +104,7 @@ test('conta sem acesso ao Java é recusada antes de salvar sessão', async () =>
   assert.equal(auth.session, undefined); await assert.rejects(fs.access(auth.vault));
 }));
 test('argumentos online usam UUID, token e tipo msa, offline mantém token 0', async () => fixture(async root => {
-  const engine = new Engine({ root });
+  const engine = new Engine({ root, totalMemory: 16 * GIB });
   const args = { jvm: [], game: ['--username', '${auth_player_name}', '--uuid', '${auth_uuid}', '--accessToken', '${auth_access_token}', '--userType', '${user_type}'] };
   await writeJson(engine.versionFile(MC), { libraries: [], assetIndex: { id: '17' }, arguments: args });
   await writeJson(engine.versionFile(VERSION), { libraries: [], arguments: { jvm: [], game: [] }, mainClass: 'Main' });
