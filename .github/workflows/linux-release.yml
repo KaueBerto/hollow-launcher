@@ -20,7 +20,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.RELEASE_TAG }}
+          # A manual retry uses the repaired default branch while still
+          # uploading artifacts to the requested release tag.
+          ref: ${{ inputs.tag && 'main' || env.RELEASE_TAG }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24

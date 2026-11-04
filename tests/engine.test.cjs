@@ -23,9 +23,9 @@ async function fixture(operation) {
 }
 test('UUID offline e regras de plataforma', () => {
   assert.equal(offlineUuid('Notch'), 'b50ad385829d3141a2167e7d7539ba7f');
-  assert.equal(allowed({ rules: [{ action: 'allow', os: { name: 'linux' } }] }), false);
-  assert.equal(allowed({ rules: [{ action: 'allow', features: { is_demo_user: true } }] }), false);
-  assert.equal(allowed({ rules: [{ action: 'allow', os: { name: 'windows' } }] }), true);
+  assert.equal(allowed({ rules: [{ action: 'allow', os: { name: 'linux' } }] }, undefined, 'win32'), false);
+  assert.equal(allowed({ rules: [{ action: 'allow', features: { is_demo_user: true } }] }, undefined, 'win32'), false);
+  assert.equal(allowed({ rules: [{ action: 'allow', os: { name: 'windows' } }] }, undefined, 'win32'), true);
   assert.throws(() => validateOptions({ mode: 'nickname', nickname: 'a;evil', ram: 6 }));
   assert.throws(() => validateOptions({ mode: 'nickname', nickname: 'Hollow', ram: 33 }, { memory: memoryLimits(32 * GIB) }));
 });

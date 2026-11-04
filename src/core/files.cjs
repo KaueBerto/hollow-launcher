@@ -14,8 +14,13 @@ async function writeJson(file, value) {
   await fs.rename(temporary, file);
 }
 function under(root, relative) {
-  if (typeof relative !== 'string' || path.isAbsolute(relative) || /[\x00:]/.test(relative)) throw new Error('Caminho de arquivo inválido.');
-  const full = path.resolve(root, relative.replaceAll('/', path.sep));
+  if (typeof relative !== 'string' || /[\x00:]/.test(relative)) throw new Error('Caminho de arquivo inválido.');
+  // Treat both separator styles as separators on every supported OS. Otherwise
+  // a Windows traversal such as ..\file would become a harmless filename only
+  // while validating on Linux and could later be reused unsafely.
+  const portable = relative.replaceAll('\\', '/');
+  if (path.posix.isAbsolute(portable) || path.win32.isAbsolute(relative)) throw new Error('Caminho de arquivo inválido.');
+  const full = path.resolve(root, portable.replaceAll('/', path.sep));
   const difference = path.relative(path.resolve(root), full);
   if (!difference || difference.startsWith(`..${path.sep}`) || difference === '..' || path.isAbsolute(difference)) {
     throw new Error('Caminho fora da pasta de instalação.');
