@@ -48,4 +48,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           sha256sum dist/*.AppImage dist/*.deb > dist/SHA256-Linux.txt
-          gh release upload "$RELEASE_TAG" dist/*.AppImage dist/*.AppImage.blockmap dist/*.deb dist/latest-linux.yml dist/SHA256-Linux.txt --clobber
+          gh release upload "$RELEASE_TAG" dist/*.AppImage dist/*.deb dist/latest-linux.yml dist/SHA256-Linux.txt --clobber
