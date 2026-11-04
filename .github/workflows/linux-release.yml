@@ -12,6 +12,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: linux-release-${{ github.repository }}
+  cancel-in-progress: true
+
 jobs:
   linux:
     runs-on: ubuntu-slim
