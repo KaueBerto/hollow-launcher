@@ -9,8 +9,20 @@ const { workers } = require('./core/workers.cjs');
 const { ensureSync } = require('./modpack-sync.cjs');
 const INSTALLER_HASH = '8e8a6889b6d7ddcae5f93c4f9c90035e14ea70cdc5b74147773265809c4f9137';
 
+async function javaWorks(engine) {
+  if (!await exists(engine.java)) return false;
+  return new Promise(resolve => {
+    const child = spawn(engine.java, ['-version'], { cwd: engine.root, windowsHide: true, stdio: 'ignore' });
+    child.once('error', () => resolve(false));
+    child.once('close', code => resolve(code === 0));
+  });
+}
+
 async function installJava(engine) {
-  if (await exists(engine.java)) return;
+  if (await javaWorks(engine)) return;
+  // A previous extraction may have been interrupted after bin/java appeared.
+  // Never trust that single file: replace only the launcher-managed runtime.
+  await fs.rm(path.join(engine.root, 'runtime'), { recursive: true, force: true });
   engine.progress('Baixando Java 21…');
   const metadata = await engine.jsonFrom(`https://api.adoptium.net/v3/assets/latest/21/hotspot?architecture=x64&image_type=jre&os=${engine.system.adoptiumName}&vendor=eclipse`);
   const archive = metadata[0]?.binary?.package;
@@ -30,8 +42,18 @@ async function installJava(engine) {
   for (const entry of await fs.readdir(staging, { withFileTypes: true })) {
     const source = under(staging, entry.name);
     if (entry.isDirectory() && await exists(path.join(source, 'bin', engine.system.javaName))) {
-      await copyTree(source, path.join(engine.root, 'runtime'));
-      if (!engine.system.windows) await fs.chmod(engine.java, 0o755);
+      const runtime = path.join(engine.root, 'runtime');
+      if (engine.system.windows) await copyTree(source, runtime);
+      else {
+        // Moving the extracted tree keeps Temurin's executable modes and
+        // symlinks intact (notably the loader path used by libjli.so).
+        await fs.rename(source, runtime);
+        await fs.chmod(engine.java, 0o755);
+      }
+      if (!await javaWorks(engine)) {
+        await fs.rm(runtime, { recursive: true, force: true });
+        throw new Error('O Java 21 baixado não conseguiu iniciar neste Linux.');
+      }
       return;
     }
   }
