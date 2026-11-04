@@ -1,9 +1,15 @@
 'use strict';
 const net = require('node:net');
+const path = require('node:path');
 const { randomUUID } = require('node:crypto');
 const discordConfig = require('./discord-config.cjs');
 
 const MAX_FRAME = 64 * 1024;
+function defaultPipes(platform = process.platform) {
+  if (platform === 'win32') return Array.from({ length: 10 }, (_, i) => `\\\\?\\pipe\\discord-ipc-${i}`);
+  const directory = process.env.XDG_RUNTIME_DIR || process.env.TMPDIR || '/tmp';
+  return Array.from({ length: 10 }, (_, i) => path.join(directory, `discord-ipc-${i}`));
+}
 function frame(opcode, payload) {
   const body = Buffer.isBuffer(payload) ? payload : Buffer.from(JSON.stringify(payload));
   const result = Buffer.allocUnsafe(8 + body.length);
@@ -14,7 +20,7 @@ function frame(opcode, payload) {
 class DiscordPresence {
   constructor({ applicationId, activityName = discordConfig.activityName, largeImage = discordConfig.largeImage,
     pid = process.pid, connect = name => net.createConnection(name),
-    pipes = Array.from({ length: 10 }, (_, i) => `\\\\?\\pipe\\discord-ipc-${i}`),
+    pipes = defaultPipes(),
     timeout = 4000, retryDelay = 15000 } = {}) {
     this.applicationId = String(applicationId || '');
     this.activity = { type: 0, name: activityName, assets: { large_image: largeImage, large_text: activityName } };
@@ -101,4 +107,4 @@ class DiscordPresence {
     return this.stopping;
   }
 }
-module.exports = { DiscordPresence, frame };
+module.exports = { DiscordPresence, frame, defaultPipes };

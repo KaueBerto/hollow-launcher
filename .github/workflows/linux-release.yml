@@ -1,0 +1,49 @@
+name: Build Linux release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to build and update
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Recover bundled AveronSync from the Windows installer
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/averon-installer /tmp/averon-app
+          gh release download "$RELEASE_TAG" --pattern 'AveronSMP-Launcher-Setup-*.exe' --dir /tmp/averon-installer
+          7z x /tmp/averon-installer/*.exe -o/tmp/averon-installer/extracted
+          archive="$(find /tmp/averon-installer/extracted -name 'app-64.7z' -print -quit)"
+          test -n "$archive"
+          7z x "$archive" -o/tmp/averon-app
+          jar="$(find /tmp/averon-app -name 'averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.15.jar' -print -quit)"
+          test -n "$jar"
+          cp "$jar" assets/
+      - run: npm ci
+      - run: npm test
+      - run: npm run build:linux
+      - name: Upload Linux packages and updater metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sha256sum dist/*.AppImage dist/*.deb > dist/SHA256-Linux.txt
+          gh release upload "$RELEASE_TAG" dist/*.AppImage dist/*.AppImage.blockmap dist/*.deb dist/latest-linux.yml dist/SHA256-Linux.txt --clobber

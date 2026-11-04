@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/averon-smp.png" alt="AVERON SMP" width="260"></p>
 <h1 align="center">Averon Launcher</h1>
-<p align="center">Launcher Electron do AVERON SMP para Windows.<br>Instalação automática, visual pixelado e modpack pelo AveronSync.</p>
-<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-f6c844"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-c9362a"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.8.6-f6c844"></p>
+<p align="center">Launcher Electron do AVERON SMP para Windows e Linux.<br>Instalação automática, visual pixelado e modpack pelo AveronSync.</p>
+<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-f6c844"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-c9362a"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.9.0-f6c844"></p>
 
 ![Interface do Averon Launcher](docs/launcher.png)
 
@@ -13,7 +13,7 @@ O Minecraft já abre com o menu AVERON personalizado desde a primeira execução
 
 ## Baixar e jogar
 
-A versão 2.8.6 inclui AveronSync 0.15, com correção de fluidez dos pets em mundos antigos. O JAR foi preparado para a VPS sem reinício automático; a conexão exige que o servidor já esteja executando 0.15. Baixe o instalador disponível na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest), instale e abra pelo atalho. O ZIP também inclui o instalador.
+A versão 2.9.0 adiciona suporte a Linux x86_64 e mantém o AveronSync 0.15. No Windows, use o instalador `.exe`; no Linux, prefira o AppImage para receber atualizações automáticas. Os arquivos ficam na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest).
 
 1. Escolha **Nickname** ou **Microsoft** e ajuste a memória.
 2. Clique em **Instalar e jogar** e aguarde a preparação inicial.
@@ -45,7 +45,7 @@ A versão 2.0 substitui a interface Windows Forms por HTML, CSS e JavaScript, co
 - Downloads HTTPS, hashes, tentativas automáticas e até 12 recursos em paralelo.
 - Janela isolada: Node desabilitado na interface, sandbox e API limitada no preload.
 
-A pasta `%LOCALAPPDATA%\HollowSMP` e as preferências da versão 1.x são reaproveitadas. **Feche o launcher antigo antes de usar o novo.** O Electron inclui Chromium: o executável e o consumo de memória são maiores que na versão C#.
+No Windows, a pasta `%LOCALAPPDATA%\HollowSMP` e as preferências da versão 1.x são reaproveitadas. No Linux, os dados ficam em `${XDG_DATA_HOME:-~/.local/share}/averon-launcher`. **Feche o launcher antigo antes de usar o novo.** O Electron inclui Chromium: o executável e o consumo de memória são maiores que na versão C#.
 
 A política do modpack mantém configurações Java Properties locais para evitar que datas regravadas pelos mods invalidem a instalação do AutoModpack. A prevenção é aplicada na publicação do pacote e vale para o launcher atual. Consulte [a regra e a verificação de atualizações](docs/ATUALIZACOES.md).
 
@@ -56,7 +56,7 @@ A política do modpack mantém configurações Java Properties locais para evita
 | Nickname | Inicia diretamente com um nome de 3 a 16 letras, números ou `_`. Não autentica uma conta Microsoft; a entrada depende de o servidor permitir esse modo. |
 | Microsoft | Autoriza a conta no navegador e inicia o Minecraft diretamente pelo Averon. Exige acesso ativo ao Minecraft Java e cadastro do aplicativo aprovado. |
 
-O launcher oficial não é necessário. O Averon usa OAuth com PKCE no navegador do sistema, valida o acesso ao Minecraft Java e utiliza seu nome e UUID oficiais. O refresh token é protegido pelo Windows via Electron `safeStorage`; senha e access tokens não são salvos na conta. **Sair da conta** remove a sessão salva. O botão **Cancelar login** encerra a autorização em andamento.
+O launcher oficial não é necessário. O Averon usa OAuth com PKCE no navegador do sistema, valida o acesso ao Minecraft Java e utiliza seu nome e UUID oficiais. O refresh token é protegido pelo cofre seguro disponível no sistema via Electron `safeStorage`; senha e access tokens não são salvos na conta. **Sair da conta** remove a sessão salva. O botão **Cancelar login** encerra a autorização em andamento.
 
 **Integração em prévia:** o Client ID do Averon ainda não foi fornecido/aprovado. Sem esse cadastro, Microsoft exibe uma mensagem de configuração pendente antes de baixar o jogo. Nickname continua funcionando. O login com uma conta real só poderá ser validado após a aprovação. Consulte [o cadastro Microsoft](docs/MICROSOFT.md).
 
@@ -74,7 +74,7 @@ Feche o Minecraft e aguarde atualizações do modpack antes. O reset recusa proc
 
 ## Requisitos
 
-- Windows 10 ou 11 de 64 bits.
+- Windows 10/11 ou uma distribuição Linux x86_64 moderna.
 - Internet, espaço para o jogo/modpack e memória suficiente para o pack.
 - Conta com Minecraft Java para Microsoft, e aplicativo Averon registrado/aprovado.
 
@@ -82,7 +82,7 @@ O jogador não precisa instalar Node.js, Electron, Java ou um SDK. A barra de RA
 
 ## Desenvolver e compilar
 
-Use Node.js 24 LTS e npm em Windows x64. As versões de dependências são fixadas no `package-lock.json`.
+Use Node.js 24 LTS e npm em Windows ou Linux x64. As versões de dependências são fixadas no `package-lock.json`.
 
 O JAR do AveronSync contém artes Cubees licenciadas separadamente e fica fora do Git público. Antes dos testes ou da compilação, coloque `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.15.jar` em `assets/`: use a cópia em `resources/assets` do instalador correspondente, ou compile os fontes de `vendor/averonsync/AveronSync-0.15-source.zip` com os pacotes originais do responsável, seguindo `PETS-AVERONSYNC.md`. Confira o SHA-256 em [AVERONSYNC.md](docs/AVERONSYNC.md).
 
@@ -93,9 +93,12 @@ npm test
 npm run test:ui
 npm run build
 npm run package
+npm run build:linux
 ```
 
-`build` gera `dist/AveronSMP-Launcher-Setup-2.8.6.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/AveronSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
+`build` gera `dist/AveronSMP-Launcher-Setup-2.9.0.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/AveronSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
+
+`build:linux` gera AppImage e pacote `.deb`. O AppImage é o formato recomendado e recebe atualizações automáticas; dê permissão de execução (`chmod +x`) e abra-o. O `.deb` integra o launcher ao sistema, mas suas atualizações devem ser instaladas pelo gerenciador de pacotes.
 
 O executável não possui certificado de assinatura de código do Averon. Para uma distribuição assinada, configure seu certificado no electron-builder.
 

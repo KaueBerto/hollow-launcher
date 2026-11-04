@@ -74,7 +74,7 @@ app.whenReady().then(async () => {
   window = new BrowserWindow({
     width: smoke ? 920 : 380, height: smoke ? 530 : 440, resizable: false, maximizable: false, frame: false,
     backgroundColor: '#0d120f', show: false, autoHideMenuBar: true,
-    icon: path.join(__dirname, '..', 'assets', 'averon.ico'),
+    icon: path.join(__dirname, '..', 'assets', process.platform === 'win32' ? 'averon.ico' : 'averon-smp.png'),
     webPreferences: { preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, nodeIntegration: false, sandbox: true, webSecurity: true, autoplayPolicy: 'no-user-gesture-required', offscreen: smoke, backgroundThrottling: !smoke },
   });
   window.setMenu(null);
@@ -94,7 +94,7 @@ app.whenReady().then(async () => {
   window.on('show', () => { if (!smoke) serverMonitor.refresh(); });
   window.on('restore', () => { if (!smoke) serverMonitor.refresh(); });
   if (!smoke) {
-    tray = new Tray(path.join(__dirname, '..', 'assets', 'averon.ico'));
+    tray = new Tray(path.join(__dirname, '..', 'assets', process.platform === 'win32' ? 'averon.ico' : 'averon-smp.png'));
     tray.setToolTip('AVERON SMP — Launcher');
     tray.on('double-click', () => gameWindow.reveal());
     tray.setContextMenu(Menu.buildFromTemplate([
@@ -111,7 +111,8 @@ app.whenReady().then(async () => {
     discordPresence.start();
     launcherUpdate = new LauncherUpdate({
       updater: require('electron-updater').autoUpdater,
-      enabled: app.isPackaged && !process.env.PORTABLE_EXECUTABLE_DIR,
+      // NSIS and AppImage support self-update. A .deb is updated by its package manager.
+      enabled: app.isPackaged && !process.env.PORTABLE_EXECUTABLE_DIR && (process.platform === 'win32' || Boolean(process.env.APPIMAGE)),
       report: publish,
       active: () => state.busy || state.gameRunning || Boolean(engine.gameProcess),
       gamePids: () => engine.hollowGamePids(),

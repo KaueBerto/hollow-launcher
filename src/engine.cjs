@@ -16,12 +16,14 @@ const { jsonFrom, download } = require('./downloads.cjs');
 const { installJava, libraries, installer, install } = require('./game-installation.cjs');
 const { syncReady, SYNC_HASH: MOD_HASH } = require('./modpack-sync.cjs');
 const { memoryLimits, clampRam } = require('./core/memory.cjs');
+const { platformInfo } = require('./platform.cjs');
 
 class Engine {
   constructor({ root, assets, report = () => {}, platform = process.platform, totalMemory } = {}) {
-    this.root = path.resolve(root || path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local'), 'HollowSMP'));
+    this.system = platformInfo(platform);
+    this.root = path.resolve(root || this.system.defaultRoot);
     this.game = path.join(this.root, 'game');
-    this.java = path.join(this.root, 'runtime', 'bin', 'java.exe');
+    this.java = path.join(this.root, 'runtime', 'bin', this.system.javaName);
     this.assets = assets;
     this.report = report;
     this.platform = platform;
@@ -67,6 +69,14 @@ class Engine {
     return (await this.hollowGamePids()).length > 0;
   }
   async hollowGamePids() {
+    if (this.platform === 'linux') {
+      const { stdout } = await runFile('ps', ['-eo', 'pid=,args='], { timeout: 15000, maxBuffer: 4 * 1024 * 1024 });
+      const rows = stdout.split(/\r?\n/).flatMap(line => {
+        const match = line.trim().match(/^(\d+)\s+(.+)$/);
+        return match ? [{ pid: Number(match[1]), executable: '', command: match[2] }] : [];
+      });
+      return relevantJavaPids(rows, { game: this.game, java: this.java });
+    }
     if (this.platform !== 'win32') return [];
     const encodedRoot = Buffer.from(this.game).toString('base64');
     const encodedJava = Buffer.from(this.java).toString('base64');
@@ -91,8 +101,9 @@ class Engine {
     if (await exists(root)) await inspect(root);
   }
   async reset() {
-    const protectedRoots = [path.parse(this.root).root, os.homedir(), process.env.LOCALAPPDATA, process.env.APPDATA].filter(Boolean).map(value => path.resolve(value).toLowerCase());
-    if (protectedRoots.includes(this.root.toLowerCase()) || path.basename(this.root).toLowerCase() !== 'hollowsmp') throw new Error('Pasta de reset inválida.');
+    const protectedRoots = [path.parse(this.root).root, os.homedir(), process.env.LOCALAPPDATA, process.env.APPDATA, process.env.XDG_DATA_HOME].filter(Boolean).map(value => path.resolve(value).toLowerCase());
+    const allowedNames = new Set(['hollowsmp', 'averon-launcher']);
+    if (protectedRoots.includes(this.root.toLowerCase()) || !allowedNames.has(path.basename(this.root).toLowerCase())) throw new Error('Pasta de reset inválida.');
     if (await this.javaRunning()) throw new Error('Feche o Minecraft e aguarde a atualização do modpack antes de resetar.');
     await this.assertNoLinks(this.root);
     if (!await exists(this.root)) return;

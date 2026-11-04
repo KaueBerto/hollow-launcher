@@ -16,7 +16,7 @@ async function buildArguments(engine, nickname, ram, account) {
   const vanilla = await readJson(engine.versionFile(MC)), neo = await readJson(engine.versionFile(VERSION));
   const merged = new Map();
   for (const library of [...vanilla.libraries, ...neo.libraries]) {
-    if (!allowed(library)) continue;
+    if (!allowed(library, undefined, engine.platform)) continue;
     const parts = library.name.split(':');
     merged.set(`${parts[0]}:${parts[1]}:${parts[3] || ''}`, library);
   }
@@ -29,9 +29,9 @@ async function buildArguments(engine, nickname, ram, account) {
       const jar = under(libraries, artifact.path);
       if (!await exists(jar)) throw new Error(`Biblioteca ausente: ${path.basename(jar)}. Use Resetar para reparar.`);
       classpath.push(jar);
-      if (library.name.includes(':natives-windows')) await extract(jar, natives, true);
+      if (library.name.includes(`:natives-${engine.system.mojangName}`)) await extract(jar, natives, true);
     }
-    const classifier = library.natives?.windows?.replace('${arch}', '64');
+    const classifier = library.natives?.[engine.system.mojangName]?.replace('${arch}', '64');
     const native = library.downloads?.classifiers?.[classifier];
     if (native) await extract(under(libraries, native.path), natives, true);
   }
@@ -41,16 +41,16 @@ async function buildArguments(engine, nickname, ram, account) {
     assets_root: path.join(engine.game, 'assets'), assets_index_name: vanilla.assetIndex.id,
     auth_uuid: account?.id || offlineUuid(nickname), auth_access_token: account?.accessToken || '0', clientid: account?.clientId || '', auth_xuid: account?.xuid || '',
     user_type: account ? 'msa' : 'legacy', version_type: 'release', natives_directory: natives,
-    launcher_name: 'HollowSMP', launcher_version: require('../package.json').version, classpath: classpath.join(';'),
-    library_directory: libraries, classpath_separator: ';', user_properties: '{}',
+    launcher_name: 'AveronSMP', launcher_version: require('../package.json').version, classpath: classpath.join(engine.system.classpathSeparator),
+    library_directory: libraries, classpath_separator: engine.system.classpathSeparator, user_properties: '{}',
   };
   const expand = argument => String(argument).replace(/\$\{([^}]+)\}/g, (_, name) => {
     if (!(name in replacements)) throw new Error(`Argumento desconhecido: ${name}`);
     return replacements[name];
   });
-  return [`-Xms1G`, `-Xmx${ram}G`, '-Dfile.encoding=UTF-8', ...[vanilla, neo].flatMap(version => argumentsOf(version, 'jvm').map(expand)),
+  return [`-Xms1G`, `-Xmx${ram}G`, '-Dfile.encoding=UTF-8', ...[vanilla, neo].flatMap(version => argumentsOf(version, 'jvm', engine.platform).map(expand)),
     `-DignoreList=client-extra,${VERSION}.jar,${MC}.jar`, neo.mainClass,
-    ...[vanilla, neo].flatMap(version => argumentsOf(version, 'game').map(expand))];
+    ...[vanilla, neo].flatMap(version => argumentsOf(version, 'game', engine.platform).map(expand))];
 }
 async function launch(engine, nickname, ram, account) {
   if (alive(engine.gameProcess)) throw new Error('O Minecraft já está aberto.');

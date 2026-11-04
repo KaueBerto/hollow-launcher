@@ -24,22 +24,23 @@ function validateOptions(options, { requireNickname = true, memory = memoryLimit
   }
   return { mode: options.mode, ram: options.ram, nickname: String(options.nickname || '').slice(0, 16), remember: Boolean(options.remember), landscape: options.landscape === true };
 }
-function allowed(node, systemVersion = os.release()) {
+function allowed(node, systemVersion = os.release(), platform = process.platform) {
   if (!node.rules) return true;
   let allow = false;
   for (const rule of node.rules) {
     const system = rule.os || {};
-    let match = (!system.name || system.name === 'windows') && (!system.arch || ['x86_64', 'amd64'].includes(system.arch));
+    const name = platform === 'win32' ? 'windows' : platform;
+    let match = (!system.name || system.name === name) && (!system.arch || ['x86_64', 'amd64'].includes(system.arch));
     if (system.version && !new RegExp(system.version).test(systemVersion)) match = false;
     if (Object.values(rule.features || {}).some(Boolean)) match = false;
     if (match) allow = rule.action === 'allow';
   }
   return allow;
 }
-function argumentsOf(version, type) {
+function argumentsOf(version, type, platform = process.platform) {
   return (version.arguments?.[type] || []).flatMap(item => {
     if (typeof item === 'string') return [item];
-    if (!allowed(item)) return [];
+    if (!allowed(item, os.release(), platform)) return [];
     return Array.isArray(item.value) ? item.value : [item.value];
   });
 }
