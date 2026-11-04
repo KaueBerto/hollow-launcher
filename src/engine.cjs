@@ -42,12 +42,15 @@ class Engine {
       // Understand preferences saved by the previous Windows Forms launcher.
       const mode = value.mode === 1 || value.mode === 'microsoft' ? 'microsoft' : 'nickname';
       const ram = clampRam(value.ram, this.memory);
-      return { mode, ram, nickname: String(value.nickname || '').slice(0, 16), remember: value.remember !== false, landscape: value.landscape === true };
+      // Voxy used the same checkbox in 2.7-2.9. Do not turn that old consent
+      // into an automatic multi-gigabyte Distant Horizons download.
+      const landscape = value.landscape === true && value.landscapeKind === 'distant-horizons';
+      return { mode, ram, nickname: String(value.nickname || '').slice(0, 16), remember: value.remember !== false, landscape };
     } catch { return defaults; }
   }
   async saveSettings(options, validation) {
     const value = this.validateOptions(options, validation);
-    await writeJson(path.join(this.root, 'launcher-settings.json'), { ...value, nickname: value.remember ? value.nickname : '' });
+    await writeJson(path.join(this.root, 'launcher-settings.json'), { ...value, nickname: value.remember ? value.nickname : '', landscapeKind: 'distant-horizons' });
   }
   validateOptions(options, validation) { return validateOptions(options, { ...validation, memory: this.memory }); }
   async jsonFrom(url) { return jsonFrom(this, url); }

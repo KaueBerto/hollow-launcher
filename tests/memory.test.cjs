@@ -43,14 +43,14 @@ test('memory validation follows this machine rather than a fixed maximum of 24 G
   assert.equal(clampRam(500, memory), 64);
 });
 
-test('saved RAM above the new machine limit is clamped while all player preferences are retained', () => fixture(8, async engine => {
+test('saved RAM is clamped and old Voxy consent does not trigger a Distant Horizons download', () => fixture(8, async engine => {
   const preferences = { mode: 'nickname', nickname: 'MyPlayer', ram: 24, remember: true, landscape: true };
   const file = path.join(engine.root, 'launcher-settings.json');
   await fs.mkdir(engine.root);
   await fs.writeFile(file, JSON.stringify(preferences));
-  assert.deepEqual(await engine.loadSettings(), { ...preferences, ram: 8 });
+  assert.deepEqual(await engine.loadSettings(), { ...preferences, ram: 8, landscape: false });
   await engine.saveSettings(await engine.loadSettings());
-  assert.deepEqual(JSON.parse(await fs.readFile(file, 'utf8')), { ...preferences, ram: 8 });
+  assert.deepEqual(JSON.parse(await fs.readFile(file, 'utf8')), { ...preferences, ram: 8, landscape: false, landscapeKind: 'distant-horizons' });
   await assert.rejects(engine.saveSettings({ ...preferences, memory: memoryLimits(128 * GIB) }), /2 a 8 GB/);
   assert.equal(JSON.parse(await fs.readFile(file, 'utf8')).ram, 8);
 }));

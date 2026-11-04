@@ -1,6 +1,6 @@
 'use strict';
 const path = require('node:path');
-const { installLandscape, landscapeInfo } = require('./voxy-landscape.cjs');
+const { installLandscape, landscapeInfo } = require('./landscape.cjs');
 
 function registerHandlers({ ipcMain, shell, app, engine, microsoft, state, publish, trusted, result, prepare, getWindow, getUpdater, getMonitor, smoke }) {
   ipcMain.handle('launcher:open-logs', event => { trusted(event); shell.showItemInFolder(path.join(engine.root, 'game-launch.log')); return { ok: true }; });
@@ -10,7 +10,7 @@ function registerHandlers({ ipcMain, shell, app, engine, microsoft, state, publi
       if (state.gameRunning || engine.gameProcess) throw new Error('Feche o Minecraft antes de baixar a paisagem.');
       await engine.saveSettings(options, { requireNickname: false });
       const installed = await installLandscape(engine, { directory: options?.landscapeDirectory });
-      return { message: installed.alreadyInstalled ? 'Essa paisagem já está instalada.' : 'Paisagem instalada. O Voxy usará a paisagem no endereço selecionado.' };
+      return { message: installed.alreadyInstalled ? 'Essa paisagem já está instalada.' : 'Paisagem instalada. O Distant Horizons usará o LOD ao entrar no servidor.' };
     }));
   });
   ipcMain.handle('launcher:update-check', async event => { trusted(event); return result(async () => { await getUpdater()?.boot(); return {}; }); });
@@ -49,7 +49,7 @@ function registerHandlers({ ipcMain, shell, app, engine, microsoft, state, publi
       microsoft.session = null;
       publish({ account: null });
       await engine.install();
-      return { settings: selected, message: 'Instalação renovada. Nickname, opções, paisagem do Voxy e schematics foram preservados. Clique em Jogar e entre no servidor para receber o modpack.' };
+      return { settings: selected, message: 'Instalação renovada. Nickname, opções, paisagem do Distant Horizons e schematics foram preservados. Clique em Jogar e entre no servidor para receber o modpack.' };
     }));
   });
   ipcMain.handle('launcher:logout', async event => { trusted(event); return result(async () => {

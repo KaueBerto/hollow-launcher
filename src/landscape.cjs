@@ -8,6 +8,7 @@ const { pipeline } = require('node:stream/promises');
 const { createGunzip } = require('node:zlib');
 const MANIFEST = 'https://painel.hollowsmp.com.br/hollow-landscape/manifest.json';
 const DIRECTORY = 'Minecraft+Server/b4c77i87dhs4g@minecraft@@overworld';
+const LANDSCAPE_INFO = { kind: 'distant-horizons', bytes: 1861362621, unpackedBytes: 1924317184, temporaryBytes: 6000000000 };
 const { landscapeDirectory } = require('./landscape-folder.cjs');
 async function digest(file) { const h = crypto.createHash('sha256'); for await (const b of createReadStream(file)) h.update(b); return h.digest('hex'); }
 async function size(file) { try { return (await fs.stat(file)).size; } catch { return 0; } }
@@ -23,6 +24,7 @@ async function validDatabase(file, minimum = 16) {
   } catch (error) { if (error.code === 'ENOENT') return false; throw error; }
   finally { await handle?.close(); }
 }
+async function landscapeInfo() { return LANDSCAPE_INFO; }
 function validate(m) {
   if (!m || !Number.isInteger(m.version) || m.directory !== DIRECTORY || !Number.isSafeInteger(m.bytes) || m.bytes <= 0 || m.bytes > 4e9 || !Number.isSafeInteger(m.databaseBytes) || m.databaseBytes <= 0 || m.databaseBytes > 8e9 || !/^[a-f0-9]{64}$/.test(m.sha256) || !/^[a-f0-9]{64}$/.test(m.databaseSha256) || !m.url.startsWith('https://painel.hollowsmp.com.br/hollow-landscape/')) throw new Error('Dados da paisagem inválidos.');
   return m;
@@ -91,4 +93,4 @@ async function installLandscape(engine, { directory: selectedDirectory } = {}) {
     return {alreadyInstalled:false};
   } catch(error) { await fs.rm(temporary,{force:true});throw error; }
 }
-module.exports={MANIFEST,DIRECTORY,validate,downloadParts,installLandscape};
+module.exports={MANIFEST,DIRECTORY,LANDSCAPE_INFO,landscapeInfo,validate,downloadParts,installLandscape};
