@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   linux:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-slim
     env:
       RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
     steps:
@@ -27,6 +27,13 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      - name: Install archive tools when needed
+        run: |
+          if ! command -v 7z >/dev/null; then
+            if command -v sudo >/dev/null; then sudo apt-get update && sudo apt-get install -y p7zip-full
+            else apt-get update && apt-get install -y p7zip-full
+            fi
+          fi
       - name: Recover bundled AveronSync from the Windows installer
         env:
           GH_TOKEN: ${{ github.token }}
