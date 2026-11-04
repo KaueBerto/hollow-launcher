@@ -14,7 +14,10 @@ const smoke = process.argv.includes('--smoke-ui');
 const integration = process.argv.includes('--verify-engine');
 const verifyRootIndex = process.argv.indexOf('--test-root');
 const verifyOutputIndex = process.argv.indexOf('--test-output');
-if (smoke) app.disableHardwareAcceleration();
+// Some Linux distributions sandbox AppImages away from the system GBM/DRI
+// drivers. The launcher UI does not need GPU acceleration, and disabling it
+// here does not affect the separately spawned Minecraft Java process.
+if (smoke || process.platform === 'linux') app.disableHardwareAcceleration();
 let window, engine, tray, microsoft, serverMonitor;
 let discordPresence, launcherUpdate, quitting = false;
 const gameWindow = new GameWindow(() => window);
