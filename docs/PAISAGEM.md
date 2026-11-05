@@ -10,7 +10,7 @@ SHA-256: `2d505c515a933a8276c464606553c43548d332b7ec3c6500b90661964c4aa770`.
 
 A versão instalada (`voxy-1.0.0-iris.jar`) usa `%LOCALAPPDATA%\HollowSMP\game\.voxy\saves\<endereço>`. Esse caminho foi conferido no próprio mod. Dentro dele ficam `config.json` e as pastas `<identificador da dimensão>/storage`, contendo CURRENT, MANIFEST, SST e WAL do RocksDB.
 
-O endereço define a pasta, independentemente do nome em Multijogador. `hollowsmp.com.br` usa a pasta de mesmo nome; `hollowsmp.com.br:25565` usa `hollowsmp.com.br_25565`.
+O launcher mantém somente o cadastro `hollowsmp.com.br` e instala a paisagem na pasta exata usada por esse cadastro no Distant Horizons.
 
 O menu FancyMenu conecta pelo endereço sem porta explícita. Se houver também um cadastro com `:25565`, o launcher oferece a escolha antes do download. Escolha a forma que você usa para entrar. A escolha fica em `voxy-landscape-installed.json` e é reaproveitada depois.
 

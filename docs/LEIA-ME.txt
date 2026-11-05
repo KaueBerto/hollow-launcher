@@ -17,7 +17,7 @@ ATUALIZAR DO HOLLOW
 As versões instaladas anteriores recebem a atualização pelo mesmo
 repositório. O instalador preserva a pasta de dados e as preferências.
 Dados e logs continuam em %LOCALAPPDATA%\HollowSMP.
-O endereço atual do servidor continua hollowsmp.com.br:25565.
+O endereço único do servidor é hollowsmp.com.br.
 
 LOGIN
 Microsoft autoriza no navegador e inicia o Minecraft diretamente.

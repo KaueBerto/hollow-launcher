@@ -27,7 +27,7 @@ function serverList(buffer) {
 }
 const clean = text => text.replace(/[\\/:*?"<>|]/g, '');
 // Same PercentEscaper("", true) naming used by Distant Horizons 3.3.3.
-const escape = text => encodeURIComponent(text).replace(/[!'()*~]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase()).replace(/%20/g, '+');
+const escape = text => encodeURIComponent(text).replace(/[.!'()*~]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase()).replace(/%20/g, '+');
 function folderName(server, mode = 'NAME_ONLY') {
   const [host, port = ''] = server.ip.split(':');
   const name = clean(server.name), ip = clean(host), suffix = port ? '-' + clean(port) : '';
@@ -41,7 +41,7 @@ async function landscapeDirectory(game, level, { preferredDirectory, selectedDir
   const normalize = ip => ip.toLowerCase().replace(/:25565$/, '');
   let servers;
   try { servers = serverList(await fs.readFile(path.join(game, 'servers.dat'))); }
-  catch (e) { if (e.code !== 'ENOENT') throw e; servers = [{ name:'Hollow SMP', ip:SERVER }]; }
+  catch (e) { if (e.code !== 'ENOENT') throw e; servers = [{ name:SERVER, ip:SERVER }]; }
   const matching = servers.filter(s => typeof s.ip === 'string' && normalize(s.ip) === normalize(SERVER) && s.hidden !== 1);
   if (!matching.length) throw Error('Cadastre hollowsmp.com.br na lista de servidores antes de baixar a paisagem.');
   let config = '';

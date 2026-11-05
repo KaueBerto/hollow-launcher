@@ -36,7 +36,7 @@ async function smokeUi({ window, engine, publish, gameWindow, safeStorage, app, 
     check(!document.querySelector('#landscape').checked, 'Paisagem deve vir desmarcada');
     check(document.querySelector('.landscape-choice').textContent.includes('baixar paisagem do distant horizons do servidor'), 'Texto da paisagem');
     check(typeof window.hollow.landscape === 'function', 'Download opcional indisponível');
-    check(current.landscapeInfo?.kind==='distant-horizons' && document.querySelector('#landscape-size').textContent.includes('1,86 GB'), 'Tamanho do LOD do Distant Horizons incorreto');
+    check(current.landscapeInfo?.kind==='distant-horizons' && document.querySelector('#landscape-size').textContent.includes('1,24 MB'), 'Tamanho do LOD do Distant Horizons incorreto');
     for (let i=0;i<16;i++) { modes[i%2].click(); check(modes.filter(item=>item.checked).length===1,'Seletores de conta'); }
     modes[0].click();
     const slider=document.querySelector('#ram');const expectedRam=Math.min(13,Number(slider.max));slider.value=String(expectedRam);slider.dispatchEvent(new Event('input',{bubbles:true}));check(document.querySelector('#ram-value').textContent===expectedRam+' GB','Memória');slider.value='6';slider.dispatchEvent(new Event('input',{bubbles:true}));

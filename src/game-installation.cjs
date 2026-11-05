@@ -83,6 +83,17 @@ async function installer(engine, jar) {
   } finally { await new Promise(resolve => output.end(resolve)); }
   if (!await exists(engine.versionFile(VERSION))) throw new Error('A instalação do NeoForge está incompleta.');
 }
+async function ensureServerList(engine) {
+  await fs.mkdir(engine.game, { recursive: true });
+  const destination = path.join(engine.game, 'servers.dat');
+  const expected = nbtServerList();
+  try { if ((await fs.readFile(destination)).equals(expected)) return false; }
+  catch (error) { if (error.code !== 'ENOENT') throw error; }
+  const temporary = destination + '.averon-pending';
+  try { await fs.writeFile(temporary, expected); await fs.copyFile(temporary, destination); }
+  finally { await fs.rm(temporary, { force: true }); }
+  return true;
+}
 async function install(engine) {
   if (!['win32', 'linux'].includes(engine.platform) || process.arch !== 'x64') throw new Error('Este launcher exige Windows ou Linux de 64 bits.');
   await fs.mkdir(engine.game, { recursive: true });
@@ -118,9 +129,8 @@ async function install(engine) {
   });
   engine.progress('Preparando AVERON SMP…');
   await ensureSync(engine);
-  const servers = path.join(engine.game, 'servers.dat');
-  if (!await exists(servers)) await fs.writeFile(servers, nbtServerList());
+  await ensureServerList(engine);
   await writeJson(path.join(engine.root, 'ready.json'), { minecraft: MC, neoforge: NF, launcher: 'electron', created: new Date().toISOString() });
   engine.progress('Instalação concluída.', 1, 1);
 }
-module.exports = { installJava, libraries, installer, install };
+module.exports = { installJava, libraries, installer, ensureServerList, install };

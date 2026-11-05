@@ -9,6 +9,7 @@ function registerHandlers({ ipcMain, shell, app, engine, microsoft, state, publi
     return result(() => prepare(async () => {
       if (state.gameRunning || engine.gameProcess) throw new Error('Feche o Minecraft antes de baixar a paisagem.');
       await engine.saveSettings(options, { requireNickname: false });
+      await engine.ensureServerList();
       const installed = await installLandscape(engine, { directory: options?.landscapeDirectory });
       return { message: installed.alreadyInstalled ? 'Essa paisagem já está instalada.' : 'Paisagem instalada. O Distant Horizons usará o LOD ao entrar no servidor.' };
     }));
@@ -30,6 +31,7 @@ function registerHandlers({ ipcMain, shell, app, engine, microsoft, state, publi
       const account = selected.mode === 'microsoft' ? await microsoft.authenticate() : undefined;
       publish({ account: await microsoft.publicAccount() });
       if (!await engine.ready()) await engine.install();
+      await engine.ensureServerList();
       if (selected.landscape) await installLandscape(engine, { directory: options?.landscapeDirectory });
       // A first installation can outlast a short session. Refresh before launching.
       const identity = account ? await microsoft.authenticate() : undefined;

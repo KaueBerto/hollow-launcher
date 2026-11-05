@@ -13,7 +13,7 @@ const { exists, readJson, writeJson, under, hashFile, extract, copyTree } = requ
 const { workers } = require('./core/workers.cjs');
 const { buildArguments, launch } = require('./game-launch.cjs');
 const { jsonFrom, download } = require('./downloads.cjs');
-const { installJava, libraries, installer, install } = require('./game-installation.cjs');
+const { installJava, libraries, installer, ensureServerList, install } = require('./game-installation.cjs');
 const { syncReady, SYNC_HASH: MOD_HASH } = require('./modpack-sync.cjs');
 const { memoryLimits, clampRam } = require('./core/memory.cjs');
 const { platformInfo } = require('./platform.cjs');
@@ -64,6 +64,7 @@ class Engine {
   async installJava() { return installJava(this); }
   async libraries(version) { return libraries(this, version); }
   async installer(jar) { return installer(this, jar); }
+  async ensureServerList() { return ensureServerList(this); }
   async install() { return install(this); }
   async buildArguments(nickname, ram, account) { return buildArguments(this, nickname, ram, account); }
   async launch(nickname, ram, account) { return launch(this, nickname, ram, account); }

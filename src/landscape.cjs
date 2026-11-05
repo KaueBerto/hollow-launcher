@@ -7,8 +7,9 @@ const { Readable, Transform } = require('node:stream');
 const { pipeline } = require('node:stream/promises');
 const { createGunzip } = require('node:zlib');
 const MANIFEST = 'https://painel.hollowsmp.com.br/hollow-landscape/manifest.json';
-const DIRECTORY = 'Minecraft+Server/b4c77i87dhs4g@minecraft@@overworld';
-const LANDSCAPE_INFO = { kind: 'distant-horizons', bytes: 1861362621, unpackedBytes: 1924317184, temporaryBytes: 6000000000 };
+const DIRECTORY = 'hollowsmp%2Ecom%2Ebr/b4c77i87dhs4g@minecraft@@overworld';
+const LEGACY_DIRECTORY = 'Minecraft+Server/b4c77i87dhs4g@minecraft@@overworld';
+const LANDSCAPE_INFO = { kind: 'distant-horizons', bytes: 1236785, unpackedBytes: 1343488, temporaryBytes: 67108864 };
 const { landscapeDirectory } = require('./landscape-folder.cjs');
 async function digest(file) { const h = crypto.createHash('sha256'); for await (const b of createReadStream(file)) h.update(b); return h.digest('hex'); }
 async function size(file) { try { return (await fs.stat(file)).size; } catch { return 0; } }
@@ -29,7 +30,6 @@ function validate(m) {
   if (!m || !Number.isInteger(m.version) || m.directory !== DIRECTORY || !Number.isSafeInteger(m.bytes) || m.bytes <= 0 || m.bytes > 4e9 || !Number.isSafeInteger(m.databaseBytes) || m.databaseBytes <= 0 || m.databaseBytes > 8e9 || !/^[a-f0-9]{64}$/.test(m.sha256) || !/^[a-f0-9]{64}$/.test(m.databaseSha256) || !m.url.startsWith('https://painel.hollowsmp.com.br/hollow-landscape/')) throw new Error('Dados da paisagem inválidos.');
   return m;
 }
-// Legacy DH entry point remains available for existing diagnostics; the launcher now uses voxy-landscape.cjs.
 const { downloadParts: downloadArchiveParts } = require('./landscape-download.cjs');
 async function downloadParts(m, ...options) { validate(m); return downloadArchiveParts(m, ...options); }
 async function installLandscape(engine, { directory: selectedDirectory } = {}) {
@@ -49,7 +49,7 @@ async function installLandscape(engine, { directory: selectedDirectory } = {}) {
         await fs.writeFile(marker,JSON.stringify({...installed,directory}));
         return {alreadyInstalled:true};
       }
-      const previous=path.join(engine.game,'Distant_Horizons_server_data',DIRECTORY,'DistantHorizons.sqlite');
+      const previous=path.join(engine.game,'Distant_Horizons_server_data',LEGACY_DIRECTORY,'DistantHorizons.sqlite');
       if(previous!==target && !await size(target) && await validDatabase(previous,m.databaseBytes)) {
         engine.progress('Reaproveitando paisagem já baixada…');
         await fs.mkdir(path.dirname(target),{recursive:true});

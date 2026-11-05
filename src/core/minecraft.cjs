@@ -6,7 +6,7 @@ const { memoryLimits } = require('./memory.cjs');
 const MC = '1.21.1';
 const NF = '21.1.253';
 const VERSION = `neoforge-${NF}`;
-const SERVER = 'hollowsmp.com.br:25565';
+const SERVER = 'hollowsmp.com.br';
 function offlineUuid(nickname) {
   const bytes = crypto.createHash('md5').update(`OfflinePlayer:${nickname}`).digest();
   bytes[6] = (bytes[6] & 15) | 48;
@@ -46,7 +46,7 @@ function argumentsOf(version, type, platform = process.platform) {
 }
 function nbtServerList() {
   const string = text => { const bytes = Buffer.from(text); const length = Buffer.alloc(2); length.writeUInt16BE(bytes.length); return Buffer.concat([length, bytes]); };
-  return Buffer.concat([Buffer.from([10]), string(''), Buffer.from([9]), string('servers'), Buffer.from([10, 0, 0, 0, 1, 8]), string('name'), string('Hollow SMP'), Buffer.from([8]), string('ip'), string(SERVER), Buffer.from([0, 0])]);
+  return Buffer.concat([Buffer.from([10]), string(''), Buffer.from([9]), string('servers'), Buffer.from([10, 0, 0, 0, 1, 8]), string('name'), string(SERVER), Buffer.from([8]), string('ip'), string(SERVER), Buffer.from([0, 0])]);
 }
 
 

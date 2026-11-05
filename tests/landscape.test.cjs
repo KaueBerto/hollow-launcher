@@ -26,7 +26,7 @@ test('installation streams gzip, backs up existing database and does not downloa
  m.databaseBytes=raw.length;m.databaseSha256=crypto.createHash('sha256').update(raw).digest('hex');
  const oldFetch=global.fetch;let requests=0;
  const engine={root,game:path.join(root,'game'),gameProcess:null,javaRunning:async()=>false,jsonFrom:async()=>m,progress:()=>{}};
- const target=path.join(engine.game,'Distant_Horizons_server_data','Hollow+SMP',DIRECTORY.split('/')[1],'DistantHorizons.sqlite');
+ const target=path.join(engine.game,'Distant_Horizons_server_data',DIRECTORY,'DistantHorizons.sqlite');
  try{
   await fs.mkdir(path.dirname(target),{recursive:true});await fs.writeFile(target,'previous cache');
   global.fetch=async(url,options)=>{requests++;const [,start,end]=/bytes=(\d+)-(\d+)/.exec(options.headers.Range);return new Response(packed.subarray(+start,+end+1),{status:206,headers:{'content-range':`bytes ${start}-${end}/${packed.length}`}})};
@@ -42,8 +42,8 @@ test('legacy receipt reuses local landscape once, including databases changed du
  const raw=Buffer.concat([Buffer.from('SQLite format 3\0'),Buffer.alloc(100)]),m=manifest(Buffer.from('unused'));
  m.databaseBytes=raw.length;m.databaseSha256=crypto.createHash('sha256').update(raw).digest('hex');
  const engine={root,game:path.join(root,'game'),gameProcess:null,javaRunning:async()=>false,jsonFrom:async()=>m,progress:()=>{}};
- const original=path.join(engine.game,'Distant_Horizons_server_data',DIRECTORY,'DistantHorizons.sqlite');
- const target=path.join(engine.game,'Distant_Horizons_server_data','Hollow+SMP',DIRECTORY.split('/')[1],'DistantHorizons.sqlite');
+ const original=path.join(engine.game,'Distant_Horizons_server_data','Minecraft+Server',DIRECTORY.split('/')[1],'DistantHorizons.sqlite');
+ const target=path.join(engine.game,'Distant_Horizons_server_data',DIRECTORY,'DistantHorizons.sqlite');
  const oldFetch=global.fetch;
  try{
   global.fetch=async()=>{assert.fail('Paisagem já instalada não deve baixar novamente');};
@@ -55,7 +55,7 @@ test('legacy receipt reuses local landscape once, including databases changed du
   assert.equal(await fs.readFile(target+'-wal','utf8'),'pending terrain journal');
   await fs.appendFile(target,'terrain discovered during play');
   assert.equal((await installLandscape(engine)).alreadyInstalled,true);
-  assert.equal((JSON.parse(await fs.readFile(path.join(root,'landscape-installed.json')))).directory,path.join('Hollow+SMP',DIRECTORY.split('/')[1]));
+  assert.equal((JSON.parse(await fs.readFile(path.join(root,'landscape-installed.json')))).directory,DIRECTORY.replaceAll('/',path.sep));
  }finally{global.fetch=oldFetch;await fs.rm(root,{recursive:true,force:true});}
 });
 
@@ -64,7 +64,7 @@ test('legacy receipt upgrades in place and does not trust a truncated database',
  const raw=Buffer.concat([Buffer.from('SQLite format 3\0'),Buffer.alloc(100)]),{gzipSync}=require('node:zlib'),packed=gzipSync(raw),m=manifest(packed);
  m.databaseBytes=raw.length;m.databaseSha256=crypto.createHash('sha256').update(raw).digest('hex');
  const engine={root,game:path.join(root,'game'),gameProcess:null,javaRunning:async()=>false,jsonFrom:async()=>m,progress:()=>{}};
- const target=path.join(engine.game,'Distant_Horizons_server_data','Hollow+SMP',DIRECTORY.split('/')[1],'DistantHorizons.sqlite');
+ const target=path.join(engine.game,'Distant_Horizons_server_data',DIRECTORY,'DistantHorizons.sqlite');
  const oldFetch=global.fetch;let requests=0;
  try{
   global.fetch=async(url,options)=>{requests++;const [,start,end]=/bytes=(\d+)-(\d+)/.exec(options.headers.Range);return new Response(packed.subarray(+start,+end+1),{status:206,headers:{'content-range':`bytes ${start}-${end}/${packed.length}`}})};
