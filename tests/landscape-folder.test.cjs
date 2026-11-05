@@ -10,22 +10,22 @@ const {registrations}=require('./helpers/server-registrations.cjs');
 test('launcher keeps one canonical server and uses the exact DH folder from the active profile', () => {
   const [server] = serverList(nbtServerList());
   assert.equal(server.ip, 'hollowsmp.com.br');
-  assert.equal(server.name, 'hollowsmp.com.br');
-  assert.equal(folderName(server), 'hollowsmp%2Ecom%2Ebr');
+  assert.equal(server.name, 'Minecraft Server');
+  assert.equal(folderName(server), 'Minecraft+Server');
   assert.equal(folderName({...server,name:'Minecraft Server'}), 'Minecraft+Server');
   assert.equal(folderName({...server,name:'Hollow/ SMP!'}), 'Hollow+SMP%21');
-  assert.equal(folderName(server,'NAME_IP_PORT'), 'hollowsmp%2Ecom%2Ebr%2C+IP+hollowsmp%2Ecom%2Ebr');
+  assert.equal(folderName(server,'NAME_IP_PORT'), 'Minecraft+Server%2C+IP+hollowsmp.com.br');
   assert.throws(() => serverList(Buffer.from([10,0])));
 });
 test('destination follows saved cadastro and DH folder mode rather than manifest source folder', async () => {
   const game = await fs.mkdtemp(path.join(os.tmpdir(),'hollow-folder-'));
   try {
     await fs.writeFile(path.join(game,'servers.dat'),nbtServerList());
-    assert.equal(await landscapeDirectory(game,'level'),path.join('hollowsmp%2Ecom%2Ebr','level'));
+    assert.equal(await landscapeDirectory(game,'level'),path.join('Minecraft+Server','level'));
     await fs.mkdir(path.join(game,'config'));
     await fs.writeFile(path.join(game,'config','DistantHorizons.toml'),'serverFolderNameMode = "IP_ONLY"');
-    assert.equal(await landscapeDirectory(game,'level'),path.join('hollowsmp%2Ecom%2Ebr','level'));
-    assert.equal(serverList(require('node:zlib').gzipSync(nbtServerList()))[0].name,'hollowsmp.com.br');
+    assert.equal(await landscapeDirectory(game,'level'),path.join('hollowsmp.com.br','level'));
+    assert.equal(serverList(require('node:zlib').gzipSync(nbtServerList()))[0].name,'Minecraft Server');
   } finally { await fs.rm(game,{recursive:true,force:true}); }
 });
 test('duplicate server aliases offer a validated choice and remember the installed folder without editing servers.dat', async () => {
@@ -43,7 +43,7 @@ test('duplicate server aliases offer a validated choice and remember the install
     assert.deepEqual(await fs.readFile(path.join(game,'servers.dat')),original);
     await fs.mkdir(path.join(game,'config'));
     await fs.writeFile(path.join(game,'config/DistantHorizons.toml'),'serverFolderNameMode = "IP_ONLY"');
-    assert.equal(await landscapeDirectory(game,'level'),path.join('hollowsmp%2Ecom%2Ebr','level'));
+    assert.equal(await landscapeDirectory(game,'level'),path.join('hollowsmp.com.br','level'));
   } finally { await fs.rm(game,{recursive:true,force:true}); }
 });
 test('launcher replaces duplicate aliases with the single server used by the pack', async () => {
@@ -55,7 +55,7 @@ test('launcher replaces duplicate aliases with the single server used by the pac
     const {ensureServerList}=require('../src/game-installation.cjs');
     assert.equal(await ensureServerList({game}),true);
     const [server,...extra]=serverList(await fs.readFile(path.join(game,'servers.dat')));
-    assert.equal(server.name,'hollowsmp.com.br'); assert.equal(server.ip,'hollowsmp.com.br'); assert.equal(extra.length,0);
+    assert.equal(server.name,'Minecraft Server'); assert.equal(server.ip,'hollowsmp.com.br'); assert.equal(extra.length,0);
     assert.equal(await ensureServerList({game}),false);
   } finally { await fs.rm(root,{recursive:true,force:true}); }
 });

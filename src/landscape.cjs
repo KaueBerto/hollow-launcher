@@ -7,9 +7,9 @@ const { Readable, Transform } = require('node:stream');
 const { pipeline } = require('node:stream/promises');
 const { createGunzip } = require('node:zlib');
 const MANIFEST = 'https://painel.hollowsmp.com.br/hollow-landscape/manifest.json';
-const DIRECTORY = 'hollowsmp%2Ecom%2Ebr/b4c77i87dhs4g@minecraft@@overworld';
-const LEGACY_DIRECTORY = 'Minecraft+Server/b4c77i87dhs4g@minecraft@@overworld';
-const LANDSCAPE_INFO = { kind: 'distant-horizons', bytes: 1236785, unpackedBytes: 1343488, temporaryBytes: 67108864 };
+const DIRECTORY = 'Minecraft+Server/b4c77i87dhs4g@minecraft@@overworld';
+const LEGACY_DIRECTORY = DIRECTORY;
+const LANDSCAPE_INFO = { kind: 'distant-horizons', bytes: 1972884182, unpackedBytes: 2036940800, temporaryBytes: 5000000000 };
 const { landscapeDirectory } = require('./landscape-folder.cjs');
 async function digest(file) { const h = crypto.createHash('sha256'); for await (const b of createReadStream(file)) h.update(b); return h.digest('hex'); }
 async function size(file) { try { return (await fs.stat(file)).size; } catch { return 0; } }
