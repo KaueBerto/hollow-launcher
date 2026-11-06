@@ -1,11 +1,11 @@
 Este launcher é um projeto independente do AVERON SMP.
 
-AveronSync 4.0.6-averonsync.0.15
+AveronSync 4.0.6-averonsync.0.26
 Fork do AutoModpack 4.0.6, por Skidam; modificações por AveronSync contributors.
 Licença LGPL-3.0; avisos originais preservados no JAR fornecido.
 Fontes correspondentes completos, instruções e avisos do fork:
-licenses/AveronSync-0.15-source.zip no instalador e no ZIP de distribuição;
-vendor/averonsync/AveronSync-0.15-source.zip no repositório do launcher.
+licenses/AveronSync-0.26-source.zip no instalador e no ZIP de distribuição;
+vendor/averonsync/AveronSync-0.26-source.zip no repositório do launcher.
 Upstream: https://github.com/Skidamek/AutoModpack/tree/v4.0.6
 O JAR é copiado separadamente para mods. Não foi modificado pelo launcher.
 
@@ -76,3 +76,6 @@ Licenças preservadas em licenses/yauzl-LICENSE.txt e licenses/pend-LICENSE.txt,
 Cubees: os recursos cosméticos de pets estão no JAR AveronSync.
 Créditos e direitos originais preservados em licenses/Cubees-NOTICE.txt.
 Essas artes não estão sob LGPL e não integram o arquivo de fontes do programa.
+
+LittleRoom: cavalo castanho, apito, texturas e sons no JAR AveronSync.
+Direitos e créditos em licenses/LittleRoom-NOTICE.txt; artes excluídas das fontes LGPL.

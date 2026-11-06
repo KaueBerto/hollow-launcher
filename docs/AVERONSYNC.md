@@ -1,8 +1,8 @@
 # AveronSync no launcher
 
-O launcher 2.8.6 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.15.jar`, sem alterações.
+O launcher 2.8.6 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.26.jar`, sem alterações.
 
-SHA-256: `f2e0821d753982a336fe1a4f11e809c693e01fa74d4d82026ef965b4d87741bc`.
+SHA-256: `cb6f9eba6eda3ab82a1dbf9335994c0f5a39afbcfcb090ca7f89ec05a2f7cf9a`.
 
 O fork mantém os IDs `automodpack` e `automodpack_mod`. Por isso, não pode coexistir com o AutoModpack original. A integração identifica o ID nos metadados NeoForge, inclusive se alguém renomear o JAR, e preserva uma cópia antes de retirá-lo de `mods`.
 
@@ -22,7 +22,7 @@ O servidor precisa usar o protocolo compatível com esse fork. A integração no
 
 ## Código correspondente
 
-O arquivo `vendor/averonsync/AveronSync-0.15-source.zip` contém os fontes correspondentes desta versão, incluindo Gradle, instruções de compilação, licenças, fila VIP e starter kits do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
+O arquivo `vendor/averonsync/AveronSync-0.26-source.zip` contém os fontes correspondentes desta versão, incluindo Gradle, instruções de compilação, licenças, fila VIP e starter kits do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
 
 ## AveronSync 0.11 / launcher 2.8.4
 
@@ -41,3 +41,7 @@ As artes Cubees mantêm os direitos de seus autores; veja `licenses/Cubees-NOTIC
 Corrige o relógio visual dos pets em mundos com milhões de ticks: a soma do tempo inteiro com o partial tick passa a preservar precisão double. Antes, em torno de 51 milhões de ticks, o arredondamento float limitava o avanço a quatro ticks por vez, aproximadamente 5 atualizações por segundo. A animação e o movimento de seguir o dono agora avançam entre ticks. Os 16 pets e a restrição do VIP nível 1 aos três pets escolhidos permanecem.
 
 Instalar o novo JAR na VPS não ativa a versão sem reiniciar o Minecraft. Clientes e servidor devem executar 0.15 para conectar. Esta distribuição não reinicia a VPS.
+
+## AveronSync 0.26 / launcher 2.9.6
+
+Menu G com abas Cavalos e Pets; seleção dos três pets do VIP nível 1, guardar, carinho e emote. Pets com 75% da escala original e posicionamento à direita ao agachar. Inclui o cavalo castanho de missão, apito original vinculado ao dono, corrida no Ctrl e seleção no menu G. Missão ainda precisa ser configurada no servidor. Clientes e servidor precisam executar 0.26. Instalar o JAR na VPS exige reinício posterior do Minecraft para ativação.

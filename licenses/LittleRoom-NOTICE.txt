@@ -1,0 +1,6 @@
+Basic bay horse model, original whistle model, textures and sounds imported from the owner's
+LITTLEROOM_horsepack_v2_1_1_21_4.rar, authored by LittleRoom.
+https://www.patreon.com/littleroomdev
+These assets remain subject to the original author's terms. They are not
+relicensed under AveronSync's source-code license. Generated artwork is excluded
+from source publication. No MythicMobs or ModelEngine plugin code is executed.
