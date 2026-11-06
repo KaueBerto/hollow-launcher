@@ -45,3 +45,7 @@ Instalar o novo JAR na VPS não ativa a versão sem reiniciar o Minecraft. Clien
 ## AveronSync 0.26 / launcher 2.9.6
 
 Menu G com abas Cavalos e Pets; seleção dos três pets do VIP nível 1, guardar, carinho e emote. Pets com 75% da escala original e posicionamento à direita ao agachar. Inclui o cavalo castanho de missão, apito original vinculado ao dono, corrida no Ctrl e seleção no menu G. Missão ainda precisa ser configurada no servidor. Clientes e servidor precisam executar 0.26. Instalar o JAR na VPS exige reinício posterior do Minecraft para ativação.
+
+## AveronSync 0.27 / launcher 2.9.7
+
+Corrige curvas normais do cavalo: a velocidade retida do tick anterior gira junto com o corpo, evitando continuar na direção antiga. Mantém a velocidade, componente vertical e a derrapagem explícita. Teste nativo reproduziu aproximadamente 4 graus de divergência na 0.26; na 0.27 os oito casos de esquerda/direita, avanço/ré e velocidades diferentes ficaram abaixo de 0,01 grau. Cliente e servidor devem executar 0.27. Instalação na VPS não inclui reinício.

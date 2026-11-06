@@ -1,6 +1,6 @@
 {
   "name": "hollow-launcher",
-  "version": "2.9.6",
+  "version": "2.9.7",
   "description": "Launcher Electron do AVERON SMP para Windows e Linux",
   "author": {
     "name": "AVERON SMP",
@@ -77,12 +77,12 @@
         "to": "preflight-source"
       },
       {
-        "from": "assets/averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.26.jar",
-        "to": "assets/averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.26.jar"
+        "from": "assets/averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.27.jar",
+        "to": "assets/averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.27.jar"
       },
       {
-        "from": "vendor/averonsync/AveronSync-0.26-source.zip",
-        "to": "licenses/AveronSync-0.26-source.zip"
+        "from": "vendor/averonsync/AveronSync-0.27-source.zip",
+        "to": "licenses/AveronSync-0.27-source.zip"
       }
     ],
     "asar": true,
