@@ -49,3 +49,7 @@ Menu G com abas Cavalos e Pets; seleção dos três pets do VIP nível 1, guarda
 ## AveronSync 0.27 / launcher 2.9.7
 
 Corrige curvas normais do cavalo: a velocidade retida do tick anterior gira junto com o corpo, evitando continuar na direção antiga. Mantém a velocidade, componente vertical e a derrapagem explícita. Teste nativo reproduziu aproximadamente 4 graus de divergência na 0.26; na 0.27 os oito casos de esquerda/direita, avanço/ré e velocidades diferentes ficaram abaixo de 0,01 grau. Cliente e servidor devem executar 0.27. Instalação na VPS não inclui reinício.
+
+## AveronSync 0.29 / launcher 2.9.8
+
+Deslocamento horizontal do cavalo em 50% da velocidade anterior: trote aproximadamente 2 blocos/s e galope 12,5 blocos/s. Animações e sons de passos no ritmo original. Comandos mais recentes prevalecem quando vários chegam no mesmo tick; física calculada uma vez por tick no servidor, com dono e autenticação validados. Renderização usa o arco mais curto ao atravessar +180/-180 graus. Câmera livre, controles e correção de trajetória da 0.27 preservados. Testes locais de servidor e cliente aprovados na 0.28; ritmo original restaurado e 130 testes core aprovados na 0.29. Cliente e servidor devem executar 0.29. Instalação na VPS não inclui reinício.
