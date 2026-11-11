@@ -48,7 +48,7 @@ jobs:
           archive="$(find /tmp/averon-installer/extracted -name 'app-64.7z' -print -quit)"
           test -n "$archive"
           7z x "$archive" -o/tmp/averon-app
-          jar="$(find /tmp/averon-app -name 'averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.29.jar' -print -quit)"
+          jar="$(find /tmp/averon-app -name 'averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.32.jar' -print -quit)"
           test -n "$jar"
           cp "$jar" assets/
       - run: npm ci

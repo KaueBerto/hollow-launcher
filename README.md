@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/averon-smp.png" alt="AVERON SMP" width="260"></p>
 <h1 align="center">Averon Launcher</h1>
 <p align="center">Launcher Electron do AVERON SMP para Windows e Linux.<br>Instalação automática, visual pixelado e modpack pelo AveronSync.</p>
-<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-f6c844"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-c9362a"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.9.8-f6c844"></p>
+<p align="center"><img alt="Electron" src="https://img.shields.io/badge/Electron-44.5.1-f6c844"> <img alt="Minecraft" src="https://img.shields.io/badge/Minecraft-1.21.1-c9362a"> <img alt="Launcher" src="https://img.shields.io/badge/Launcher-2.9.9-f6c844"></p>
 
 ![Interface do Averon Launcher](docs/launcher.png)
 
@@ -13,7 +13,7 @@ O Minecraft já abre com o menu AVERON personalizado desde a primeira execução
 
 ## Baixar e jogar
 
-A versão 2.9.8 inclui AveronSync 0.29 com velocidade reduzida do cavalo, animações no ritmo original e ajustes de comandos e direção, menu G para cavalos e pets e ajuste de tamanho dos pets. Mantém o suporte a Windows e Linux e volta a oferecer a paisagem do Distant Horizons no lugar do Voxy. No Windows, use o instalador `.exe`; no Linux, prefira o AppImage para receber atualizações automáticas. Os arquivos ficam na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest).
+A versão 2.9.9 inclui AveronSync 0.32 com chegada do cavalo ao apito, vínculo com bônus em estradas, dano de queda e ajuste de câmera para Better Third Person. No Windows, use o instalador `.exe`; no Linux, prefira o AppImage para receber atualizações automáticas. Os arquivos ficam na página de [Releases](https://github.com/KaueBerto/hollow-launcher/releases/latest).
 
 1. Escolha **Nickname** ou **Microsoft** e ajuste a memória.
 2. Clique em **Instalar e jogar** e aguarde a preparação inicial.

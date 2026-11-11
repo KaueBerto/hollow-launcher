@@ -53,3 +53,7 @@ Corrige curvas normais do cavalo: a velocidade retida do tick anterior gira junt
 ## AveronSync 0.29 / launcher 2.9.8
 
 Deslocamento horizontal do cavalo em 50% da velocidade anterior: trote aproximadamente 2 blocos/s e galope 12,5 blocos/s. Animações e sons de passos no ritmo original. Comandos mais recentes prevalecem quando vários chegam no mesmo tick; física calculada uma vez por tick no servidor, com dono e autenticação validados. Renderização usa o arco mais curto ao atravessar +180/-180 graus. Câmera livre, controles e correção de trajetória da 0.27 preservados. Testes locais de servidor e cliente aprovados na 0.28; ritmo original restaurado e 130 testes core aprovados na 0.29. Cliente e servidor devem executar 0.29. Instalação na VPS não inclui reinício.
+
+## AveronSync 0.32 / launcher 2.9.9
+
+O cavalo relincha ao apito, chega trotando e desacelera perto do dono. Monte com o botão direito. O vínculo aparece no menu G e dá +10% e +20% de velocidade em estradas após 5 e 15 minutos de deslocamento montado. Cavalo e cavaleiro recebem dano de queda separadamente. Se o cavalo morrer, `/cavalo apito` entrega um novo apito. Com Better Third Person instalado, esta montaria usa a câmera padrão do Minecraft.
