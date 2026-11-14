@@ -18,7 +18,10 @@ concurrency:
 
 jobs:
   macos:
-    runs-on: macos-14
+    # Use an explicit Intel image: the generic macos-14 label may resolve to
+    # an unavailable ARM64 configuration. electron-builder still produces a
+    # universal app containing both x64 and arm64 Electron slices.
+    runs-on: macos-15-intel
     env:
       RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
     steps:
