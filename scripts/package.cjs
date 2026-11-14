@@ -33,12 +33,28 @@ const metadata = require('../package.json');
   zip.addLocalFolder(path.join(root, 'licenses'), 'licenses');
   zip.addLocalFile(path.join(root, 'vendor/averonsync/AveronSync-0.32-source.zip'), 'licenses');
   zip.addLocalFolder(path.join(root, 'java', 'preflight'), 'preflight-source');
-  // Chromium notices are distributed by Electron alongside its runtime.
-  zip.addLocalFile(path.join(root, 'node_modules', 'electron', 'dist', 'LICENSE'), 'licenses', 'Electron-LICENSE.txt');
-  zip.addLocalFile(path.join(root, 'node_modules', 'electron', 'dist', 'LICENSES.chromium.html'), 'licenses');
+  // electron-builder may keep the runtime only in win-unpacked after packaging.
+  const electronLicense = await firstExisting([
+    path.join(root, 'node_modules', 'electron', 'dist', 'LICENSE'),
+    path.join(root, 'node_modules', 'electron', 'LICENSE'),
+    path.join(dist, 'win-unpacked', 'LICENSE.electron.txt'),
+  ]);
+  const chromiumNotices = await firstExisting([
+    path.join(root, 'node_modules', 'electron', 'dist', 'LICENSES.chromium.html'),
+    path.join(dist, 'win-unpacked', 'LICENSES.chromium.html'),
+  ]);
+  zip.addLocalFile(electronLicense, 'licenses', 'Electron-LICENSE.txt');
+  zip.addLocalFile(chromiumNotices, 'licenses');
   const archive = path.join(dist, 'AveronSMP-Launcher-Windows.zip');
   zip.writeZip(archive);
   const files = [archive, exe, `${exe}.blockmap`, path.join(dist, 'latest.yml')];
   await fs.writeFile(path.join(dist, 'SHA256.txt'), (await Promise.all(files.map(async file => `${await hashFile(file, 'sha256')}  ${path.basename(file)}\n`))).join(''));
   console.log(`Pacote criado: ${archive}`);
 })().catch(error => { console.error(error); process.exitCode = 1; });
+
+async function firstExisting(candidates) {
+  for (const candidate of candidates) {
+    try { await fs.access(candidate); return candidate; } catch {}
+  }
+  throw new Error(`Licença distribuída não encontrada: ${candidates.map(file => path.basename(file)).join(', ')}`);
+}
