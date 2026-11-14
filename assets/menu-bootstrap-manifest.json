@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "id": "averon-fancymenu-20261025-resourcepack",
+  "id": "averon-fancymenu-20261114-macos-png",
   "minecraft": "1.21.1",
   "files": [
     {
@@ -118,9 +118,9 @@
     {
       "path": "config/fancymenu/assets/averonsmp.png",
       "kind": "default",
-      "sha256": "31f7d6942c7ba57d7b7b92f1e0d2c6a664bfcf7f4b7160d4eca5586ce8104106",
-      "size": 1278541,
-      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/31f7d6942c7ba57d7b7b92f1e0d2c6a664bfcf7f4b7160d4eca5586ce8104106.png"
+      "sha256": "31344ffd9641c6695619c4f77bf969b93e056b257ced4e61eb834578ad863278",
+      "size": 1254875,
+      "url": "https://painel.hollowsmp.com.br/hollow-packs/launcher-menu/31344ffd9641c6695619c4f77bf969b93e056b257ced4e61eb834578ad863278.png"
     },
     {
       "path": "config/drippyloadingscreen/options.txt",
