@@ -85,6 +85,8 @@ async function prepareMenu(engine, { manifest } = {}) {
   let downloaded = 0, installed = 0;
   for (const item of manifest.files) {
     const destination = path.join(engine.game, ...item.path.split('/'));
+    const managedMedia = item.kind === 'default' && /^config\/fancymenu\/assets\/.+\.(?:png|mp4)$/i.test(item.path);
+    let replaceExisting = false;
     await noLinks(engine.root, destination);
     if (item.kind === 'mod') {
       const active = path.join(engine.game, 'automodpack/client/active/mods');
@@ -116,7 +118,14 @@ async function prepareMenu(engine, { manifest } = {}) {
         if (await hashFile(destination, 'sha256') !== item.sha256) throw Error('O resource pack local difere do padrão. O arquivo foi preservado; confira a instalação.');
         continue;
       } catch (error) { if (error.code !== 'ENOENT') throw error; }
+    } else if (managedMedia) {
+      try {
+        const stat = await fs.stat(destination);
+        if (stat.size === item.size && await hashFile(destination, 'sha256') === item.sha256) continue;
+        replaceExisting = true;
+      } catch (error) { if (error.code !== 'ENOENT') throw error; }
     } else {
+      // Text layouts and options are intentionally player-editable defaults.
       try { await fs.access(destination); continue; } catch (error) { if (error.code !== 'ENOENT') throw error; }
     }
     const cached = path.join(engine.root, 'downloads/menu', item.sha256 + path.extname(item.path));
@@ -128,8 +137,9 @@ async function prepareMenu(engine, { manifest } = {}) {
     downloaded++;
     await fs.mkdir(path.dirname(destination), { recursive: true });
     await noLinks(engine.root, destination);
-    try { await fs.copyFile(cached, destination, constants.COPYFILE_EXCL); }
+    try { await fs.copyFile(cached, destination, replaceExisting ? 0 : constants.COPYFILE_EXCL); }
     catch (error) { if (error.code !== 'EEXIST') throw error; else continue; }
+    if (await hashFile(destination, 'sha256') !== item.sha256 || (await fs.stat(destination)).size !== item.size) throw Error('Não foi possível reparar a mídia do menu. O jogo não foi aberto.');
     installed++;
     if (item.kind === 'mod') owned[item.path] = item.sha256;
     // Persist ownership after each JAR, so an interrupted first installation can resume safely.

@@ -34,6 +34,18 @@ test('fresh menu installs before first launch; subsequent offline launches do no
   assert.equal(await fs.readFile(path.join(engine.game, manifest.files[1].path), 'utf8'), 'player custom menu');
   assert.equal(await fs.readFile(path.join(engine.game, 'options.txt'), 'utf8'), 'renderDistance:20');
 }));
+test('corrupt FancyMenu media is repaired while editable layouts stay untouched', () => fixture(async ({ engine, manifest, calls }) => {
+  await prepareMenu(engine, { manifest });
+  const layout = path.join(engine.game, manifest.files[1].path);
+  const media = path.join(engine.game, manifest.files[2].path);
+  await fs.writeFile(layout, 'player custom menu');
+  await fs.writeFile(media, 'corrupt media');
+  const result = await prepareMenu(engine, { manifest });
+  assert.equal(result.installed, 1);
+  assert.equal(calls(), 4);
+  assert.equal(await fs.readFile(layout, 'utf8'), 'player custom menu');
+  assert.equal(await fs.readFile(media, 'utf8'), 'video bytes');
+}));
 test('server projection replaces an owned bootstrap mod without duplicate JARs or changing the projection', () => fixture(async ({ engine, manifest, calls }) => {
   await prepareMenu(engine, { manifest });
   const active = path.join(engine.game, 'automodpack/client/active/mods/fancymenu_neoforge_new.jar');
