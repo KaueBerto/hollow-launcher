@@ -22,7 +22,10 @@ const data = {
 };
 
 async function fixture(operation) {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'averon-voxy-'));
+  // macOS exposes /var as a system symlink to /private/var. Use the canonical
+  // temporary path so reset link protection tests the fixture itself instead
+  // of rejecting that operating-system alias.
+  const root = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), 'averon-voxy-')));
   const zip = new AdmZip();
   for (const [name, value] of Object.entries(data)) zip.addFile(`${SERVER}/${name}`, Buffer.from(value));
   const bytes = zip.toBuffer();
