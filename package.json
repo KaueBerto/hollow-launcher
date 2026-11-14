@@ -90,7 +90,7 @@
     "win": {
       "target": "nsis",
       "icon": "assets/averon.ico",
-      "artifactName": "AveronSMP-Launcher-Setup-${version}.exe",
+      "artifactName": "AveronSMP-Windows-Instalador-${version}.exe",
       "signAndEditExecutable": true
     },
     "linux": {
@@ -101,7 +101,7 @@
       "category": "Game",
       "icon": "assets/averon-smp.png",
       "syncDesktopName": true,
-      "artifactName": "AveronSMP-Launcher-${version}-${arch}.${ext}"
+      "artifactName": "AveronSMP-Linux-${ext}-${version}.${ext}"
     },
     "mac": {
       "target": [
@@ -110,7 +110,7 @@
       ],
       "category": "public.app-category.games",
       "icon": "assets/averon-smp.png",
-      "artifactName": "AveronSMP-Launcher-${version}-${arch}.${ext}",
+      "artifactName": "AveronSMP-macOS-Universal-${version}.${ext}",
       "identity": "-",
       "hardenedRuntime": false,
       "gatekeeperAssess": false

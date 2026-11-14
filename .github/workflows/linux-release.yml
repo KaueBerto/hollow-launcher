@@ -43,7 +43,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p /tmp/averon-installer /tmp/averon-app
-          gh release download "$RELEASE_TAG" --pattern 'AveronSMP-Launcher-Setup-*.exe' --dir /tmp/averon-installer
+          gh release download "$RELEASE_TAG" --pattern 'AveronSMP-Windows-Instalador-*.exe' --dir /tmp/averon-installer
           7z x /tmp/averon-installer/*.exe -o/tmp/averon-installer/extracted
           archive="$(find /tmp/averon-installer/extracted -name 'app-64.7z' -print -quit)"
           test -n "$archive"

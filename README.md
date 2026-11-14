@@ -97,7 +97,7 @@ npm run build:linux
 npm run build:mac
 ```
 
-`build` gera `dist/AveronSMP-Launcher-Setup-2.9.1.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/AveronSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
+`build` gera `dist/AveronSMP-Windows-Instalador-<versão>.exe`, um instalador NSIS, seu `.blockmap` e `latest.yml` para atualização automática. `package` gera `dist/AveronSMP-Launcher-Windows.zip`, instruções, licenças e `SHA256.txt`. O empacotamento usa electron-builder e não exige Visual Studio ou compilador C#.
 
 `build:linux` gera AppImage e pacote `.deb`. O AppImage é o formato recomendado e recebe atualizações automáticas; dê permissão de execução (`chmod +x`) e abra-o. O `.deb` integra o launcher ao sistema, mas suas atualizações devem ser instaladas pelo gerenciador de pacotes.
 
