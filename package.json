@@ -1,7 +1,7 @@
 {
   "name": "hollow-launcher",
-  "version": "2.9.9",
-  "description": "Launcher Electron do AVERON SMP para Windows e Linux",
+  "version": "2.9.10",
+  "description": "Launcher Electron do AVERON SMP para Windows, Linux e macOS",
   "author": {
     "name": "AVERON SMP",
     "email": "kaueberto@users.noreply.github.com"
@@ -16,6 +16,7 @@
     "test:ui": "node scripts/smoke.cjs",
     "build": "electron-builder --win nsis --x64 --publish never",
     "build:linux": "electron-builder --linux AppImage deb --x64 --publish never",
+    "build:mac": "electron-builder --mac dmg zip --universal --publish never",
     "package": "node scripts/package.cjs"
   },
   "dependencies": {
@@ -101,6 +102,18 @@
       "icon": "assets/averon-smp.png",
       "syncDesktopName": true,
       "artifactName": "AveronSMP-Launcher-${version}-${arch}.${ext}"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.games",
+      "icon": "assets/averon-smp.png",
+      "artifactName": "AveronSMP-Launcher-${version}-${arch}.${ext}",
+      "identity": "-",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
     },
     "nsis": {
       "oneClick": false,

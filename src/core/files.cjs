@@ -35,7 +35,7 @@ async function hashFile(file, algorithm = 'sha1') {
 async function extract(zipPath, target, nativesOnly = false) {
   const zip = new AdmZip(zipPath);
   // Validate the whole archive before writing even the first file.
-  const entries = zip.getEntries().filter(entry => !nativesOnly || /\.dll$/i.test(entry.entryName));
+  const entries = zip.getEntries().filter(entry => !nativesOnly || /\.(?:dll|so|dylib|jnilib)$/i.test(entry.entryName));
   for (const entry of entries) {
     under(target, entry.entryName);
     const mode = entry.header.attr >>> 16;

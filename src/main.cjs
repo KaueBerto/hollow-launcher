@@ -114,8 +114,9 @@ app.whenReady().then(async () => {
     discordPresence.start();
     launcherUpdate = new LauncherUpdate({
       updater: require('electron-updater').autoUpdater,
-      // NSIS and AppImage support self-update. A .deb is updated by its package manager.
-      enabled: app.isPackaged && !process.env.PORTABLE_EXECUTABLE_DIR && (process.platform === 'win32' || Boolean(process.env.APPIMAGE)),
+      // NSIS, AppImage and the macOS ZIP companion support self-update.
+      // A .deb is updated by its package manager.
+      enabled: app.isPackaged && !process.env.PORTABLE_EXECUTABLE_DIR && (process.platform === 'win32' || process.platform === 'darwin' || Boolean(process.env.APPIMAGE)),
       report: publish,
       active: () => state.busy || state.gameRunning || Boolean(engine.gameProcess),
       gamePids: () => engine.hollowGamePids(),

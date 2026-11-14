@@ -1,0 +1,57 @@
+name: Build macOS release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to build and update
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: macos-release-${{ github.repository }}
+  cancel-in-progress: true
+
+jobs:
+  macos:
+    runs-on: macos-14
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # A manual retry uses the repaired default branch while still
+          # uploading artifacts to the requested release tag.
+          ref: ${{ inputs.tag && 'main' || env.RELEASE_TAG }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install archive tools when needed
+        run: command -v 7z >/dev/null || brew install p7zip
+      - name: Recover bundled AveronSync from the Windows installer
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/averon-installer /tmp/averon-app
+          gh release download "$RELEASE_TAG" --pattern 'AveronSMP-Launcher-Setup-*.exe' --dir /tmp/averon-installer
+          7z x /tmp/averon-installer/*.exe -o/tmp/averon-installer/extracted
+          archive="$(find /tmp/averon-installer/extracted -name 'app-64.7z' -print -quit)"
+          test -n "$archive"
+          7z x "$archive" -o/tmp/averon-app
+          jar="$(find /tmp/averon-app -name 'averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.32.jar' -print -quit)"
+          test -n "$jar"
+          cp "$jar" assets/
+      - run: npm ci
+      - run: npm test
+      - run: npm run build:mac
+      - name: Upload macOS packages and updater metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shasum -a 256 dist/*.dmg dist/*.zip > dist/SHA256-macOS.txt
+          gh release upload "$RELEASE_TAG" dist/*.dmg dist/*.zip dist/latest-mac.yml dist/SHA256-macOS.txt --clobber

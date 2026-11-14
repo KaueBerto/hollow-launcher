@@ -16,7 +16,7 @@ async function buildArguments(engine, nickname, ram, account) {
   const vanilla = await readJson(engine.versionFile(MC)), neo = await readJson(engine.versionFile(VERSION));
   const merged = new Map();
   for (const library of [...vanilla.libraries, ...neo.libraries]) {
-    if (!allowed(library, undefined, engine.platform)) continue;
+    if (!allowed(library, undefined, engine.platform, engine.arch)) continue;
     const parts = library.name.split(':');
     merged.set(`${parts[0]}:${parts[1]}:${parts[3] || ''}`, library);
   }
@@ -48,9 +48,9 @@ async function buildArguments(engine, nickname, ram, account) {
     if (!(name in replacements)) throw new Error(`Argumento desconhecido: ${name}`);
     return replacements[name];
   });
-  return [`-Xms1G`, `-Xmx${ram}G`, '-Dfile.encoding=UTF-8', ...[vanilla, neo].flatMap(version => argumentsOf(version, 'jvm', engine.platform).map(expand)),
+  return [`-Xms1G`, `-Xmx${ram}G`, '-Dfile.encoding=UTF-8', ...[vanilla, neo].flatMap(version => argumentsOf(version, 'jvm', engine.platform, engine.arch).map(expand)),
     `-DignoreList=client-extra,${VERSION}.jar,${MC}.jar`, neo.mainClass,
-    ...[vanilla, neo].flatMap(version => argumentsOf(version, 'game', engine.platform).map(expand))];
+    ...[vanilla, neo].flatMap(version => argumentsOf(version, 'game', engine.platform, engine.arch).map(expand))];
 }
 async function launch(engine, nickname, ram, account) {
   if (alive(engine.gameProcess)) throw new Error('O Minecraft já está aberto.');

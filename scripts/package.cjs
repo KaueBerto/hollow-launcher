@@ -25,6 +25,7 @@ const metadata = require('../package.json');
   zip.addLocalFile(path.join(root, 'docs', 'MENU.md'));
   zip.addLocalFile(path.join(root, 'docs', 'AVERONSYNC.md'));
   zip.addLocalFile(path.join(root, 'docs', 'ARCHITECTURE.md'));
+  zip.addLocalFile(path.join(root, 'docs', 'MACOS.md'));
   zip.addLocalFile(path.join(root, 'docs', 'minecraft-menu.png'));
   zip.addLocalFile(path.join(root, 'docs', 'PAISAGEM.md'));
   zip.addLocalFile(path.join(root, 'docs', 'landscape-selection.png'));

@@ -21,3 +21,24 @@ test('Discord uses Unix sockets on Linux and named pipes on Windows', () => {
   assert.equal(path.basename(socket), 'discord-ipc-0');
   assert.doesNotMatch(socket, /\\\\[.?]\\pipe/);
 });
+
+test('macOS supports Intel and Apple Silicon Java and Mojang rules', () => {
+  const intel = platformInfo('darwin', 'x64');
+  const apple = platformInfo('darwin', 'arm64');
+  assert.equal(intel.mojangName, 'osx');
+  assert.equal(intel.adoptiumName, 'mac');
+  assert.equal(intel.adoptiumArchitecture, 'x64');
+  assert.equal(apple.adoptiumArchitecture, 'aarch64');
+  assert.deepEqual(apple.extractedJavaHome, ['Contents', 'Home']);
+  assert.equal(apple.classpathSeparator, ':');
+  assert.match(apple.defaultRoot, /Library[\\/]Application Support[\\/]averon-launcher$/);
+  assert.equal(allowed({ rules: [{ action: 'allow', os: { name: 'osx', arch: 'x86_64' } }] }, '24.0', 'darwin', 'x64'), true);
+  assert.equal(allowed({ rules: [{ action: 'allow', os: { name: 'osx', arch: 'arm64' } }] }, '24.0', 'darwin', 'arm64'), true);
+  assert.equal(allowed({ rules: [{ action: 'allow', os: { name: 'windows' } }] }, '24.0', 'darwin', 'arm64'), false);
+  assert.equal(path.basename(defaultPipes('darwin')[0]), 'discord-ipc-0');
+});
+
+test('unsupported platform and architecture combinations are rejected', () => {
+  assert.throws(() => platformInfo('linux', 'arm64'), /64 bits/);
+  assert.throws(() => platformInfo('darwin', 'ia32'), /64 bits/);
+});

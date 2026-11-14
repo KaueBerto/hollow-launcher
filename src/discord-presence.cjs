@@ -7,6 +7,10 @@ const discordConfig = require('./discord-config.cjs');
 const MAX_FRAME = 64 * 1024;
 function defaultPipes(platform = process.platform) {
   if (platform === 'win32') return Array.from({ length: 10 }, (_, i) => `\\\\?\\pipe\\discord-ipc-${i}`);
+  if (platform === 'darwin') {
+    const roots = [process.env.TMPDIR, '/tmp', path.join(require('node:os').homedir(), 'Library', 'Application Support', 'discord')].filter(Boolean);
+    return roots.flatMap(directory => Array.from({ length: 10 }, (_, i) => path.join(directory, `discord-ipc-${i}`)));
+  }
   const directory = process.env.XDG_RUNTIME_DIR || process.env.TMPDIR || '/tmp';
   return Array.from({ length: 10 }, (_, i) => path.join(directory, `discord-ipc-${i}`));
 }

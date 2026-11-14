@@ -24,23 +24,24 @@ function validateOptions(options, { requireNickname = true, memory = memoryLimit
   }
   return { mode: options.mode, ram: options.ram, nickname: String(options.nickname || '').slice(0, 16), remember: Boolean(options.remember), landscape: options.landscape === true };
 }
-function allowed(node, systemVersion = os.release(), platform = process.platform) {
+function allowed(node, systemVersion = os.release(), platform = process.platform, arch = process.arch) {
   if (!node.rules) return true;
   let allow = false;
   for (const rule of node.rules) {
     const system = rule.os || {};
-    const name = platform === 'win32' ? 'windows' : platform;
-    let match = (!system.name || system.name === name) && (!system.arch || ['x86_64', 'amd64'].includes(system.arch));
+    const name = platform === 'win32' ? 'windows' : platform === 'darwin' ? 'osx' : platform;
+    const architectures = arch === 'arm64' ? ['arm64', 'aarch64'] : ['x86', 'x86_64', 'amd64', 'x64'];
+    let match = (!system.name || system.name === name) && (!system.arch || architectures.includes(system.arch));
     if (system.version && !new RegExp(system.version).test(systemVersion)) match = false;
     if (Object.values(rule.features || {}).some(Boolean)) match = false;
     if (match) allow = rule.action === 'allow';
   }
   return allow;
 }
-function argumentsOf(version, type, platform = process.platform) {
+function argumentsOf(version, type, platform = process.platform, arch = process.arch) {
   return (version.arguments?.[type] || []).flatMap(item => {
     if (typeof item === 'string') return [item];
-    if (!allowed(item, os.release(), platform)) return [];
+    if (!allowed(item, os.release(), platform, arch)) return [];
     return Array.isArray(item.value) ? item.value : [item.value];
   });
 }

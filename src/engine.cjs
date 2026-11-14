@@ -19,14 +19,15 @@ const { memoryLimits, clampRam } = require('./core/memory.cjs');
 const { platformInfo } = require('./platform.cjs');
 
 class Engine {
-  constructor({ root, assets, report = () => {}, platform = process.platform, totalMemory } = {}) {
-    this.system = platformInfo(platform);
+  constructor({ root, assets, report = () => {}, platform = process.platform, arch = process.arch, totalMemory } = {}) {
+    this.system = platformInfo(platform, arch);
     this.root = path.resolve(root || this.system.defaultRoot);
     this.game = path.join(this.root, 'game');
     this.java = path.join(this.root, 'runtime', 'bin', this.system.javaName);
     this.assets = assets;
     this.report = report;
     this.platform = platform;
+    this.arch = arch;
     this.gameProcess = null;
     this.memory = memoryLimits(totalMemory);
   }
@@ -73,7 +74,7 @@ class Engine {
     return (await this.hollowGamePids()).length > 0;
   }
   async hollowGamePids() {
-    if (this.platform === 'linux') {
+    if (this.platform === 'linux' || this.platform === 'darwin') {
       const { stdout } = await runFile('ps', ['-eo', 'pid=,args='], { timeout: 15000, maxBuffer: 4 * 1024 * 1024 });
       const rows = stdout.split(/\r?\n/).flatMap(line => {
         const match = line.trim().match(/^(\d+)\s+(.+)$/);

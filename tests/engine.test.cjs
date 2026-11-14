@@ -33,6 +33,17 @@ test('caminhos recusam travessia, raiz e caminhos absolutos', () => {
   for (const name of ['../outside', '..\\outside', '.', 'C:\\outside', '/outside']) assert.throws(() => under(directory, name));
   assert.equal(under(directory, 'assets/object'), path.join(directory, 'assets', 'object'));
 });
+test('extração nativa aceita bibliotecas de Windows, Linux e macOS', async () => fixture(async (engine, folder) => {
+  const archive = path.join(folder, 'natives.zip');
+  const zip = new AdmZip();
+  for (const name of ['native.dll', 'native.so', 'native.dylib', 'native.jnilib']) zip.addFile(`bin/${name}`, Buffer.from(name));
+  zip.addFile('bin/readme.txt', Buffer.from('ignore'));
+  zip.writeZip(archive);
+  const target = path.join(folder, 'native-output');
+  await extract(archive, target, true);
+  for (const name of ['native.dll', 'native.so', 'native.dylib', 'native.jnilib']) assert.equal(await fs.readFile(path.join(target, 'bin', name), 'utf8'), name);
+  await assert.rejects(fs.access(path.join(target, 'bin', 'readme.txt')));
+}));
 test('AveronSync fornecido preservado', async () => { const { SYNC_FILE } = require('../src/modpack-sync.cjs'); assert.equal(await hashFile(path.resolve(__dirname, '..', 'assets', SYNC_FILE), 'sha256'), MOD_HASH); });
 test('preferências da versão C# são migradas e nickname não lembrado é removido', async () => fixture(async engine => {
   await writeJson(path.join(engine.root, 'launcher-settings.json'), { mode: 1, nickname: 'Hollow', ram: 8, remember: true });

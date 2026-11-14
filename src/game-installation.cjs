@@ -24,9 +24,9 @@ async function installJava(engine) {
   // Never trust that single file: replace only the launcher-managed runtime.
   await fs.rm(path.join(engine.root, 'runtime'), { recursive: true, force: true });
   engine.progress('Baixando Java 21…');
-  const metadata = await engine.jsonFrom(`https://api.adoptium.net/v3/assets/latest/21/hotspot?architecture=x64&image_type=jre&os=${engine.system.adoptiumName}&vendor=eclipse`);
+  const metadata = await engine.jsonFrom(`https://api.adoptium.net/v3/assets/latest/21/hotspot?architecture=${engine.system.adoptiumArchitecture}&image_type=jre&os=${engine.system.adoptiumName}&vendor=eclipse`);
   const archive = metadata[0]?.binary?.package;
-  if (!archive?.link || !archive.checksum) throw new Error(`Não encontrei o Java 21 para ${engine.system.windows ? 'Windows' : 'Linux'}.`);
+  if (!archive?.link || !archive.checksum) throw new Error(`Não encontrei o Java 21 para ${engine.system.windows ? 'Windows' : engine.system.mac ? 'macOS' : 'Linux'}.`);
   const archiveFile = path.join(engine.root, 'downloads', engine.system.archiveName);
   await engine.download(archive.link, archiveFile, archive.checksum, 'sha256', (done, total) => engine.progress('Baixando Java 21…', done, total));
   engine.progress('Preparando Java 21…');
@@ -41,18 +41,19 @@ async function installJava(engine) {
   });
   for (const entry of await fs.readdir(staging, { withFileTypes: true })) {
     const source = under(staging, entry.name);
-    if (entry.isDirectory() && await exists(path.join(source, 'bin', engine.system.javaName))) {
+    const javaHome = path.join(source, ...engine.system.extractedJavaHome);
+    if (entry.isDirectory() && await exists(path.join(javaHome, 'bin', engine.system.javaName))) {
       const runtime = path.join(engine.root, 'runtime');
-      if (engine.system.windows) await copyTree(source, runtime);
+      if (engine.system.windows) await copyTree(javaHome, runtime);
       else {
         // Moving the extracted tree keeps Temurin's executable modes and
         // symlinks intact (notably the loader path used by libjli.so).
-        await fs.rename(source, runtime);
+        await fs.rename(javaHome, runtime);
         await fs.chmod(engine.java, 0o755);
       }
       if (!await javaWorks(engine)) {
         await fs.rm(runtime, { recursive: true, force: true });
-        throw new Error('O Java 21 baixado não conseguiu iniciar neste Linux.');
+        throw new Error(`O Java 21 baixado não conseguiu iniciar neste ${engine.system.mac ? 'Mac' : 'Linux'}.`);
       }
       return;
     }
@@ -60,7 +61,7 @@ async function installJava(engine) {
   throw new Error('O Java baixado está incompleto.');
 }
 async function libraries(engine, version) {
-  await workers((version.libraries || []).filter(library => allowed(library, undefined, engine.platform)), 6, async library => {
+  await workers((version.libraries || []).filter(library => allowed(library, undefined, engine.platform, engine.arch)), 6, async library => {
     const downloads = library.downloads || {};
     const artifact = downloads.artifact;
     if (artifact?.url) await engine.download(artifact.url, under(path.join(engine.game, 'libraries'), artifact.path), artifact.sha1);
@@ -95,7 +96,8 @@ async function ensureServerList(engine) {
   return true;
 }
 async function install(engine) {
-  if (!['win32', 'linux'].includes(engine.platform) || process.arch !== 'x64') throw new Error('Este launcher exige Windows ou Linux de 64 bits.');
+  const supported = ['win32', 'linux'].includes(engine.platform) ? engine.arch === 'x64' : engine.platform === 'darwin' && ['x64', 'arm64'].includes(engine.arch);
+  if (!supported) throw new Error('Este launcher exige Windows, Linux ou macOS de 64 bits.');
   await fs.mkdir(engine.game, { recursive: true });
   await engine.installJava();
   engine.progress('Preparando Minecraft 1.21.1…');
