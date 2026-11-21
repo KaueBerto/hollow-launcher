@@ -2,7 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const net = require('node:net');
-const { queryServer, ServerMonitor, varInt, readVarInt, packet } = require('../src/server-status.cjs');
+const { queryServer, queryServerAddress, ServerMonitor, varInt, readVarInt, packet } = require('../src/server-status.cjs');
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function fixture(accept, action) {
   const sockets = new Set();
@@ -33,6 +33,19 @@ test('consulta Java aceita pacotes fragmentados e mede pong sem expor MOTD', asy
   assert.equal(result.kind, 'online'); assert.equal(result.players, 3); assert.equal(result.maxPlayers, 100);
   assert.ok(result.ping >= 10); assert.ok(result.ping < 1000); assert.ok(result.checkedAt > 0);
   assert.equal('description' in result, false);
+}));
+test('endereço sem porta usa 25565 e resolve SRV para consultar jogadores', async () => fixture(fakeServer, async port => {
+  const result = await queryServerAddress('hollow.test', { resolver: async name => {
+    assert.equal(name, '_minecraft._tcp.hollow.test');
+    return [{ name: '127.0.0.1', port, priority: 0 }];
+  } });
+  assert.equal(result.kind, 'online');
+  assert.equal(result.players, 3);
+}));
+test('endereço com porta explícita consulta o servidor configurado', async () => fixture(fakeServer, async port => {
+  const result = await queryServerAddress('127.0.0.1:' + port);
+  assert.equal(result.kind, 'online');
+  assert.equal(result.players, 3);
 }));
 test('servidor com status mas sem pong continua online com ping desconhecido', async () => fixture(socket => fakeServer(socket, { pong: false }), async port => {
   const result = await queryServer({ host: '127.0.0.1', port, timeout: 100, useSrv: false });

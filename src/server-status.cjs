@@ -85,6 +85,10 @@ async function queryServer({ host, port = 25565, timeout = 5000, useSrv = true, 
     })().catch(() => finish());
   });
 }
+function queryServerAddress(address, options = {}) {
+  const [host, port = '25565'] = address.split(':');
+  return queryServer({ ...options, host, port: Number(port) });
+}
 class ServerMonitor {
   constructor({ query, report, visible = () => true, interval = 45000, cacheMs = 15000 }) {
     Object.assign(this, { query, report, visible, interval, cacheMs });
@@ -107,4 +111,4 @@ class ServerMonitor {
   }
   stop() { this.stopped = true; clearInterval(this.timer); }
 }
-module.exports = { queryServer, ServerMonitor, varInt, readVarInt, packet, handshake, statusData };
+module.exports = { queryServer, queryServerAddress, ServerMonitor, varInt, readVarInt, packet, handshake, statusData };

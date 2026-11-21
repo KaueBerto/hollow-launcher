@@ -5,7 +5,7 @@ const fs = require('node:fs/promises');
 const { Engine, SERVER } = require('./engine.cjs');
 const { GameWindow } = require('./game-window.cjs');
 const { MicrosoftAuth } = require('./microsoft-auth.cjs');
-const { queryServer, ServerMonitor } = require('./server-status.cjs');
+const { queryServerAddress, ServerMonitor } = require('./server-status.cjs');
 const { DiscordPresence } = require('./discord-presence.cjs');
 const discordConfig = require('./discord-config.cjs');
 const { LauncherUpdate } = require('./launcher-update.cjs');
@@ -93,7 +93,7 @@ app.whenReady().then(async () => {
   });
   window.on('minimize', () => window.webContents.send('launcher:animation', false));
   window.on('restore', () => window.webContents.send('launcher:animation', true));
-  serverMonitor = new ServerMonitor({ query: () => { const [host, port] = SERVER.split(':'); return queryServer({ host, port: Number(port) }); }, report: server => publish({ server }), visible: () => window && !window.isDestroyed() && window.isVisible() && !window.isMinimized() });
+  serverMonitor = new ServerMonitor({ query: () => queryServerAddress(SERVER), report: server => publish({ server }), visible: () => window && !window.isDestroyed() && window.isVisible() && !window.isMinimized() });
   window.on('show', () => { if (!smoke) serverMonitor.refresh(); });
   window.on('restore', () => { if (!smoke) serverMonitor.refresh(); });
   if (!smoke) {
