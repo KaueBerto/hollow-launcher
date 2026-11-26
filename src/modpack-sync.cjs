@@ -9,8 +9,8 @@ const AdmZip = require('adm-zip');
 const { exists, hashFile, writeJson } = require('./core/files.cjs');
 const { prepareModpack } = require('./modpack-preflight.cjs');
 
-const SYNC_FILE = 'averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.48.jar';
-const SYNC_HASH = '24469fc598b9e0e12538a6a0069338138584b6b111d8e32b7e8e3228846db5be';
+const SYNC_FILE = 'averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.49.jar';
+const SYNC_HASH = '0f1a4fc66adfe36469fba759b01d6f50f2208b2564521e38a6fb58d9038b0b22';
 const runFile = promisify(execFile);
 
 async function noLinks(root, destination) {

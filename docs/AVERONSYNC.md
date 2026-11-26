@@ -1,8 +1,8 @@
 # AveronSync no launcher
 
-O launcher 2.9.16 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.48.jar`, sem alterações.
+O launcher 2.9.17 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.49.jar`, sem alterações.
 
-SHA-256: `24469fc598b9e0e12538a6a0069338138584b6b111d8e32b7e8e3228846db5be`.
+SHA-256: `0f1a4fc66adfe36469fba759b01d6f50f2208b2564521e38a6fb58d9038b0b22`.
 
 O fork mantém os IDs `automodpack` e `automodpack_mod`. Por isso, não pode coexistir com o AutoModpack original. A integração identifica o ID nos metadados NeoForge, inclusive se alguém renomear o JAR, e preserva uma cópia antes de retirá-lo de `mods`.
 
@@ -22,7 +22,7 @@ O servidor precisa usar o protocolo compatível com esse fork. A integração no
 
 ## Código correspondente
 
-O arquivo `vendor/averonsync/AveronSync-0.48-source.zip` contém os fontes correspondentes desta versão, incluindo Gradle, instruções de compilação, licenças, fila VIP e starter kits do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
+O arquivo `vendor/averonsync/AveronSync-0.49-source.zip` contém os fontes correspondentes desta versão, incluindo Gradle, instruções de compilação, licenças, fila VIP e starter kits do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
 
 ## AveronSync 0.11 / launcher 2.8.4
 
@@ -57,3 +57,11 @@ Deslocamento horizontal do cavalo em 50% da velocidade anterior: trote aproximad
 ## AveronSync 0.32 / launcher 2.9.9
 
 O cavalo relincha ao apito, chega trotando e desacelera perto do dono. Monte com o botão direito. O vínculo aparece no menu G e dá +10% e +20% de velocidade em estradas após 5 e 15 minutos de deslocamento montado. Cavalo e cavaleiro recebem dano de queda separadamente. Se o cavalo morrer, `/cavalo apito` entrega um novo apito. Com Better Third Person instalado, esta montaria usa a câmera padrão do Minecraft.
+
+## AveronSync 0.49 / launcher 2.9.17
+
+- Animações de entrada e saída (EliteAnimations v1, Halloween): cinco temas, `/animacao` para escolher, testar ou desligar. O tamanho acompanha a raça do AveronOrigins (`minecraft:scale`).
+- VIP nível 2: `/async vip add <nick> 2`. Tem a Possessão do Boneco como animação padrão e mais três pets (Cerejeira, Profundezas sombrias, Portal do Nether), seis no total.
+- Parro (DepartmentQDE x Mister Spooky): pet e montaria dados por `/async parro dar <jogador>`, chamados pela aba Parro do menu G ou `/parro`. Sobe de nível, ataca mobs (nunca jogadores), vira montaria com sela, salta e plana.
+
+Os canais de rede mudaram (`averonsync-mount-menu-6`, `averonsync-entrance-1`, `averonsync-parro-1`). Cliente e servidor precisam executar 0.49. Instalar o JAR na VPS exige reiniciar o Minecraft dela. Não foi testado no jogo antes desta release.

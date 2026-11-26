@@ -1,0 +1,6 @@
+Parro companion and saddled mount models, textures and icon imported from the owner's purchased
+"Parro Pet - Mister Spooky v1.0.1.zip", a collaboration between Department of Questionably
+Designed Entities (DepartmentQDE / DQDE) and Mister Spooky. https://x.com/DepartmentQDE
+These assets remain subject to the original authors' terms. They are not
+relicensed under AveronSync's source-code license. Generated artwork is excluded
+from source publication. No MCPets, MythicMobs or ModelEngine plugin code is executed.

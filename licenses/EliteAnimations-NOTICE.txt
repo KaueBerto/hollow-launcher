@@ -1,0 +1,5 @@
+Join/leave animation models, textures and sounds imported from the owner's purchased
+eliteanimations-v1-halloween_edition.zip (EliteAnimations v1 - Halloween Edition).
+These assets remain subject to the original author's terms. They are not
+relicensed under AveronSync's source-code license. Generated artwork is excluded
+from source publication. No AnimationsCore, MythicMobs or ModelEngine plugin code is executed.

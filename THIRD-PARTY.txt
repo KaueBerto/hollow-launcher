@@ -1,11 +1,11 @@
 Este launcher é um projeto independente do AVERON SMP.
 
-AveronSync 4.0.6-averonsync.0.48
+AveronSync 4.0.6-averonsync.0.49
 Fork do AutoModpack 4.0.6, por Skidam; modificações por AveronSync contributors.
 Licença LGPL-3.0; avisos originais preservados no JAR fornecido.
 Fontes correspondentes completos, instruções e avisos do fork:
-licenses/AveronSync-0.48-source.zip no instalador e no ZIP de distribuição;
-vendor/averonsync/AveronSync-0.48-source.zip no repositório do launcher.
+licenses/AveronSync-0.49-source.zip no instalador e no ZIP de distribuição;
+vendor/averonsync/AveronSync-0.49-source.zip no repositório do launcher.
 Upstream: https://github.com/Skidamek/AutoModpack/tree/v4.0.6
 O JAR é copiado separadamente para mods. Não foi modificado pelo launcher.
 
@@ -79,3 +79,9 @@ Essas artes não estão sob LGPL e não integram o arquivo de fontes do programa
 
 LittleRoom: cavalo castanho, apito, texturas e sons no JAR AveronSync.
 Direitos e créditos em licenses/LittleRoom-NOTICE.txt; artes excluídas das fontes LGPL.
+
+EliteAnimations v1 (Halloween Edition): modelos, texturas e sons das animações de entrada e saída no JAR AveronSync.
+Direitos e créditos em licenses/EliteAnimations-NOTICE.txt; artes excluídas das fontes LGPL.
+
+Parro Pet (DepartmentQDE x Mister Spooky): modelos, texturas e ícone do Parro no JAR AveronSync.
+Direitos e créditos em licenses/Parro-NOTICE.txt; artes excluídas das fontes LGPL.
