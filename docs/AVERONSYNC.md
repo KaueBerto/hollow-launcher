@@ -1,8 +1,8 @@
 # AveronSync no launcher
 
-O launcher 2.9.18 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.50.jar`, sem alterações.
+O launcher 2.9.19 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.51.jar`, sem alterações.
 
-SHA-256: `178c5e6a277775c35ce751cf7f5f5463703d08e1eff132ecc1c59708b088c9d8`.
+SHA-256: `0ed44c100adadc33c53e4b5b0d2e8daa1bef9486f75d8c7f236224ec24648714`.
 
 O fork mantém os IDs `automodpack` e `automodpack_mod`. Por isso, não pode coexistir com o AutoModpack original. A integração identifica o ID nos metadados NeoForge, inclusive se alguém renomear o JAR, e preserva uma cópia antes de retirá-lo de `mods`.
 
@@ -22,7 +22,7 @@ O servidor precisa usar o protocolo compatível com esse fork. A integração no
 
 ## Código correspondente
 
-O arquivo `vendor/averonsync/AveronSync-0.50-source.zip` contém os fontes correspondentes desta versão, incluindo Gradle, instruções de compilação, licenças, fila VIP e starter kits do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
+O arquivo `vendor/averonsync/AveronSync-0.51-source.zip` contém os fontes correspondentes desta versão, incluindo Gradle, instruções de compilação, licenças, fila VIP e starter kits do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
 
 ## AveronSync 0.11 / launcher 2.8.4
 
@@ -74,3 +74,12 @@ Os canais de rede mudaram (`averonsync-mount-menu-6`, `averonsync-entrance-1`, `
 - Montarias andam mais devagar em servidor dedicado sobrecarregado (abaixo de 20 TPS, até 60% em 10 TPS).
 
 Cliente e servidor precisam executar 0.50. Instalar o JAR na VPS exige reiniciar o Minecraft dela.
+
+## AveronSync 0.51 / launcher 2.9.19
+
+- VIP por código: `/averon codigo <codigo>` ativa o VIP por 30 dias e entrega o kit na hora; renovar com outro código entrega o kit de novo. Admin: `/async vip codigo gerar|contar|revogar` e `/async vip kit verificar`. Códigos ficam só como hash em `automodpack/averonsync-vip-codes.json`.
+- Kits em `config/averonsync-vip-kits.json` (criado com exemplo na primeira vez), um nível por lista de itens. Kit que não cabe no inventário fica guardado e sai com `/kitvip`. O Starter Kit não é mais necessário.
+- Cavalo: pelagens Preto e Alazão para VIP 1; Palomino e Pampa também para VIP 2. Vínculo por maçãs (10 níveis, até +15% de velocidade).
+- Parro: vínculo de 10 níveis (30 minutos entre sementes), jogador montado grudado na sela, giro mais rápido.
+
+Cliente e servidor precisam executar 0.51. Instalar o JAR na VPS exige reiniciar o Minecraft dela.
