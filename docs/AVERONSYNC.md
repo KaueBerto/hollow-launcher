@@ -1,8 +1,8 @@
 # AveronSync no launcher
 
-O launcher 2.9.17 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.49.jar`, sem alterações.
+O launcher 2.9.18 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.50.jar`, sem alterações.
 
-SHA-256: `0f1a4fc66adfe36469fba759b01d6f50f2208b2564521e38a6fb58d9038b0b22`.
+SHA-256: `178c5e6a277775c35ce751cf7f5f5463703d08e1eff132ecc1c59708b088c9d8`.
 
 O fork mantém os IDs `automodpack` e `automodpack_mod`. Por isso, não pode coexistir com o AutoModpack original. A integração identifica o ID nos metadados NeoForge, inclusive se alguém renomear o JAR, e preserva uma cópia antes de retirá-lo de `mods`.
 
@@ -22,7 +22,7 @@ O servidor precisa usar o protocolo compatível com esse fork. A integração no
 
 ## Código correspondente
 
-O arquivo `vendor/averonsync/AveronSync-0.49-source.zip` contém os fontes correspondentes desta versão, incluindo Gradle, instruções de compilação, licenças, fila VIP e starter kits do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
+O arquivo `vendor/averonsync/AveronSync-0.50-source.zip` contém os fontes correspondentes desta versão, incluindo Gradle, instruções de compilação, licenças, fila VIP e starter kits do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
 
 ## AveronSync 0.11 / launcher 2.8.4
 
@@ -65,3 +65,12 @@ O cavalo relincha ao apito, chega trotando e desacelera perto do dono. Monte com
 - Parro (DepartmentQDE x Mister Spooky): pet e montaria dados por `/async parro dar <jogador>`, chamados pela aba Parro do menu G ou `/parro`. Sobe de nível, ataca mobs (nunca jogadores), vira montaria com sela, salta e plana.
 
 Os canais de rede mudaram (`averonsync-mount-menu-6`, `averonsync-entrance-1`, `averonsync-parro-1`). Cliente e servidor precisam executar 0.49. Instalar o JAR na VPS exige reiniciar o Minecraft dela. Não foi testado no jogo antes desta release.
+
+## AveronSync 0.50 / launcher 2.9.18
+
+- Parro: vínculo por sementes no lugar do XP de combate (10 níveis, de 12,5 a 17 blocos/s e até 40% maior), animações corrigidas (sinais do Blockbench 5, transições entre estados, estados de ar em loop), cauda com física de segmentos, controle montado como o cavalo (A/D viram) e degrau de 1 bloco com sela.
+- Comandos de admin também em `/parro dar|remover|info <jogador>` (OP 2). Em singleplayer e LAN, o Parro é liberado sozinho, o login não é exigido e `/async` funciona com OP 3.
+- Animações de entrada: quem ainda não logou e vai ter animação fica invisível para os outros até ela começar (canal `averonsync-entrance-2`).
+- Montarias andam mais devagar em servidor dedicado sobrecarregado (abaixo de 20 TPS, até 60% em 10 TPS).
+
+Cliente e servidor precisam executar 0.50. Instalar o JAR na VPS exige reiniciar o Minecraft dela.
