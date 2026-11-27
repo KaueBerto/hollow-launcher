@@ -17,3 +17,9 @@ node scripts/prepare-profile-defaults.cjs "$env:LOCALAPPDATA\HollowSMP\game" ass
 ```
 
 Depois, revise o manifesto, execute os testes e publique uma nova versão do launcher. A alteração do hash gera um novo identificador do preset, mas continua preenchendo apenas arquivos ausentes.
+
+## Teclas e Simple Voice Distance (launcher 2.9.25)
+
+O preset passou a incluir as teclas de atalho atuais do responsável pelo servidor (somente as linhas `key_*` de `options.txt`: 13 teclas alteradas e 13 de mods que faltavam, como o painel de montarias, o ciclo de modo de voz do Simple Voice Distance e o treechop) e o `config/simplevoicedistanceneoforge/client.toml`, do addon Simple Voice Distance.
+
+Vídeo, recursos, volume, microfone e demais opções do preset continuam como estavam; nada do Simple Voice Chat em si (microfone, volumes, mudo) é distribuído. Como em todo o preset, os arquivos só são criados quando ainda não existem: **quem já instalou o launcher mantém as próprias teclas e configurações**. A distância da voz propriamente dita (`max_voice_distance`) é uma configuração do servidor e não vem do launcher.

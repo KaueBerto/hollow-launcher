@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "id": "averon-profile-945880fc5d3f",
+  "id": "averon-profile-baec003edd69",
   "minecraft": "1.21.1",
   "archive": {
     "file": "profile-defaults.zip",
-    "size": 824473,
-    "sha256": "fad2d3331297239aa4a20c8294bcf18ac39b09e4911ff7d241265fb3e1c75faa"
+    "size": 825099,
+    "sha256": "14268c5cc264a5dc245a702beb4762c323b8530ff551d7611fdbeeab8d0ca2ba"
   },
   "enforcedFiles": [
     "config/emf_compat.json",
@@ -4715,6 +4715,11 @@
       "sha256": "7a40d316646f95ce8f14a53584eb0bfa603833d45fd63695d15e2c4d3045ecd1"
     },
     {
+      "path": "config/simplevoicedistanceneoforge/client.toml",
+      "size": 707,
+      "sha256": "c2ade982ed878e6122a38cd755706f32cc6aeb933317c435073879cce549fcc4"
+    },
+    {
       "path": "config/simplyswords/compatibility.toml",
       "size": 11974,
       "sha256": "e7a5c5756ccadd5d968049a8820c83dce700d7d478a843385688d38d135a9217"
@@ -5591,8 +5596,8 @@
     },
     {
       "path": "options.txt",
-      "size": 12905,
-      "sha256": "1ddab4be8a2aa98bf68f509f8451c010aa5b3043d969ae287b3b49828b1d4a0a"
+      "size": 13288,
+      "sha256": "6903c7cc4dd925732da75a691daf1d1720f9ae5d2bcd64110e1e7188326bcb26"
     }
   ]
 }
