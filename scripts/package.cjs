@@ -31,7 +31,7 @@ const metadata = require('../package.json');
   zip.addLocalFile(path.join(root, 'docs', 'landscape-selection.png'));
   zip.addLocalFile(path.join(root, 'THIRD-PARTY.txt'));
   zip.addLocalFolder(path.join(root, 'licenses'), 'licenses');
-  zip.addLocalFile(path.join(root, 'vendor/averonsync/AveronSync-0.57-source.zip'), 'licenses');
+  zip.addLocalFile(path.join(root, 'vendor/averonsync/AveronSync-0.58-source.zip'), 'licenses');
   zip.addLocalFolder(path.join(root, 'java', 'preflight'), 'preflight-source');
   // electron-builder may keep the runtime only in win-unpacked after packaging.
   const electronLicense = await firstExisting([

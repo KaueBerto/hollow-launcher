@@ -1,8 +1,8 @@
 # AveronSync no launcher
 
-O launcher 2.9.23 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.57.jar`, sem alterações.
+O launcher 2.9.24 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.58.jar`, sem alterações.
 
-SHA-256: `fb7d88531bf1351af866638a47c051c13c5c5e08e436d1b63eda00ff67bb3b52`.
+SHA-256: `8433ea98ce1d08bfbd78957576e5f45a41e132cd82cfc4416a9e70a8bb54e4ac`.
 
 O fork mantém os IDs `automodpack` e `automodpack_mod`. Por isso, não pode coexistir com o AutoModpack original. A integração identifica o ID nos metadados NeoForge, inclusive se alguém renomear o JAR, e preserva uma cópia antes de retirá-lo de `mods`.
 
@@ -22,7 +22,7 @@ O servidor precisa usar o protocolo compatível com esse fork. A integração no
 
 ## Código correspondente
 
-O arquivo `vendor/averonsync/AveronSync-0.57-source.zip` contém os fontes correspondentes desta versão, incluindo Gradle, instruções de compilação, licenças, fila VIP e starter kits do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
+O arquivo `vendor/averonsync/AveronSync-0.58-source.zip` contém os fontes correspondentes desta versão, incluindo Gradle, instruções de compilação, licenças, fila VIP e starter kits do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
 
 ## AveronSync 0.11 / launcher 2.8.4
 
@@ -109,3 +109,9 @@ Cliente e servidor precisam executar 0.56. Instalar o JAR na VPS exige reiniciar
 - Correção: `/averon codigo <codigo>` agora funciona para qualquer jogador. Outros mods registram a raiz `/averon` como "somente OP" e o primeiro registro decidia quem a enxergava, o que escondia o comando dos jogadores. O mod registra o subcomando por último, mantém os demais subcomandos de `/averon` como estavam e abre só o `codigo`.
 
 Cliente e servidor precisam executar 0.57. Instalar o JAR na VPS exige reiniciar o Minecraft dela.
+
+## AveronSync 0.58 / launcher 2.9.24
+
+- Admin: `/async inv vip <nivel>` salva os 36 slots do inventário do admin como o kit desse nível em `config/averonsync-vip-kits.json`, mantendo o outro nível e uma cópia `.bak` do arquivo anterior. Armadura e mão secundária não entram.
+
+Cliente e servidor precisam executar 0.58. Instalar o JAR na VPS exige reiniciar o Minecraft dela.
