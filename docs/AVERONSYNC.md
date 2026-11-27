@@ -1,8 +1,8 @@
 # AveronSync no launcher
 
-O launcher 2.9.20 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.52.jar`, sem alterações.
+O launcher 2.9.21 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.55.jar`, sem alterações.
 
-SHA-256: `d8e73df25e0fa88a26f8eb3bbfc75fb20166cfe6604ab7948f481cde3de4f8da`.
+SHA-256: `b0bcb8593b9e07198883e1889a6c115c55597ef665cca82054f7926cb4075791`.
 
 O fork mantém os IDs `automodpack` e `automodpack_mod`. Por isso, não pode coexistir com o AutoModpack original. A integração identifica o ID nos metadados NeoForge, inclusive se alguém renomear o JAR, e preserva uma cópia antes de retirá-lo de `mods`.
 
@@ -22,7 +22,7 @@ O servidor precisa usar o protocolo compatível com esse fork. A integração no
 
 ## Código correspondente
 
-O arquivo `vendor/averonsync/AveronSync-0.52-source.zip` contém os fontes correspondentes desta versão, incluindo Gradle, instruções de compilação, licenças, fila VIP e starter kits do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
+O arquivo `vendor/averonsync/AveronSync-0.55-source.zip` contém os fontes correspondentes desta versão, incluindo Gradle, instruções de compilação, licenças, fila VIP e starter kits do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
 
 ## AveronSync 0.11 / launcher 2.8.4
 
@@ -89,3 +89,11 @@ Cliente e servidor precisam executar 0.51. Instalar o JAR na VPS exige reiniciar
 - Mensagens de entrada em português: launcher desatualizado, arquivos do jogo desatualizados, servidor em atualização, mod ausente e modpack em preparo agora dizem ao jogador o que fazer (abrir o Averon Launcher). O texto vem do servidor, então vale também para launchers antigos quando a VPS roda 0.52.
 
 Cliente e servidor precisam executar 0.52. Instalar o JAR na VPS exige reiniciar o Minecraft dela.
+
+## AveronSync 0.55 / launcher 2.9.21
+
+- TAB: `[VIP]` antes do nome para VIP 1 e VIP 2; VIP 1 azul claro e VIP 2 laranja. A lista fica em ordem VIP 2, VIP 1 e demais, cada grupo alfabético (o cliente reordena lendo a tag e a cor).
+- Códigos VIP: os códigos gerados por `/async vip codigo gerar` aparecem mesmo com `sendCommandFeedback` desligado e copiam com um clique. As mensagens de VIP ativado e de `/kitvip` também aparecem sempre.
+- Fila de entrada: o tempo máximo de espera padrão subiu de 10 para 30 minutos (`entryQueue.maxWaitSeconds`, 1800). Servidores com o valor já gravado no `automodpack-server.json` precisam editar esse campo.
+
+Cliente e servidor precisam executar 0.55. Instalar o JAR na VPS exige reiniciar o Minecraft dela.
