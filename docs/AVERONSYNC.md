@@ -1,8 +1,8 @@
 # AveronSync no launcher
 
-O launcher 2.9.21 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.55.jar`, sem alterações.
+O launcher 2.9.22 instala o JAR fornecido `averonsync-mc1.21.1-neoforge-4.0.6-averonsync.0.56.jar`, sem alterações.
 
-SHA-256: `b0bcb8593b9e07198883e1889a6c115c55597ef665cca82054f7926cb4075791`.
+SHA-256: `3320b2e68ddbed8a2a5ca6de00c708d9feabe255bdb2fb83dbe4af2a679a33f3`.
 
 O fork mantém os IDs `automodpack` e `automodpack_mod`. Por isso, não pode coexistir com o AutoModpack original. A integração identifica o ID nos metadados NeoForge, inclusive se alguém renomear o JAR, e preserva uma cópia antes de retirá-lo de `mods`.
 
@@ -22,7 +22,7 @@ O servidor precisa usar o protocolo compatível com esse fork. A integração no
 
 ## Código correspondente
 
-O arquivo `vendor/averonsync/AveronSync-0.55-source.zip` contém os fontes correspondentes desta versão, incluindo Gradle, instruções de compilação, licenças, fila VIP e starter kits do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
+O arquivo `vendor/averonsync/AveronSync-0.56-source.zip` contém os fontes correspondentes desta versão, incluindo Gradle, instruções de compilação, licenças, fila VIP e starter kits do fork. Ele acompanha o instalador em `resources/licenses` e o ZIP de distribuição em `licenses`. O AutoModpack 5.x e a ponte Java permanecem apenas como dependências da migração antiga.
 
 ## AveronSync 0.11 / launcher 2.8.4
 
@@ -97,3 +97,9 @@ Cliente e servidor precisam executar 0.52. Instalar o JAR na VPS exige reiniciar
 - Fila de entrada: o tempo máximo de espera padrão subiu de 10 para 30 minutos (`entryQueue.maxWaitSeconds`, 1800). Servidores com o valor já gravado no `automodpack-server.json` precisam editar esse campo.
 
 Cliente e servidor precisam executar 0.55. Instalar o JAR na VPS exige reiniciar o Minecraft dela.
+
+## AveronSync 0.56 / launcher 2.9.22
+
+- Fila de entrada inteligente: `maxConcurrentAdmissions` (padrão 2) é o máximo de jogadores entrando ao mesmo tempo enquanto o servidor está saudável; com o tempo médio do tick acima de 35 ms a fila volta a admitir um por vez. O intervalo entre admissões continua valendo. Servidores com o valor já gravado no `automodpack-server.json` precisam editar o campo.
+
+Cliente e servidor precisam executar 0.56. Instalar o JAR na VPS exige reiniciar o Minecraft dela.
